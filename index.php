@@ -6,7 +6,7 @@
 require_once 'config/db.php';
 // Fetch questions from the database
 try {
-  $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+  $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $usernameDB, $passwordDB);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   $stmt = $pdo->query("SELECT text FROM questions ORDER BY id ASC");
   $questions = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -39,7 +39,7 @@ try {
 <body>
   <div class="container">
     <h2 class="mb-4">Sistema de avaliação de tarefas de usabilidade</h2>
-    <div id="progress" class="mb-3">Perguntas <span id="current-num">1</span> de <span id="total-num"><?= count($questions) ?></span></div>
+    <div id="progress" class="mb-3">Perguntas <span id="current-num">1</span> de <span id="total-num"><?php echo count($questions) ?></span></div>
 
     <div id="question-container">
       <h4 id="question-text" class="question-text"></h4>
@@ -65,7 +65,7 @@ try {
   </div>
 
   <script>
-    const questions = <?= json_encode($questions) ?>;
+    const questions = <?php echo json_encode($questions) ?>;
     let currentQuestion = 0;
     let responses = [];
     let questionStartTime;
