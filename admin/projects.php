@@ -19,11 +19,48 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $message = null;
+    if (isset($_SESSION['message'])) {
+        $message = $_SESSION['message'];
+        unset($_SESSION['message']); // Remove it so it only shows once
+    }
 
     // CREATE a new test (automatically sets created_at)
     if (isset($_POST['new_test']) && !empty($_POST['test_title'])) {
+        $testTitle = $_POST['test_title'];
+        $testDescription = $_POST['test_description'] ?? '';
+    
+        // Step 1: Insert test without image first to get the ID
         $stmt = $pdo->prepare("INSERT INTO tests (title, description) VALUES (?, ?)");
-        $stmt->execute([$_POST['test_title'], $_POST['test_description'] ?? '']);
+        $stmt->execute([$testTitle, $testDescription]);
+    
+        $testId = $pdo->lastInsertId();
+    
+        $layoutImageName = null;
+    
+        // Step 2: If image was uploaded, process it
+        if (isset($_FILES['layout_image']) && $_FILES['layout_image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/layouts/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+    
+            $fileTmpPath = $_FILES['layout_image']['tmp_name'];
+            $fileExt = pathinfo($_FILES['layout_image']['name'], PATHINFO_EXTENSION);
+    
+            // Step 3: Sanitize title for filename
+            $safeTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($testTitle));
+            $newFileName = "layout_{$testId}_{$safeTitle}." . $fileExt;
+            $destPath = $uploadDir . $newFileName;
+    
+            if (move_uploaded_file($fileTmpPath, $destPath)) {
+                $layoutImageName = $newFileName;
+    
+                // Step 4: Update test row with the image filename
+                $stmt = $pdo->prepare("UPDATE tests SET layout_image = ? WHERE id = ?");
+                $stmt->execute([$layoutImageName, $testId]);
+            }
+        }
+    
         $message = "New project created!";
     }
 
@@ -49,7 +86,7 @@ try {
     // FETCH tests with created_at date
     if ($_SESSION['is_admin']) {
         $stmt = $pdo->query("SELECT * FROM tests ORDER BY id DESC");
-        $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
         $stmt = $pdo->prepare(
             "
@@ -60,7 +97,7 @@ try {
         "
         );
         $stmt->execute(['mod_id' => $_SESSION['moderator_id']]);
-        $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 } catch (PDOException $e) {
@@ -71,7 +108,7 @@ try {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Usabio Admin - <?php echo htmlspecialchars($theProject['title']) ?> / Manage Tasks</title>
+    <title>Usabio Admin - Projects</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/styles.css">
 </head>
@@ -104,110 +141,74 @@ try {
 <div class="container mt-5">
     <h2>Projects</h2>
 
-    <?php if ($message) { ?>
-        <div class="alert alert-success"><?php echo htmlspecialchars($message) ?></div>
-    <?php } ?>
+    <a href="new-project.php" class="btn btn-primary mb-3">Create a new Project</a>
+   
+    <?php if ($message): ?>
+    <div class="alert alert-success">
+        <?php echo htmlspecialchars($message); ?>
+    </div>
+    <?php endif; ?>
 
-    <!-- Create Project Form -->
-    <form method="post" class="mb-4">
-        <h5>Create New Project</h5>
-        <div class="form-row">
-            <div class="col">
-                <input type="text" name="test_title" class="form-control" placeholder="Project title" required>
-            </div>
-            <div class="col">
-                <input type="text" name="test_description" class="form-control" placeholder="Description (optional)">
-            </div>
-            <div class="col-auto">
-                <button type="submit" name="new_test" class="btn btn-primary">Create</button>
-            </div>
-        </div>
-    </form>
+   
 
     <!-- List Existing Projects -->
     <h5>Existing Projects</h5>
     <ul class="list-group">
-        <?php foreach ($tests as $t): ?>
+        <?php foreach ($projects as $project): ?>
             <li class="list-group-item">
                 <div class="d-flex justify-content-between align-items-center">
                     
                     <div>
-                        <strong>#<?php echo $t['id'] ?>:</strong> 
-                        <span id="title<?php echo $t['id'] ?>">
-                            <?php echo htmlspecialchars($t['title']) ?>
+                        <strong>#<?php echo $project['id'] ?>:</strong> 
+                        <span id="title<?php echo $project['id'] ?>">
+                            <?php echo htmlspecialchars($project['title']) ?>
                         </span>
                         <br>
                         <small>
-                            Created on: <?php echo date("Y-m-d H:i", strtotime($t['created_at'])) ?>
+                            Created on: <?php echo date("Y-m-d H:i", strtotime($project['created_at'])) ?>
                         </small>
-                        <?php if (!empty($t['description'])) : ?>
-                            <br><small><?php echo htmlspecialchars($t['description']) ?></small>
-                        <?php endif; ?>
+                        <?php if (!empty($project['description'])) { ?>
+                            <br><small><?php echo htmlspecialchars($project['description']) ?></small>
+                        <?php } ?>
+                        <?php if (!empty($project['layout_image'])) {?>
+                            <br>
+                            <a href="uploads/layouts/<?php echo htmlspecialchars($project['layout_image']) ?>" target="_blank"><img src="uploads/layouts/<?php echo htmlspecialchars($project['layout_image']) ?>" alt="Layout Image" class="img-thumbnail" style="max-width: 100px;"></a>
+                        <?php } ?>
                     </div>
-                    <div>
-                        <!-- Results -->
-                        <a href="view-results.php?test_id=<?php echo $t['id'] ?>" class="btn btn-sm btn-primary">Results</a>
-                    </div>
-
-                    <div>
-                        <!-- Start test -->
-                        <a href="start-test.php?test_id=<?php echo $t['id'] ?>" class="btn btn-lg btn-success">Start test</a>
-                    </div>
-
+                 
                     <div>
                      
                         <!-- Manage Tasks -->
-                        <a href="manage-tasks.php?test_id=<?php echo $t['id'] ?>" class="btn btn-sm btn-secondary">Manage Tasks</a>
+                        <a href="manage-tasks.php?test_id=<?php echo $project['id'] ?>" class="btn btn-sm btn-secondary">Manage Tasks</a>
 
                         <!-- Manage Questions -->
-                        <a href="manage-questions.php?test_id=<?php echo $t['id'] ?>" class="btn btn-sm btn-info">Manage Questions</a>
+                        <a href="manage-questions.php?test_id=<?php echo $project['id'] ?>" class="btn btn-sm btn-info">Manage Questions</a>
 
                         <!-- Edit Button -->
-                        <button class="btn btn-sm btn-warning" 
-                                onclick="showEditForm(<?php echo $t['id'] ?>, '<?php echo htmlspecialchars($t['title'], ENT_QUOTES) ?>', '<?php echo htmlspecialchars($t['description'], ENT_QUOTES) ?>')">
-                            Edit
-                        </button>
+                     
+                        <a href="edit-project.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-warning">Edit</a>
 
                         <!-- Delete Form -->
-                        <form method="post" class="d-inline" onsubmit="return confirm('Delete project #<?php echo $t['id'] ?>?')">
-                            <input type="hidden" name="delete_test_id" value="<?php echo $t['id'] ?>">
+                        <form method="post" class="d-inline" onsubmit="return confirm('Delete project #<?php echo $project['id'] ?>?')">
+                            <input type="hidden" name="delete_test_id" value="<?php echo $project['id'] ?>">
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                         </form>
+
+                    </div>
+                    <div>
+                    <a href="view-results.php?test_id=<?php echo $project['id'] ?>" class="btn btn-lg btn-primary">Results</a>
+               
+                    <!-- Start test -->
+                        <a href="start-test.php?test_id=<?php echo $project['id'] ?>" class="btn btn-lg btn-success">Start test</a>
                     </div>
                 </div>
 
-                <!-- Hidden Edit Form -->
-                <div class="mt-2 hidden" id="editForm<?php echo $t['id'] ?>">
-                    <form method="post" class="form-inline">
-                        <input type="hidden" name="edit_test_id" value="<?php echo $t['id'] ?>">
-                        <div class="form-group mb-2 mr-2">
-                            <label for="editTestTitle<?php echo $t['id'] ?>" class="sr-only">Title</label>
-                            <input type="text" class="form-control" name="edit_test_title" id="editTestTitle<?php echo $t['id'] ?>" required>
-                        </div>
-                        <div class="form-group mb-2 mr-2">
-                            <label for="editTestDesc<?php echo $t['id'] ?>" class="sr-only">Description</label>
-                            <input type="text" class="form-control" name="edit_test_description" id="editTestDesc<?php echo $t['id'] ?>">
-                        </div>
-                        <button type="submit" class="btn btn-success mb-2 mr-2">Save</button>
-                        <button type="button" class="btn btn-secondary mb-2" onclick="hideEditForm(<?php echo $t['id'] ?>)">Cancel</button>
-                    </form>
-                </div>
             </li>
         <?php endforeach; ?>
     </ul>
 </div>
 
-<script>
-function showEditForm(id, title, description) {
-  document.getElementById('editForm' + id).classList.remove('hidden');
-  document.getElementById('editTestTitle' + id).value = title;
-  document.getElementById('editTestDesc' + id).value = description;
-}
-
-function hideEditForm(id) {
-  document.getElementById('editForm' + id).classList.add('hidden');
-}
-</script>
+<?php include 'includes/footer.php'; ?>
 
 </body>
 </html>
