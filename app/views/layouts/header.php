@@ -66,39 +66,30 @@
             </li>
           </ul>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/?controller=Project&action=create">
-            Users
-          </a>
-        </li>
+       
+        <?php if (!empty($_SESSION['is_admin'])): ?>
+            <li class="nav-item">
+                <a class="nav-link" href="/index.php?controller=User&action=index">User Management</a>
+            </li>
+        <?php endif; ?>
         <!-- Add more nav items if needed -->
       </ul>
 
       <!-- Right-aligned user info and logout -->
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-    <?php if (isset($_SESSION['username'])) : ?>
-        <!-- Logged-in user info -->
+    <?php if (isset($_SESSION['username'])): ?>
         <li class="nav-item d-flex align-items-center me-2">
             <span class="nav-link disabled">
-                Logged in as <?php echo htmlspecialchars($_SESSION['username']); ?>
+                Hi, <?php echo htmlspecialchars($_SESSION['username']); ?>!
             </span>
         </li>
+
         <li class="nav-item">
-            <a class="btn btn-outline-danger" href="/index.php?controller=Auth&action=logout">
-                Logout
-            </a>
+            <a class="btn btn-outline-danger ms-2" href="/index.php?controller=Auth&action=logout">Logout</a>
         </li>
     <?php else: ?>
-        <!-- Guest view -->
-        <li class="nav-item d-flex align-items-center me-2">
-            <span class="nav-link disabled">
-                Not logged in
-            </span>
-        </li>
         <li class="nav-item">
-            <a class="btn btn-success" href="/?controller=Auth&action=login">
-                Login
-            </a>
+            <a class="btn btn-success" href="/index.php?controller=Auth&action=login">Login</a>
         </li>
     <?php endif; ?>
 </ul>

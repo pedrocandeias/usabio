@@ -1,9 +1,8 @@
 <!-- app/views/projects/index.php -->
-
-
 <?php 
 $title = 'Projects';
 require __DIR__ . '/../layouts/header.php'; ?>
+
 <div class="container py-5">
         <h1 class="mb-4">Projects</h1>
 
@@ -17,12 +16,11 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <div class="col">
                         <div class="card h-100 shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($proj['product_under_test']); ?></h5>
-                                <p class="card-text"><?php echo nl2br(htmlspecialchars($proj['business_case'])); ?></p>
+                                <h5 class="card-title"><?php echo htmlspecialchars($proj['title']); ?></h5>
+                                <p class="card-text"><?php echo nl2br(htmlspecialchars($proj['description'])); ?></p>
                             </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <a href="/index.php?controller=Project&action=edit&id=<?php echo $proj['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                                <a href="/index.php?controller=Project&action=destroy&id=<?php echo $proj['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this project?');">Delete</a>
+                            <div class="card-footer d-flex flex-column gap-2">
+                                 <a href="/index.php?controller=Project&action=show&id=<?php echo $proj['id']; ?>" class="btn btn-outline-secondary btn-sm w-100">View Project</a>
                             </div>
                         </div>
                     </div>

@@ -16,9 +16,13 @@ $error = $_GET['error'] ?? null;
     />
 </head>
 <body>
-<div class="container py-5">
-    <h1>Login</h1>
-
+<div class="container py-5 form-outline mb-4">
+<div class="row justify-content-center">
+<div class="col-md-6">
+    
+    <div class="text-center mb-4">
+        <img src="/assets/img/testflow-logo.png" alt="Logo" class="img-fluid" style="max-width: 150px;">
+    </div>
     <?php if ($error): ?>
         <div class="alert alert-danger">
             <?php echo htmlspecialchars($error); ?>
@@ -27,26 +31,28 @@ $error = $_GET['error'] ?? null;
 
     <form action="/?controller=Auth&action=processLogin" method="POST">
         <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
             <input
               type="text"
               class="form-control"
               name="username"
               id="username"
+                placeholder="Enter your username"
               required
             />
         </div>
         <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
             <input
               type="password"
               class="form-control"
               name="password"
               id="password"
+              placeholder="Enter your password"
               required
             />
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+        </div>
     </form>
 </div>
 </body>

@@ -28,15 +28,17 @@ class Project
     {
         $stmt = $this->pdo->prepare("
             INSERT INTO projects (
-                product_under_test, business_case, test_objectives, participants,
+                title, description, product_under_test, business_case, test_objectives, participants,
                 equipment, responsibilities, location_dates, test_procedure
             ) VALUES (
-                :product_under_test, :business_case, :test_objectives, :participants,
+                :title, :description, :product_under_test, :business_case, :test_objectives, :participants,
                 :equipment, :responsibilities, :location_dates, :test_procedure
             )
         ");
 
         return $stmt->execute([
+            ':title'              => $data['title'],
+            ':description'        => $data['description'],
             ':product_under_test' => $data['product_under_test'],
             ':business_case'      => $data['business_case'],
             ':test_objectives'    => $data['test_objectives'],
@@ -52,6 +54,8 @@ class Project
     {
         $stmt = $this->pdo->prepare("
             UPDATE projects SET
+                title = :title,
+                description = :description,
                 product_under_test = :product_under_test,
                 business_case = :business_case,
                 test_objectives = :test_objectives,
@@ -65,6 +69,8 @@ class Project
 
         return $stmt->execute([
             ':id'                 => $id,
+            ':title'              => $data['title'],
+            ':description'        => $data['description'],
             ':product_under_test' => $data['product_under_test'],
             ':business_case'      => $data['business_case'],
             ':test_objectives'    => $data['test_objectives'],

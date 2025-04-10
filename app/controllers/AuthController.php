@@ -55,8 +55,9 @@ class AuthController
         // Verify the password against the stored hash
         if ($user && password_verify($password, $user['password_hash'])) {
             // If valid, store the user info in the session
+            $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            $_SESSION['is_admin'] = $user['is_admin']; // or any additional fields you need
+            $_SESSION['is_admin'] = $user['is_admin'];
 
             // Redirect to the main page (Project index, for example)
             header('Location: /?controller=Project&action=index');

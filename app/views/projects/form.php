@@ -14,6 +14,8 @@ require __DIR__ . '/../layouts/header.php'; ?>
 
             <?php
             $fields = [
+                'title' => 'Project Title',
+                'description' => 'Project Description',
                 'product_under_test' => 'Product Under Test',
                 'business_case' => 'Business Case',
                 'test_objectives' => 'Test Objectives',
@@ -30,6 +32,22 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <textarea class="form-control" id="<?php echo $name; ?>" name="<?php echo $name; ?>" rows="3" required><?php echo htmlspecialchars($project[$name]); ?></textarea>
                 </div>
             <?php endforeach; ?>
+
+            <?php print_r($allUsers); ?>
+            <br>
+            <?php print_r($assignedUsers); ?>
+            <div class="mb-3">
+    <label for="assigned_users" class="form-label">Assign Users to this Project</label>
+    <select id="assigned_users" name="assigned_users[]" class="form-select" multiple>
+        <?php foreach ($allUsers as $user): ?>
+            <option value="<?php echo $user['id']; ?>"
+                <?php echo in_array($user['id'], $assignedUsers) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($user['username']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <small class="form-text text-muted">Hold down Ctrl (Windows) or Cmd (Mac) to select multiple users.</small>
+</div>
 
             <button type="submit" class="btn btn-primary"><?php echo $project['id'] ? 'Update' : 'Create'; ?> Project</button>
             <a href="/index.php?controller=Project&action=index" class="btn btn-secondary">Cancel</a>
