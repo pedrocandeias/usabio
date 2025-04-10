@@ -11,14 +11,32 @@ try {
 
     $pdo->exec("USE `$dbname`");
 
+    // === TABLE: projects ===
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS projects (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            product_under_test TEXT NOT NULL,
+            business_case TEXT NOT NULL,
+            test_objectives TEXT NOT NULL,
+            participants TEXT NOT NULL,
+            equipment TEXT NOT NULL,
+            responsibilities TEXT NOT NULL,
+            location_dates TEXT NOT NULL,
+            test_procedure TEXT NOT NULL
+        ) ENGINE=InnoDB;
+    ");
+    echo "Table 'projects' created or already exists.<br>";
+
     // === TABLE: tests ===
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS tests (
             id INT AUTO_INCREMENT PRIMARY KEY,
+            project_id INT NOT NULL,
             title VARCHAR(255) NOT NULL,
             description TEXT,
             layout_image VARCHAR(255),
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;
     ");
     echo "Table 'tests' created or already exists.<br>";
@@ -46,36 +64,61 @@ try {
     ");
     echo "Table 'moderator_test' created or already exists.<br>";
 
+    // === TABLE: task_groups ===
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS task_groups (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            test_id INT NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            position INT DEFAULT 0,
+            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;
+    ");
+    echo "Table 'task_groups' created or already exists.<br>";
+
+    // === TABLE: tasks ===
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            task_group_id INT NOT NULL,
+            task_text TEXT NOT NULL,
+            script TEXT,
+            scenario TEXT,
+            metrics TEXT,
+            task_type ENUM('text', 'radio', 'checkbox', 'dropdown') DEFAULT 'text',
+            task_options TEXT,
+            position INT DEFAULT 0,
+            FOREIGN KEY (task_group_id) REFERENCES task_groups(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;
+    ");
+    echo "Table 'tasks' created or already exists.<br>";
+
+    // === TABLE: questionnaire_groups ===
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS questionnaire_groups (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            test_id INT NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            position INT DEFAULT 0,
+            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;
+    ");
+    echo "Table 'questionnaire_groups' created or already exists.<br>";
+
     // === TABLE: questions ===
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS questions (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            test_id INT NOT NULL,
-            text VARCHAR(255) NOT NULL,
-            question_type ENUM('text', 'radio', 'checkbox') DEFAULT 'text',
-            question_options TEXT NULL,
-            position INT NOT NULL DEFAULT 0,
-            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
+            questionnaire_group_id INT NOT NULL,
+            text TEXT NOT NULL,
+            question_type ENUM('text', 'radio', 'checkbox', 'dropdown') DEFAULT 'text',
+            question_options TEXT,
+            position INT DEFAULT 0,
+            FOREIGN KEY (questionnaire_group_id) REFERENCES questionnaire_groups(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;
     ");
     echo "Table 'questions' created or already exists.<br>";
 
-    // === TABLE: tasks (nova) ===
-    $pdo->exec("
-    CREATE TABLE IF NOT EXISTS tasks (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        test_id INT NOT NULL,
-        task_text VARCHAR(255) NOT NULL,
-        script TEXT NULL,
-        scenario TEXT NULL,
-        metrics TEXT NULL,
-        task_type ENUM('text', 'radio', 'checkbox', 'dropdown') DEFAULT 'text',
-        task_options TEXT NULL,
-        position INT NOT NULL DEFAULT 0,
-        FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB;
-");
-echo "Table 'tasks' created or already exists.<br>";
     // === TABLE: evaluations ===
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS evaluations (
@@ -87,7 +130,7 @@ echo "Table 'tasks' created or already exists.<br>";
             FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;
     ");
-    echo "Table 'evaluations' created or updated.<br>";
+    echo "Table 'evaluations' created or already exists.<br>";
 
     // === TABLE: responses ===
     $pdo->exec("
