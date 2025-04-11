@@ -16,11 +16,15 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <div class="col">
                         <div class="card h-100 shadow-sm">
                             <div class="card-body">
+                                
                                 <h5 class="card-title"><?php echo htmlspecialchars($proj['title']); ?></h5>
                                 <p class="card-text"><?php echo nl2br(htmlspecialchars($proj['description'])); ?></p>
+                                <p class="text-muted mb-0"><small>Created on: <?php echo date('F j, Y', strtotime($proj['created_at'])); ?></small></p>
+                                <p class="text-muted mb-0"><small>Last updated: <?php echo date('F j, Y', strtotime($proj['updated_at'])); ?></small></p>
                             </div>
                             <div class="card-footer d-flex flex-column gap-2">
-                                 <a href="/index.php?controller=Project&action=show&id=<?php echo $proj['id']; ?>" class="btn btn-outline-secondary btn-sm w-100">View Project</a>
+                                <a href="/index.php?controller=Session&action=dashboard" class="btn btn-primary">Test Sessions</a>
+                                 <a href="/index.php?controller=Project&action=show&id=<?php echo $proj['id']; ?>" class="btn btn-secondary btn-sm w-100">View Project</a>
                             </div>
                         </div>
                     </div>
@@ -32,10 +36,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
     </div>
 
     <?php require __DIR__ . '/../layouts/footer.php'; ?>
+<?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
 
-<!-- Bootstrap 5.3.1 JS Bundle -->
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-></script>
 </body>
 </html>

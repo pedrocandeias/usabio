@@ -1,0 +1,53 @@
+@import "bootstrap";
+
+body {
+    background-color: #f9f9f9; 
+}
+.hidden { display: none; }
+
+button.btn, .form-check-input, .form-select {
+    font-size: 1.25rem;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.btn-sm {
+    font-size: 1.1rem;
+    padding: 0.6rem 1.2rem;
+}
+
+textarea, select, .form-check-label {
+    font-size: 1.2rem;
+}
+
+.card {
+    margin-bottom: 2rem;
+}
+
+.completed {
+    transition: opacity 0.2s ease-in-out;
+}
+.form-check-input {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.form-check-label {
+    font-size: 1.25rem;
+    padding-left: 0.5rem;
+}
+
+select.form-select,
+textarea.form-control {
+    font-size: 1.2rem;
+}
+
+.task-options {
+    margin-left: 1em !important;
+}

@@ -35,10 +35,6 @@ require __DIR__ . '/../layouts/header.php'; ?>
     </div>
 
     <?php require __DIR__ . '/../layouts/footer.php'; ?>
-
-<!-- Bootstrap 5.3.1 JS Bundle -->
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-></script>
+<?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
 </body>
 </html>

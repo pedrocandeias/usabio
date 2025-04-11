@@ -5,8 +5,7 @@
     <title>TestFlow: <?php echo $title; ?></title>
     <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-/>
+  href="dist/css/styles.css" />
 
 </head>
 
@@ -19,7 +18,7 @@
     <a class="navbar-brand d-flex align-items-center" href="/?controller=Project&action=index">
       <!-- Replace with your actual logo path -->
       <img
-        src="../assets/img/testflow-logo.png"
+        src="dist/img/testflow-logo.png"
         alt="Logo"
         style="height: 40px; width: auto; margin-right: 8px;"
       />
@@ -42,7 +41,13 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <!-- Left-aligned menu items -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item dropdown">
+      <?php if (isset($_SESSION['username'])): ?>
+      <li class="nav-item">
+          <a class="nav-link" href="/index.php?controller=Session&action=dashboard">Test Sessions</a>
+      </li>
+      <?php endif; ?>  
+      
+      <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
             href="#"

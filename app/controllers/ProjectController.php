@@ -76,16 +76,16 @@ class ProjectController
 
         $this->projectModel->create($data);
 
-$projectId = $pdo->lastInsertId(); // or use $_POST['id'] in update
-$assignedUsers = $_POST['assigned_users'] ?? [];
+        $projectId = $this->pdo->lastInsertId(); // or use $_POST['id'] in update
+        $assignedUsers = $_POST['assigned_users'] ?? [];
 
-$stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
-$stmt->execute([$projectId]);
+        $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
+        $stmt->execute([$projectId]);
 
-$stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-foreach ($assignedUsers as $userId) {
-    $stmt->execute([$projectId, $userId]);
-}
+        $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
+        foreach ($assignedUsers as $userId) {
+            $stmt->execute([$projectId, $userId]);
+        }
 
         header('Location: /index.php?controller=Project&action=index');
         exit;
@@ -94,6 +94,7 @@ foreach ($assignedUsers as $userId) {
     public function show()
     {
 
+        
         if (!$_SESSION['is_admin']) {
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
             $stmt->execute([$project_id, $_SESSION['user_id']]);
@@ -118,6 +119,15 @@ foreach ($assignedUsers as $userId) {
             exit;
         }
 
+        $stmt = $this->pdo->prepare("
+            SELECT m.id, m.username 
+            FROM project_user pu 
+            JOIN moderators m ON pu.moderator_id = m.id 
+            WHERE pu.project_id = ?
+        ");
+        $stmt->execute([$id]);
+        $assignedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         // Fetch related tests
         $stmt = $this->pdo->prepare("SELECT * FROM tests WHERE project_id = ?");
         $stmt->execute([$id]);
@@ -133,6 +143,8 @@ foreach ($assignedUsers as $userId) {
     public function edit()
     {
         if (!$_SESSION['is_admin']) {
+            $id = $_GET['id'] ?? 0;
+            $project_id = $id;
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
             $stmt->execute([$project_id, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
@@ -153,10 +165,10 @@ foreach ($assignedUsers as $userId) {
         }
 
         // for edit
-// Fetch all users to show in the multiselect
-$stmt = $this->pdo->query("SELECT id, username FROM moderators ORDER BY username");
-$allUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$assignedUsers = []; // for create
+        // Fetch all users to show in the multiselect
+        $stmt = $this->pdo->query("SELECT id, username FROM moderators ORDER BY username");
+        $allUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $assignedUsers = []; // for create
         include __DIR__ . '/../views/projects/form.php';
     }
 
@@ -167,11 +179,13 @@ $assignedUsers = []; // for create
     {
 
         if (!$_SESSION['is_admin']) {
+            $id = $_GET['id'] ?? 0;
+            $project_id = $id;
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
             $stmt->execute([$project_id, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
 
-            $projectId = $pdo->lastInsertId(); // or use $_POST['id'] in update
+            $projectId = $this->pdo->lastInsertId(); // or use $_POST['id'] in update
             $assignedUsers = $_POST['assigned_users'] ?? [];
             
             $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
@@ -208,6 +222,8 @@ $assignedUsers = []; // for create
     public function destroy()
     {
         if (!$_SESSION['is_admin']) {
+            $id = $_GET['id'] ?? 0;
+            $project_id = $id;
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
             $stmt->execute([$project_id, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();

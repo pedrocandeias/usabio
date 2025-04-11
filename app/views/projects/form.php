@@ -33,9 +33,6 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 </div>
             <?php endforeach; ?>
 
-            <?php print_r($allUsers); ?>
-            <br>
-            <?php print_r($assignedUsers); ?>
             <div class="mb-3">
     <label for="assigned_users" class="form-label">Assign Users to this Project</label>
     <select id="assigned_users" name="assigned_users[]" class="form-select" multiple>
@@ -55,11 +52,9 @@ require __DIR__ . '/../layouts/header.php'; ?>
     </div>
 
     <?php require __DIR__ . '/../layouts/footer.php'; ?>
-
+<?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
 <!-- Bootstrap 5.3.1 JS Bundle -->
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-></script>
+
 </body>
 </html>
 
