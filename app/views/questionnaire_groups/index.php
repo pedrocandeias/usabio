@@ -3,6 +3,10 @@ $title = 'Questions for tests';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 <div class="container py-5">
+    <p class="text-muted mb-3">
+        <strong>Project:</strong> <?php echo htmlspecialchars($test['project_name']); ?><br>
+        <strong>Test:</strong> <?php echo htmlspecialchars($test['title']); ?>
+    </p>
     <h1 class="mb-4">Questionnaire Groups</h1>
 
     <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo htmlspecialchars($_GET['test_id']); ?>" class="btn btn-success mb-3">+ Add Questionnaire Group</a>
@@ -16,6 +20,7 @@ require __DIR__ . '/../layouts/header.php';
                         <small class="text-muted">(Position: <?php echo $group['position']; ?>)</small>
                     </div>
                     <div>
+                    <a href="/index.php?controller=Question&action=create&group_id=<?php echo $group['id']; ?>&test_id=<?php echo $group['test_id']; ?>" class="btn btn-sm btn-success">+ Add Question</a>
                         <a href="/index.php?controller=QuestionnaireGroup&action=edit&id=<?php echo $group['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
                         <a href="/index.php?controller=QuestionnaireGroup&action=destroy&id=<?php echo $group['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this group?');">Delete</a>
                     </div>

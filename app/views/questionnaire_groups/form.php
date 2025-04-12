@@ -3,10 +3,21 @@ $title = 'Questions for tests';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 <div class="container py-5">
+<?php if (!empty($context)): ?>
+
+    <a href="/index.php?controller=Test&action=show&id=<?php echo $context['test_id']; ?>#questionnaire-group<?php echo $group['id']; ?>" class="btn btn-secondary btn-xs mb-4">
+        ← Back to Test
+    </a>
+    <p class="text-muted mb-4">
+        <strong>Project:</strong> <?php echo htmlspecialchars($context['project_name']); ?><br>
+        <strong>Test:</strong> <?php echo htmlspecialchars($context['test_title']); ?>
+    </p>
+<?php endif; ?>
+
     <h1 class="mb-4"><?php echo $group['id'] ? 'Edit' : 'Create'; ?> Questionnaire Group</h1>
 
     <form method="POST" action="/index.php?controller=QuestionnaireGroup&action=<?php echo $group['id'] ? 'update' : 'store'; ?>">
-        <?php if ($group['id']): ?>
+        <?php if ($group['id']) : ?>
             <input type="hidden" name="id" value="<?php echo $group['id']; ?>">
         <?php endif; ?>
         <input type="hidden" name="test_id" value="<?php echo $group['test_id']; ?>">

@@ -77,8 +77,14 @@
                 <a class="nav-link" href="/index.php?controller=User&action=index">User Management</a>
             </li>
         <?php endif; ?>
-        <!-- Add more nav items if needed -->
+        <?php if ($_SESSION['is_admin'] ?? false): ?>
+            <li class="nav-item">
+                <a class="nav-link" href="/index.php?controller=Admin&action=dashboard">📊 Dashboard</a>
+            </li>
+        <?php endif; ?>
+
       </ul>
+
 
       <!-- Right-aligned user info and logout -->
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

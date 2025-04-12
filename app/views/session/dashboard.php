@@ -4,14 +4,16 @@ $title = 'Projects';
 require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
+    <a href="/index.php?controller=Project&action=index" class="btn btn-secondary mb-4">← Back to Projects</a>
+
     <h1 class="mb-4">Test Sessions</h1>
 
-    <?php if (isset($_GET['success'])): ?>
+    <?php if (isset($_GET['success'])) : ?>
     <div class="alert alert-success">✅ Task session saved successfully!</div>
-<?php endif; ?>
+    <?php endif; ?>
 
 
-    <?php if (!empty($tests)): ?>
+    <?php if (!empty($tests)) : ?>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             <?php foreach ($tests as $test): ?>
                 <div class="col">

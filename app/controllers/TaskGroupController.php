@@ -45,29 +45,60 @@ class TaskGroupController
 
         $stmt = $this->pdo->prepare("SELECT * FROM task_groups WHERE test_id = ? ORDER BY position ASC, id ASC");
         $stmt->execute([$testId]);
-        $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $taskGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch test + project info
+        $stmt = $this->pdo->prepare(
+            "
+        SELECT t.title, p.product_under_test AS project_name
+        FROM tests t
+        JOIN projects p ON t.project_id = p.id
+        WHERE t.id = ?
+        "
+        );
+        $stmt->execute([$testId]);
+        $test = $stmt->fetch(PDO::FETCH_ASSOC);
 
         include __DIR__ . '/../views/task_groups/index.php';
     }
 
     public function create()
-    {
-        $testId = $_GET['test_id'] ?? 0;
+{
+    $testId = $_GET['test_id'] ?? 0;
 
-        if (!$this->userCanAccessTest($testId)) {
-            echo "Access denied.";
-            exit;
-        }
-
-        $group = ['id' => 0, 'test_id' => $testId, 'title' => '', 'position' => 0];
-
-        include __DIR__ . '/../views/task_groups/form.php';
+    if (!$this->userCanAccessTest($testId)) {
+        echo "Access denied.";
+        exit;
     }
+
+    $taskGroup = [
+        'id' => 0,
+        'test_id' => $testId,
+        'title' => '',
+        'position' => 0
+    ];
+
+    // Use only the test_id to fetch project + test context
+    $stmt = $this->pdo->prepare("
+        SELECT 
+            t.title AS test_title, 
+            t.id AS test_id, 
+            p.product_under_test AS project_name,
+            p.id AS project_id
+        FROM tests t
+        JOIN projects p ON p.id = t.project_id
+        WHERE t.id = ?
+    ");
+    $stmt->execute([$testId]);
+    $context = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    include __DIR__ . '/../views/task_groups/form.php';
+}
 
     public function store()
     {
         $data = $_POST;
-
+        $testId = $data['test_id'] ?? 0;
         $stmt = $this->pdo->prepare("INSERT INTO task_groups (test_id, title, position) VALUES (?, ?, ?)");
         $stmt->execute(
             [
@@ -77,19 +108,30 @@ class TaskGroupController
             ]
         );
 
-        header("Location: /index.php?controller=TaskGroup&action=index&test_id=" . $data['test_id']);
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId."#task-group-list");
         exit;
     }
 
     public function edit()
     {
+        
         $id = $_GET['id'] ?? 0;
 
         $stmt = $this->pdo->prepare("SELECT * FROM task_groups WHERE id = ?");
         $stmt->execute([$id]);
-        $group = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$group || !$this->userCanAccessTest($group['test_id'])) {
+        $taskGroup = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $testId = $taskGroup['test_id'];
+        $stmt = $this->pdo->prepare("
+            SELECT t.title AS test_title, t.id AS test_id, p.product_under_test AS project_name
+            FROM tests t
+            JOIN projects p ON p.id = t.project_id
+            WHERE t.id = ?
+        ");
+        $stmt->execute([$testId]);
+        $context = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$taskGroup || !$this->userCanAccessTest($taskGroup['test_id'])) {
             echo "Access denied or group not found.";
             exit;
         }
@@ -113,7 +155,8 @@ class TaskGroupController
     public function update()
     {
         $data = $_POST;
-
+        $testId = $data['test_id'] ?? 0;
+        $taskGroupId = $data['id'] ?? 0;
         $stmt = $this->pdo->prepare("UPDATE task_groups SET title = ?, position = ? WHERE id = ?");
         $stmt->execute(
             [
@@ -123,18 +166,18 @@ class TaskGroupController
             ]
         );
 
-        header("Location: /index.php?controller=TaskGroup&action=index&test_id=" . $data['test_id']);
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId."#taskgroup".$taskGroupId);
         exit;
     }
 
     public function destroy()
     {
         $id = $_GET['id'] ?? 0;
-
+        
         $stmt = $this->pdo->prepare("SELECT test_id FROM task_groups WHERE id = ?");
         $stmt->execute([$id]);
         $testId = $stmt->fetchColumn();
-
+        $taskGroupId = $id;
         if (!$this->userCanAccessTest($testId)) {
             echo "Access denied.";
             exit;
@@ -143,7 +186,7 @@ class TaskGroupController
         $stmt = $this->pdo->prepare("DELETE FROM task_groups WHERE id = ?");
         $stmt->execute([$id]);
 
-        header("Location: /index.php?controller=TaskGroup&action=index&test_id=" . $testId);
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId."#task-group-list");
         exit;
     }
 }

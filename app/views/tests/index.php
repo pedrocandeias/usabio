@@ -3,6 +3,12 @@ $title = 'Test for project';
 require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
+<?php if (!empty($context)): ?>
+    <p class="text-muted mb-4">
+        <strong>Project:</strong> <?php echo htmlspecialchars($context['product_under_test']); ?>
+    </p>
+<?php endif; ?>
+
     <h1>Tests for Project #<?php echo htmlspecialchars($_GET['project_id'] ?? ''); ?></h1>
 
     <a href="/index.php?controller=Test&action=create&project_id=<?php echo $_GET['project_id']; ?>" class="btn btn-success mb-3">Add Test</a>

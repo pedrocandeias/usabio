@@ -6,7 +6,8 @@ class TestController
 
     public function __construct($pdo)
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start();
+        if (session_status() === PHP_SESSION_NONE) { 
+            session_start();
         }
 
         if (!isset($_SESSION['username'])) {
@@ -30,6 +31,10 @@ class TestController
         $stmt->execute([$projectId]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $stmt = $this->pdo->prepare("SELECT product_under_test FROM projects WHERE id = ?");
+        $stmt->execute([$projectId]);
+        $context = $stmt->fetch(PDO::FETCH_ASSOC);
+
         include __DIR__ . '/../views/tests/index.php';
     }
 
@@ -49,6 +54,14 @@ class TestController
             'layout_image' => '',
             'project_id' => $projectId
         ];
+
+        $stmt = $this->pdo->prepare(
+            "
+        SELECT product_under_test FROM projects WHERE id = ?
+    "
+        );
+        $stmt->execute([$projectId]);
+        $context = $stmt->fetch(PDO::FETCH_ASSOC);
 
         include __DIR__ . '/../views/tests/form.php';
     }
@@ -95,9 +108,18 @@ class TestController
     public function edit()
     {
         $id = $_GET['id'] ?? 0;
+   
         $stmt = $this->pdo->prepare("SELECT * FROM tests WHERE id = ?");
         $stmt->execute([$id]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
+        $projectId = $test['project_id'];
+        $stmt = $this->pdo->prepare(
+            "
+            SELECT product_under_test FROM projects WHERE id = ?
+        "
+        );
+        $stmt->execute([$projectId]);
+        $context = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$test || !$this->userCanAccessProject($test['project_id'])) {
             echo "Access denied or test not found.";
@@ -252,12 +274,14 @@ class TestController
         $questionnaireGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($questionnaireGroups as &$qGroup) {
-            $stmt = $this->pdo->prepare("
+            $stmt = $this->pdo->prepare(
+                "
                 SELECT id, text, question_type, position
                 FROM questions
                 WHERE questionnaire_group_id = ?
                 ORDER BY position ASC
-            ");
+            "
+            );
             $stmt->execute([$qGroup['id']]);
             $qGroup['questions'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
@@ -288,7 +312,8 @@ class TestController
 
     private function userCanAccessProject($projectId)
     {
-        if ($_SESSION['is_admin']) { return true;
+        if ($_SESSION['is_admin']) { 
+            return true;
         }
 
         $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");

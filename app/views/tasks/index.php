@@ -1,9 +1,17 @@
 <?php 
-$title = 'Test for project';
+$title = 'Manage Tasks';
 require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
-    <h1 class="mb-4">Tasks</h1>
+<?php if (!empty($context)): ?>
+    <p class="text-muted mb-4">
+        <strong>Project:</strong> <?php echo htmlspecialchars($context['project_name']); ?><br>
+        <strong>Test:</strong> <?php echo htmlspecialchars($context['test_title']); ?><br>
+        <strong>Task Group:</strong> <?php echo htmlspecialchars($context['group_title']); ?>
+    </p>
+<?php endif; ?>
+
+<h1 class="mb-4">Tasks for: <?php echo htmlspecialchars($testTitle); ?></h1>
 
     <a href="/index.php?controller=Task&action=create&group_id=<?php echo htmlspecialchars($_GET['group_id']); ?>" class="btn btn-success mb-3">Add Task</a>
 
@@ -25,9 +33,8 @@ require __DIR__ . '/../layouts/header.php'; ?>
     <?php else: ?>
         <p class="text-muted">No tasks found in this group.</p>
     <?php endif; ?>
-
-    <a href="/index.php?controller=TaskGroup&action=index&test_id=<?php echo htmlspecialchars($_GET['test_id'] ?? ''); ?>" class="btn btn-secondary mt-4">← Back to Task Groups</a>
-</div>
+    <a href="/index.php?controller=Project&action=show&id=<?php echo htmlspecialchars($projectId); ?>" class="btn btn-secondary mt-4">← Back to Project</a>
+    </div>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
 </body>
