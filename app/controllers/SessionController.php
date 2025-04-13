@@ -22,25 +22,53 @@ class SessionController
     {
         $moderatorId = $_SESSION['user_id'];
         $isAdmin = $_SESSION['is_admin'] ?? false;
+        $isSuperadmin = $_SESSION['is_superadmin'] ?? false;
+        $projectId = $_GET['project_id'] ?? null;
 
-        // Get all tests for this user (assigned via project_user)
-        $query = $isAdmin
-            ? "SELECT t.*, p.product_under_test AS project_name
-               FROM tests t
-               JOIN projects p ON t.project_id = p.id
-               ORDER BY p.id DESC"
-            : "SELECT t.*, p.product_under_test AS project_name
-               FROM tests t
-               JOIN projects p ON t.project_id = p.id
+        $breadcrumbs = [
+        ['label' => 'Moderator Dashboard', 'url' => '', 'active' => true],
+        ];
+
+        // CASE A: Show list of projects to pick from
+        if (!$projectId) {
+            $query = $isAdmin || $isSuperadmin
+            ? "SELECT * FROM projects ORDER BY created_at DESC"
+            : "SELECT p.* FROM projects p
                JOIN project_user pu ON pu.project_id = p.id
                WHERE pu.moderator_id = ?
-               ORDER BY p.id DESC";
+               ORDER BY p.created_at DESC";
 
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute($isAdmin ? [] : [$moderatorId]);
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($isAdmin || $isSuperadmin ? [] : [$moderatorId]);
+            $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Send to dashboard view with a project picker mode
+            include __DIR__ . '/../views/session/project_list.php';
+            return;
+        }
+
+        // CASE B: Show tests for selected project
+        if (!$isAdmin && !$isSuperadmin) {
+            $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
+            $stmt->execute([$projectId, $moderatorId]);
+            if (!$stmt->fetchColumn()) {
+                echo "Access denied.";
+                exit;
+            }
+        }
+
+        $stmt = $this->pdo->prepare(
+            "
+        SELECT t.*, p.product_under_test AS project_name
+        FROM tests t
+        JOIN projects p ON t.project_id = p.id
+        WHERE t.project_id = ?
+        ORDER BY t.id DESC
+    "
+        );
+        $stmt->execute([$projectId]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Count tasks and questionnaires per test
         foreach ($tests as &$test) {
             $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM task_groups WHERE test_id = ?");
             $stmt->execute([$test['id']]);
@@ -53,7 +81,7 @@ class SessionController
 
         include __DIR__ . '/../views/session/dashboard.php';
     }
-
+      
     public function startTaskSession()
     {
         $testId = $_GET['test_id'] ?? 0;
@@ -64,12 +92,14 @@ class SessionController
         }
     
         // Fetch test + project name
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare(
+            "
             SELECT t.*, p.product_under_test AS project_name 
             FROM tests t 
             JOIN projects p ON p.id = t.project_id 
             WHERE t.id = ?
-        ");
+        "
+        );
         $stmt->execute([$testId]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -78,10 +108,22 @@ class SessionController
             exit;
         }
     
+         // Optional: prefill participant logic...
+        $prefillCustomData = [];
+        $previousEvaluation = [];
+
         $stmt = $this->pdo->prepare("SELECT * FROM test_custom_fields WHERE test_id = ? ORDER BY position ASC");
         $stmt->execute([$testId]);
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
+        // Breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $test['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $test['project_id'], 'active' => false],
+            ['label' => $test['title'], 'url' => '/index.php?controller=Test&action=show&id=' . $test['id'], 'active' => false],
+            ['label' => 'Start Task Session', 'url' => '', 'active' => true],
+        ];
+        
         include __DIR__ . '/../views/session/start_task_session.php';
     }
 
@@ -169,13 +211,15 @@ class SessionController
         }
 
         // Fetch custom participant fields and their values
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare(
+            "
             SELECT f.label, d.value
             FROM evaluation_custom_data d
             JOIN test_custom_fields f ON f.id = d.field_id
             WHERE d.evaluation_id = ?
             ORDER BY f.position ASC
-        ");
+        "
+        );
         $stmt->execute([$evaluationId]);
         $customData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -259,9 +303,18 @@ class SessionController
                 ]
             );
         }
-        
+        $stmt = $this->pdo->prepare("
+            SELECT e.*, t.project_id
+            FROM evaluations e
+            JOIN tests t ON e.test_id = t.id
+            WHERE e.id = ?
+        ");
+        $stmt->execute([$evaluationId]);
+        $evaluation = $stmt->fetch(PDO::FETCH_ASSOC);
+        $projectId = $evaluation['project_id'];
+
         // Done! Redirect to dashboard or summary
-        header("Location: /index.php?controller=Session&action=dashboard&success=1");
+        header("Location: /index.php?controller=Session&action=dashboard&project_id=" . $projectId . "&success=1");
         exit;
     }
 
@@ -273,7 +326,7 @@ class SessionController
             echo "Missing test ID.";
             exit;
         }
-    
+        $minimalLayout = true;
         $stmt = $this->pdo->prepare(
             "
             SELECT t.*, p.product_under_test AS project_name
@@ -297,21 +350,25 @@ class SessionController
         $prefillName = $_GET['name'] ?? null;
 
         if ($prefillName) {
-            $stmt = $this->pdo->prepare("
+            $stmt = $this->pdo->prepare(
+                "
     SELECT id, participant_name, participant_age, participant_gender, participant_academic_level
     FROM evaluations
     WHERE test_id = ? AND participant_name = ?
     ORDER BY timestamp DESC
     LIMIT 1
-");
+"
+            );
             $stmt->execute([$testId, $prefillName]);
             $previousEvaluation = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($previousEvaluation) {
-                $stmt = $this->pdo->prepare("
+                $stmt = $this->pdo->prepare(
+                    "
                     SELECT field_id, value FROM evaluation_custom_data
                     WHERE evaluation_id = ?
-                ");
+                "
+                );
                 $stmt->execute([$previousEvaluation['id']]);
                 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     $prefillCustomData[$row['field_id']] = $row['value'];
@@ -324,14 +381,23 @@ class SessionController
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
         // Fetch existing participants who completed tasks in this test
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare(
+            "
             SELECT DISTINCT participant_name
             FROM evaluations
             WHERE test_id = ? AND participant_name IS NOT NULL
             ORDER BY participant_name
-        ");
+        "
+        );
         $stmt->execute([$testId]);
         $existingParticipants = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $test['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $test['project_id'], 'active' => false],
+            ['label' => $test['title'], 'url' => '/index.php?controller=Test&action=show&id=' . $test['id'], 'active' => false],
+            ['label' => 'Start Questionnaire', 'url' => '', 'active' => true],
+        ];
 
         include __DIR__ . '/../views/session/start_questionnaire.php';
     }
@@ -356,6 +422,8 @@ class SessionController
             WHERE e.id = ?
         "
         );
+
+        
         $stmt->execute([$evaluationId]);
         $evaluation = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -367,7 +435,7 @@ class SessionController
         // Get questionnaire groups & questions
         $stmt = $this->pdo->prepare(
             "
-            SELECT qg.id AS group_id, qg.title AS group_title, qg.position AS group_position,
+            SELECT qg.id AS group_id, qg.title AS group_title, qg.position AS group_position, 
                    q.id AS question_id, q.text, q.question_type, q.question_options, q.position AS question_position, q.preset_type
             FROM questionnaire_groups qg
             LEFT JOIN questions q ON q.questionnaire_group_id = qg.id
@@ -378,6 +446,7 @@ class SessionController
         $stmt->execute([$evaluation['test_id']]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+        
         // Group questions
         $questionnaireGroups = [];
         foreach ($rows as $row) {
@@ -394,8 +463,8 @@ class SessionController
                 $questionnaireGroups[$gid]['questions'][] = [
                     'id' => $row['question_id'],
                     'text' => $row['text'],
-                    'type' => $row['question_type'],
-                    'options' => $row['question_options'],
+                    'question_type'  => $row['question_type'],
+                    'question_options' => $row['question_options'],
                     'preset_type' => $row['preset_type']
                 ];
             }
@@ -460,50 +529,54 @@ class SessionController
     }
 
     public function saveQuestionnaireResponses()
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: /index.php?controller=Session&action=dashboard');
-        exit;
-    }
-
-    $evaluationId = $_POST['evaluation_id'] ?? null;
-
-    if (!$evaluationId) {
-        echo "Missing evaluation ID.";
-        exit;
-    }
-
-    $answers = $_POST['answer'] ?? [];
-
-    // Loop through each question answered
-    foreach ($answers as $questionId => $answer) {
-        // Handle checkbox answers (arrays)
-        if (is_array($answer)) {
-            $answer = implode('; ', $answer);
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /index.php?controller=Session&action=dashboard');
+            exit;
         }
 
-        // Get the original question text for display (optional)
-        $stmt = $this->pdo->prepare("SELECT text FROM questions WHERE id = ?");
-        $stmt->execute([$questionId]);
-        $questionText = $stmt->fetchColumn() ?? 'Unknown question';
+        $evaluationId = $_POST['evaluation_id'] ?? null;
 
-        // Save the response
-        $stmt = $this->pdo->prepare("
+        if (!$evaluationId) {
+            echo "Missing evaluation ID.";
+            exit;
+        }
+
+        $answers = $_POST['answer'] ?? [];
+
+        // Loop through each question answered
+        foreach ($answers as $questionId => $answer) {
+            // Handle checkbox answers (arrays)
+            if (is_array($answer)) {
+                $answer = implode('; ', $answer);
+            }
+
+            // Get the original question text for display (optional)
+            $stmt = $this->pdo->prepare("SELECT text FROM questions WHERE id = ?");
+            $stmt->execute([$questionId]);
+            $questionText = $stmt->fetchColumn() ?? 'Unknown question';
+
+            // Save the response
+            $stmt = $this->pdo->prepare(
+                "
             INSERT INTO responses (evaluation_id, question, answer, time_spent)
             VALUES (?, ?, ?, ?)
-        ");
-        $stmt->execute([
-            $evaluationId,
-            $questionText,
-            $answer,
-            0 // time_spent is not tracked in questionnaires for now
-        ]);
-    }
+        "
+            );
+            $stmt->execute(
+                [
+                $evaluationId,
+                $questionText,
+                $answer,
+                0 // time_spent is not tracked in questionnaires for now
+                ]
+            );
+        }
 
-    // Redirect to confirmation page
-    header('Location: /index.php?controller=Session&action=questionnaireComplete');
-    exit;
-}
+        // Redirect to confirmation page
+        header('Location: /index.php?controller=Session&action=questionnaireComplete');
+        exit;
+    }
 
     public function questionnaireComplete()
     {

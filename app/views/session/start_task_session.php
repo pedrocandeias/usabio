@@ -4,10 +4,6 @@
 <div class="container py-5">
     <h1 class="mb-4">Start Task Session</h1>
 
-    <p class="text-muted mb-3">
-        <strong>Project:</strong> <?php echo htmlspecialchars($test['project_name']); ?><br>
-        <strong>Test:</strong> <?php echo htmlspecialchars($test['title']); ?>
-    </p>
     <form method="POST" action="/index.php?controller=Session&action=beginTaskSession">
         <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 

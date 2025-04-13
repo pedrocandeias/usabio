@@ -2,14 +2,15 @@
 $title = 'Test for project';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
+
 <div class="container py-5">
 
-    <?php if (!empty($context)) : ?>
-        <a href="/index.php?controller=Project&action=show&id=<?php echo $context['project_id']; ?>" class="btn btn-secondary btn-xs mb-4">
+    <?php if (!empty($test)) : ?>
+        <a href="/index.php?controller=Project&action=show&id=<?php echo $test['project_id']; ?>" class="btn btn-secondary btn-xs mb-4">
             ← Back to Project
         </a>
         <p class="text-muted mb-4">
-            <strong>Project:</strong> <?php echo htmlspecialchars($context['product_under_test']); ?>
+            <strong>Project:</strong> <?php echo htmlspecialchars($test['project_name']); ?>
         </p>
     <?php endif; ?>
 
@@ -92,6 +93,7 @@ require __DIR__ . '/../layouts/header.php';
     </div>
 
     <div id="questionnaire-group-list">
+     
         <?php if (!empty($questionnaireGroups)) : ?>
             <?php foreach ($questionnaireGroups as $qGroup): ?>
                 <div class="card mb-3 shadow-sm questionnaire-group" id="questionnaire-group<?php echo $qGroup['id']; ?>" data-id="<?php echo $qGroup['id']; ?>">
@@ -141,68 +143,69 @@ require __DIR__ . '/../layouts/header.php';
     </div>
 
     <!-- Custom Participant Fields -->
-    <hr class="my-5">
-    <h4 class="mb-3">🧬 Custom Participant Fields</h4>
+    <div id="custom-fields-list">
+        <hr class="my-5">
+        <h4 class="mb-3">🧬 Custom Participant Fields</h4>
 
-    <form method="POST" action="/index.php?controller=CustomField&action=store" class="row g-3 mb-4">
-        <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
+        <form method="POST" action="/index.php?controller=CustomField&action=store" class="row g-3 mb-4">
+            <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
-        <div class="col-md-4">
-            <input type="text" name="label" class="form-control" placeholder="Field Label" required>
-        </div>
+            <div class="col-md-4">
+                <input type="text" name="label" class="form-control" placeholder="Field Label" required>
+            </div>
 
-        <div class="col-md-4">
-            <select name="field_type" class="form-select" required>
-                <option value="text">Text</option>
-                <option value="number">Number</option>
-                <option value="select">Dropdown (select)</option>
-            </select>
-        </div>
+            <div class="col-md-4">
+                <select name="field_type" class="form-select" required>
+                    <option value="text">Text</option>
+                    <option value="number">Number</option>
+                    <option value="select">Dropdown (select)</option>
+                </select>
+            </div>
 
-        <div class="col-md-3">
-            <input type="text" name="options" class="form-control" placeholder="Options (for select, e.g. A;B;C)">
-        </div>
+            <div class="col-md-3">
+                <input type="text" name="options" class="form-control" placeholder="Options (for select, e.g. A;B;C)">
+            </div>
 
-        <div class="col-md-1">
-            <button type="submit" class="btn btn-success w-100">Add</button>
-        </div>
-    </form>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+        </form>
 
-    <?php
-    $stmt = $this->pdo->prepare("SELECT * FROM test_custom_fields WHERE test_id = ? ORDER BY position ASC");
-    $stmt->execute([$test['id']]);
-    $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    ?>
+        <?php
+        $stmt = $this->pdo->prepare("SELECT * FROM test_custom_fields WHERE test_id = ? ORDER BY position ASC");
+        $stmt->execute([$test['id']]);
+        $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
 
-    <?php if (!empty($customFields)) : ?>
-        <table class="table table-bordered table-sm">
-            <thead>
-                <tr>
-                    <th>Label</th>
-                    <th>Type</th>
-                    <th>Options</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($customFields as $field): ?>
+        <?php if (!empty($customFields)) : ?>
+            <table class="table table-bordered table-sm">
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($field['label']); ?></td>
-                        <td><?php echo $field['field_type']; ?></td>
-                        <td><?php echo htmlspecialchars($field['options']); ?></td>
-                        <td class="text-end">
-                            <a href="/index.php?controller=CustomField&action=destroy&id=<?php echo $field['id']; ?>&test_id=<?php echo $test['id']; ?>"
-                               class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this field?')">Remove</a>
-                        </td>
+                        <th>Label</th>
+                        <th>Type</th>
+                        <th>Options</th>
+                        <th></th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php else: ?>
-        <p class="text-muted">No custom fields defined yet for this test.</p>
-    <?php endif; ?>
-
-</div> <!-- ✅ Close .container -->
+                </thead>
+                <tbody>
+                    <?php foreach ($customFields as $field): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($field['label']); ?></td>
+                            <td><?php echo $field['field_type']; ?></td>
+                            <td><?php echo htmlspecialchars($field['options']); ?></td>
+                            <td class="text-end">
+                                <a href="/index.php?controller=CustomField&action=destroy&id=<?php echo $field['id']; ?>&test_id=<?php echo $test['id']; ?>"
+                                class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this field?')">Remove</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="text-muted">No custom fields defined yet for this test.</p>
+        <?php endif; ?>
+    </div>
+</div> <!-- Close .container -->
 
 <!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">

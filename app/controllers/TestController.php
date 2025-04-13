@@ -1,8 +1,9 @@
 <?php
-
+require_once __DIR__ . '/../models/Test.php';
 class TestController
 {
     private $pdo;
+    protected $testModel;
 
     public function __construct($pdo)
     {
@@ -16,6 +17,7 @@ class TestController
         }
 
         $this->pdo = $pdo;
+        $this->testModel = new Test($pdo);
     }
 
     public function index()
@@ -41,69 +43,84 @@ class TestController
     public function create()
     {
         $projectId = $_GET['project_id'] ?? 0;
-
-        if (!$this->userCanAccessProject($projectId)) {
-            echo "Access denied.";
+    
+        if (!$projectId) {
+            echo "Missing project ID.";
             exit;
         }
-
+    
+        // Check access (admin or assigned user)
+        if (!$_SESSION['is_admin']) {
+            $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
+            $stmt->execute([$projectId, $_SESSION['user_id']]);
+            if (!$stmt->fetchColumn()) {
+                echo "Access denied.";
+                exit;
+            }
+        }
+    
+        // Fetch project name for context
+        $stmt = $this->pdo->prepare("SELECT product_under_test AS project_name FROM projects WHERE id = ?");
+        $stmt->execute([$projectId]);
+        $project = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$project) {
+            echo "Project not found.";
+            exit;
+        }
+    
+        $context = [
+            'project_id' => $projectId,
+            'project_name' => $project['project_name'],
+        ];
+    
         $test = [
             'id' => 0,
+            'project_id' => $projectId,
             'title' => '',
             'description' => '',
             'layout_image' => '',
-            'project_id' => $projectId
         ];
-
-        $stmt = $this->pdo->prepare(
-            "
-        SELECT product_under_test FROM projects WHERE id = ?
-    "
-        );
-        $stmt->execute([$projectId]);
-        $context = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $projectId, 'active' => false],
+            ['label' => 'Create Test', 'url' => '', 'active' => true],
+        ];
+    
         include __DIR__ . '/../views/tests/form.php';
     }
+    
 
-    public function store()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?controller=Project&action=index');
-            exit;
-        }
-    
-        $data = $_POST;
-    
-        // Handle uploaded image
-        $layoutImageName = '';
-        if (!empty($_FILES['layout_image']['name'])) {
-            $layoutImageName = uniqid() . '_' . basename($_FILES['layout_image']['name']);
-            $targetPath = __DIR__ . '/../../uploads/' . $layoutImageName;
-            move_uploaded_file($_FILES['layout_image']['tmp_name'], $targetPath);
-        }
-    
-        // Insert into database
-        $stmt = $this->pdo->prepare(
-            "
-            INSERT INTO tests (project_id, title, description, layout_image)
-            VALUES (:project_id, :title, :description, :layout_image)
-        "
-        );
-        $stmt->execute(
-            [
-            ':project_id' => $data['project_id'],
-            ':title' => $data['title'],
-            ':description' => $data['description'],
-            ':layout_image' => $layoutImageName
-            ]
-        );
-    
-        // Redirect to the project's detail page
-        header("Location: /index.php?controller=Project&action=show&id=" . $data['project_id']);
+public function store()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header("Location: /index.php?controller=Project&action=index&id=" . $projectId."#tests-list");
         exit;
     }
-    
+
+    $data = $_POST;
+
+    // Handle image upload
+    $layoutImageName = '';
+    if (!empty($_FILES['layout_image']['name'])) {
+        $layoutImageName = uniqid() . '_' . basename($_FILES['layout_image']['name']);
+        move_uploaded_file(
+            $_FILES['layout_image']['tmp_name'],
+            __DIR__ . '/../../uploads/' . $layoutImageName
+        );
+    }
+
+    $data['layout_image'] = $layoutImageName;
+
+    // Create test and get ID
+    $testId = $this->testModel->create($data);
+    $projectId = $data['project_id'];
+    // Redirect to the test detail view
+    header("Location: /index.php?controller=Project&action=show&id=" . $projectId."#tests-list");
+    exit;
+}
+
 
     public function edit()
     {
@@ -132,7 +149,7 @@ class TestController
     public function update()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?controller=Project&action=index');
+            header("Location: /index.php?controller=Project&action=index&id=" . $projectId."#tests-list");
             exit;
         }
 
@@ -174,7 +191,7 @@ class TestController
         );
 
         // Redirect back to project detail
-        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
+        header("Location: /index.php?controller=Project&action=show&&id=" . $projectId."#tests-list");
         exit;
     }
     
@@ -209,8 +226,21 @@ class TestController
         $stmt->execute([$testId]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        $context = [
+            'test_id' => $test['id'],
+            'test_title' => $test['title'],
+            'project_id' => $test['project_id'],
+            'product_under_test' => $test['project_name'],
+            'project_name' => $test['project_name'],
+        ];
 
-        
+        // Build breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
+            ['label' => $context['test_title'], 'url' => '', 'active' => true],
+        ];
+
         // Access control: user must be admin or assigned to the project
         $projectId = $test['project_id'];
         if (!$_SESSION['is_admin']) {
@@ -274,18 +304,17 @@ class TestController
         $questionnaireGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($questionnaireGroups as &$qGroup) {
-            $stmt = $this->pdo->prepare(
-                "
-                SELECT id, text, question_type, position
-                FROM questions
-                WHERE questionnaire_group_id = ?
-                ORDER BY position ASC
-            "
-            );
+            $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE questionnaire_group_id = ? ORDER BY position ASC");
             $stmt->execute([$qGroup['id']]);
             $qGroup['questions'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        
+        unset($qGroup); // ✅ Break reference after loop
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
+            ['label' => $test['title'], 'url' => '', 'active' => true],
+        ];        
+
         // Send everything to the view
         include __DIR__ . '/../views/tests/show.php';
     }
@@ -306,7 +335,7 @@ class TestController
         $stmt = $this->pdo->prepare("DELETE FROM tests WHERE id = ?");
         $stmt->execute([$id]);
 
-        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
+        header("Location: /index.php?controller=Project&action=show&id=" . $projectId."#tests-list");
         exit;
     }
 

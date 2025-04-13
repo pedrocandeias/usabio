@@ -26,7 +26,7 @@ class CustomFieldController
             $data['position'] ?? 0
         ]);
 
-        header("Location: /index.php?controller=Test&action=show&id=" . $data['test_id']);
+        header("Location: /index.php?controller=Test&action=show&id=" . $data['test_id']. "#custom-fields-list");
         exit;
     }
 
@@ -38,7 +38,7 @@ class CustomFieldController
         $stmt = $this->pdo->prepare("DELETE FROM test_custom_fields WHERE id = ?");
         $stmt->execute([$id]);
 
-        header("Location: /index.php?controller=Test&action=show&id=" . $testId);
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId. "#custom-fields-list");
         exit;
     }
 }

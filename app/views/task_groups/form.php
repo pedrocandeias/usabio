@@ -4,14 +4,11 @@ require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
     <!-- Back Button -->
+     <?php $context['test_id']; ?>
     <a href="/index.php?controller=Test&action=show&id=<?php echo $context['test_id']; ?>#taskgroup<?php echo $taskGroup['id']; ?>" class="btn btn-secondary btn-xs mb-4">
         ← Back to Test
     </a>  
-    <p class="text-muted mb-3">
-        <strong>Project:</strong> <?php echo htmlspecialchars($context['project_name']); ?><br>
-        <strong>Test:</strong> <?php echo htmlspecialchars($context['test_title']); ?>
-    </p>
-
+   
     <h1><?php echo $taskGroup['id'] ? 'Edit' : 'Create'; ?> Task Group</h1>
 
     <form method="POST" action="/index.php?controller=TaskGroup&action=<?php echo $taskGroup['id'] ? 'update' : 'store'; ?>">
@@ -31,7 +28,12 @@ require __DIR__ . '/../layouts/header.php'; ?>
         </div>
 
         <button type="submit" class="btn btn-primary">Save</button>
-        <a href="/index.php?controller=TaskGroup&action=index&test_id=<?php echo $taskGroup['test_id']; ?>" class="btn btn-secondary">Cancel</a>
+        <?php
+        $anchor = $taskGroup['id'] ? '#taskgroup' . $taskGroup['id'] : '#task-group-list';
+        $cancelUrl = '/index.php?controller=Test&action=show&id=' . $taskGroup['test_id'] . $anchor;
+        ?>
+        <a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary">Cancel</a>
+
     </form>
 </div>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

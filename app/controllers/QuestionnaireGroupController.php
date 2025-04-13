@@ -74,7 +74,12 @@ class QuestionnaireGroupController
             exit;
         }
 
-        $group = ['id' => 0, 'test_id' => $testId, 'title' => '', 'position' => 0];
+        $group = [
+            'id' => 0,
+            'test_id' => $testId,
+            'title' => '',
+            'position' => 0
+        ];
         
         // Fetch test + project context
         $stmt = $this->pdo->prepare(
@@ -91,6 +96,14 @@ class QuestionnaireGroupController
         );
         $stmt->execute([$testId]);
         $context = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
+            ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $testId . '#questionnaire-group-list', 'active' => false],
+            ['label' => 'Create Questionnaire Group', 'url' => '', 'active' => true],
+        ];
+    
 
         include __DIR__ . '/../views/questionnaire_groups/form.php';
     }
@@ -114,36 +127,46 @@ class QuestionnaireGroupController
     }
 
     public function edit()
-{
-    $id = $_GET['id'] ?? 0;
-
-    $stmt = $this->pdo->prepare("SELECT * FROM questionnaire_groups WHERE id = ?");
-    $stmt->execute([$id]);
-    $group = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$group || !$this->userCanAccessTest($group['test_id'])) {
-        echo "Access denied or group not found.";
-        exit;
+    {
+        $id = $_GET['id'] ?? 0;
+    
+        // Load the questionnaire group
+        $stmt = $this->pdo->prepare("SELECT * FROM questionnaire_groups WHERE id = ?");
+        $stmt->execute([$id]);
+        $group = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$group || !$this->userCanAccessTest($group['test_id'])) {
+            echo "Access denied or group not found.";
+            exit;
+        }
+    
+        $testId = $group['test_id'];
+    
+        // Load test + project context
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                t.title AS test_title, 
+                t.id AS test_id,
+                p.id AS project_id,
+                p.product_under_test AS project_name
+            FROM tests t
+            JOIN projects p ON p.id = t.project_id
+            WHERE t.id = ?
+        ");
+        $stmt->execute([$testId]);
+        $context = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        // Add breadcrumbs with anchor to this specific group
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
+            ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $testId . '#questionnaire-group' . $id, 'active' => false],
+            ['label' => 'Edit Questionnaire Group', 'url' => '', 'active' => true],
+        ];
+    
+        include __DIR__ . '/../views/questionnaire_groups/form.php';
     }
-
-    $testId = $group['test_id'];
-
-    // Fetch test + project context
-    $stmt = $this->pdo->prepare("
-        SELECT 
-            t.title AS test_title, 
-            t.id AS test_id,
-            p.id AS project_id,
-            p.product_under_test AS project_name
-        FROM tests t
-        JOIN projects p ON p.id = t.project_id
-        WHERE t.id = ?
-    ");
-    $stmt->execute([$testId]);
-    $context = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    include __DIR__ . '/../views/questionnaire_groups/form.php';
-}
+    
 
     public function reorder()
     {

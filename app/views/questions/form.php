@@ -8,11 +8,6 @@ require __DIR__ . '/../layouts/header.php';
         <a href="/index.php?controller=Test&action=show&id=<?php echo $context['test_id']; ?>#questionnaire-group<?php echo $question['questionnaire_group_id']; ?>" class="btn btn-secondary btn-xs mb-4">
             ← Back to Test
         </a>
-        <p class="text-muted mb-4">
-            <strong>Project:</strong> <?php echo htmlspecialchars($context['project_name']); ?><br>
-            <strong>Test:</strong> <?php echo htmlspecialchars($context['test_title']); ?><br>
-            <strong>Group:</strong> <?php echo htmlspecialchars($context['group_title']); ?>
-        </p>
     <?php endif; ?>
 
     <h1 class="mb-4"><?php echo $title; ?></h1>
@@ -66,7 +61,11 @@ require __DIR__ . '/../layouts/header.php';
 
         <div class="d-flex gap-2 mt-4">
             <button type="submit" class="btn btn-primary">Save Question</button>
-            <a href="/index.php?controller=Test&action=show&id=<?php echo $_GET['test_id'] ?? $_POST['test_id'] ?? ''; ?>" class="btn btn-secondary">Cancel</a>
+            <?php
+$anchor = $question['id'] ? '#questionnaire-group' . $question['questionnaire_group_id'] : '#questionnaire-group-list';
+$cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] . $anchor;
+?>
+<a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
@@ -77,15 +76,15 @@ const presets = {
         type: "radio",
         options: "Yes:yes;No:no"
     },
-    "Agreement Scale (1–5)": {
+    "Agreement Scale (1-5)": {
         type: "radio",
         options: "Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5"
     },
-    "Difficulty Scale (1–5)": {
+    "Difficulty Scale (1-5)": {
         type: "radio",
         options: "Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5"
     },
-    "Satisfaction Scale (1–5)": {
+    "Satisfaction Scale (1-5)": {
         type: "radio",
         options: "Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5"
     }

@@ -3,15 +3,11 @@ $title = 'Questions for tests';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 <div class="container py-5">
-<?php if (!empty($context)): ?>
 
+<?php if (!empty($context)): ?>
     <a href="/index.php?controller=Test&action=show&id=<?php echo $context['test_id']; ?>#questionnaire-group<?php echo $group['id']; ?>" class="btn btn-secondary btn-xs mb-4">
         ← Back to Test
     </a>
-    <p class="text-muted mb-4">
-        <strong>Project:</strong> <?php echo htmlspecialchars($context['project_name']); ?><br>
-        <strong>Test:</strong> <?php echo htmlspecialchars($context['test_title']); ?>
-    </p>
 <?php endif; ?>
 
     <h1 class="mb-4"><?php echo $group['id'] ? 'Edit' : 'Create'; ?> Questionnaire Group</h1>
@@ -33,7 +29,12 @@ require __DIR__ . '/../layouts/header.php';
         </div>
 
         <button type="submit" class="btn btn-primary">Save</button>
-        <a href="/index.php?controller=Test&action=show&id=<?php echo $group['test_id']; ?>" class="btn btn-secondary">Cancel</a>
+        <?php
+        $anchor = $group['id'] ? '#questionnaire-group' . $group['id'] : '#questionnaire-group-list';
+        $cancelUrl = '/index.php?controller=Test&action=show&id=' . $group['test_id'] . $anchor;
+        ?>
+        <a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary">Cancel</a>
+
     </form>
 </div>
 

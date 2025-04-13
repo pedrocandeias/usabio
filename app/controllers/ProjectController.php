@@ -71,53 +71,57 @@ class ProjectController
             header('Location: /index.php?controller=Project&action=index');
             exit;
         }
-
+    
         $data = $_POST;
-
-        $this->projectModel->create($data);
-
-        $projectId = $this->pdo->lastInsertId(); // or use $_POST['id'] in update
+    
+        // Create the project and get its ID
+        $projectId = $this->projectModel->create($data);
+    
+        // Assign users if provided
         $assignedUsers = $_POST['assigned_users'] ?? [];
-
-        $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
-        $stmt->execute([$projectId]);
-
-        $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-        foreach ($assignedUsers as $userId) {
-            $stmt->execute([$projectId, $userId]);
+        if (!empty($assignedUsers)) {
+            $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
+            foreach ($assignedUsers as $userId) {
+                $stmt->execute([$projectId, $userId]);
+            }
         }
-
-        header('Location: /index.php?controller=Project&action=index');
+    
+        // Redirect to project detail view
+        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
         exit;
     }
+    
 
     public function show()
     {
+        $projectId = $_GET['id'] ?? 0;
 
-        
-        if (!$_SESSION['is_admin']) {
-            $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
-            $stmt->execute([$project_id, $_SESSION['user_id']]);
-            $authorized = $stmt->fetchColumn();
-        
-            if (!$authorized) {
-                echo "Access denied: You are not assigned to this project.";
-                exit;
-            }
-        }
+    if (!$projectId) {
+        echo "Invalid project ID.";
+        exit;
+    }
 
-        $id = $_GET['id'] ?? 0;
-        if (!$id) {
-            echo "Invalid project ID.";
+    // Superadmins can always access
+    if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
+        $stmt = $this->pdo->prepare("
+            SELECT 1 FROM project_user
+            WHERE project_id = ? AND moderator_id = ?
+        ");
+        $stmt->execute([$projectId, $_SESSION['user_id']]);
+        $authorized = $stmt->fetchColumn();
+
+        if (!$authorized) {
+            echo "Access denied: You are not assigned to this project.";
             exit;
         }
+    }
 
-        $project = $this->projectModel->find($id);
-
-        if (!$project) {
-            echo "Project not found.";
-            exit;
-        }
+    // Fetch project
+    $project = $this->projectModel->find($projectId);
+    if (!$project) {
+        echo "Project not found.";
+        exit;
+    }
 
         $stmt = $this->pdo->prepare(
             "
@@ -127,13 +131,18 @@ class ProjectController
             WHERE pu.project_id = ?
         "
         );
-        $stmt->execute([$id]);
+        $stmt->execute([$projectId]);
         $assignedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Fetch related tests
         $stmt = $this->pdo->prepare("SELECT * FROM tests WHERE project_id = ?");
-        $stmt->execute([$id]);
+        $stmt->execute([$projectId]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $project['title'], 'url' => '', 'active' => true],
+        ];
 
         include __DIR__ . '/../views/projects/show.php';
     }
@@ -144,79 +153,99 @@ class ProjectController
      */
     public function edit()
     {
-        if (!$_SESSION['is_admin']) {
-            $id = $_GET['id'] ?? 0;
-            $project_id = $id;
-            $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
-            $stmt->execute([$project_id, $_SESSION['user_id']]);
+        $projectId = $_GET['id'] ?? 0;
+    
+        if (!$projectId) {
+            echo "Invalid project ID.";
+            exit;
+        }
+    
+        // Allow superadmins and admins, restrict for regular moderators
+        if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
+            $stmt = $this->pdo->prepare("
+                SELECT 1 FROM project_user
+                WHERE project_id = ? AND moderator_id = ?
+            ");
+            $stmt->execute([$projectId, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
-        
+    
             if (!$authorized) {
                 echo "Access denied: You are not assigned to this project.";
                 exit;
             }
         }
-        $id = $_GET['id'] ?? 0;
-        $project = $this->projectModel->find($id);
-
-
-
+    
+        $project = $this->projectModel->find($projectId);
         if (!$project) {
             echo "Project not found.";
             exit;
         }
-
-        // for edit
-        // Fetch all users to show in the multiselect
+    
+        // Load all moderators for assignment UI
         $stmt = $this->pdo->query("SELECT id, username FROM moderators ORDER BY username");
         $allUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $assignedUsers = []; // for create
+    
+        // Fetch currently assigned users
+        $stmt = $this->pdo->prepare("SELECT moderator_id FROM project_user WHERE project_id = ?");
+        $stmt->execute([$projectId]);
+        $assignedUsers = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
         include __DIR__ . '/../views/projects/form.php';
     }
+    
 
     /**
      * Update an existing project
      */
     public function update()
     {
-
-        if (!$_SESSION['is_admin']) {
-            $id = $_GET['id'] ?? 0;
-            $project_id = $id;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /index.php?controller=Project&action=index');
+            exit;
+        }
+    
+        $projectId = $_POST['id'] ?? 0;
+    
+        if (!$projectId) {
+            echo "Missing project ID.";
+            exit;
+        }
+    
+        // Access control
+        if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
-            $stmt->execute([$project_id, $_SESSION['user_id']]);
+            $stmt->execute([$projectId, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
-
-            $projectId = $this->pdo->lastInsertId(); // or use $_POST['id'] in update
-            $assignedUsers = $_POST['assigned_users'] ?? [];
-            
-            $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
-            $stmt->execute([$projectId]);
-            
-            $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-            foreach ($assignedUsers as $userId) {
-                $stmt->execute([$projectId, $userId]);
-            }
-
+    
             if (!$authorized) {
                 echo "Access denied: You are not assigned to this project.";
                 exit;
             }
         }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?controller=Project&action=index');
-            exit;
-        }
-
-        $id = $_POST['id'] ?? 0;
+    
+        // Update project data
         $data = $_POST;
-
-        $this->projectModel->update($id, $data);
-
-        header('Location: /index.php?controller=Project&action=index');
+        $this->projectModel->update($projectId, $data);
+    
+        // Update assigned users
+        $assignedUsers = $_POST['assigned_users'] ?? [];
+    
+        // Clear old assignments
+        $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
+        $stmt->execute([$projectId]);
+    
+        // Insert new ones
+        if (!empty($assignedUsers)) {
+            $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
+            foreach ($assignedUsers as $userId) {
+                $stmt->execute([$projectId, $userId]);
+            }
+        }
+    
+        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
         exit;
     }
+    
 
     /**
      * Delete a project

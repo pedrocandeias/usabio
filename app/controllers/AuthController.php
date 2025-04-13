@@ -20,6 +20,7 @@ class AuthController
     {
         // If user is already logged in, redirect to the main page (or wherever).
         if (isset($_SESSION['username'])) {
+            
             header('Location: /?controller=Project&action=index');
             exit;
         }
@@ -28,7 +29,7 @@ class AuthController
         $error = $_GET['error'] ?? null;
 
         // Load the login view (make sure the path is correct for your app)
-        require __DIR__ . '/../views/auth/login.php';
+        include __DIR__ . '/../views/auth/login.php';
     }
 
     /**
@@ -36,38 +37,53 @@ class AuthController
      */
     public function processLogin()
     {
-        // We only handle POST requests here. If not POST, redirect back to login form.
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /?controller=Auth&action=login');
             exit;
         }
 
-        // Grab the form data
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        // Find the user in the "moderators" table
         $stmt = $this->pdo->prepare("SELECT * FROM moderators WHERE username = :username LIMIT 1");
         $stmt->bindValue(':username', $username);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Verify the password against the stored hash
         if ($user && password_verify($password, $user['password_hash'])) {
-            // If valid, store the user info in the session
+            // ✅ Store session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['fullname'] = $user['fullname'] ?? $user['username'];
             $_SESSION['is_admin'] = $user['is_admin'];
+            $_SESSION['is_superadmin'] = $user['is_superadmin']; // fix here too
 
-            // Redirect to the main page (Project index, for example)
+            $stmt = $this->pdo->prepare(
+                "
+            UPDATE moderators
+            SET last_login = NOW(),
+                last_login_ip = ?,
+                last_login_user_agent = ?
+            WHERE id = ?
+        "
+            );
+            $stmt->execute(
+                [
+                $_SERVER['REMOTE_ADDR'],
+                $_SERVER['HTTP_USER_AGENT'],
+                $user['id']
+                ]
+            );
+
+            // ✅ Redirect after login
             header('Location: /?controller=Project&action=index');
             exit;
         }
 
-        // Otherwise, credentials are invalid, so redirect back with an error message
         header('Location: /?controller=Auth&action=login&error=Invalid%20credentials');
         exit;
     }
+
 
     /**
      * Logout the user by destroying the session.

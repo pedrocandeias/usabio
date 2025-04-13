@@ -107,9 +107,14 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         </div>
     </div>
+    
+    <a href="/index.php?controller=Participant&action=index&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-dark btn-sm">
+    👤 View Participants
+</a>
+
 
     <!-- Test List -->
-    <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+    <div id="tests-list" class="d-flex justify-content-between align-items-center mb-3 mt-5">
         <h3>Tests</h3>
         <a href="/index.php?controller=Test&action=create&project_id=<?php echo $project['id']; ?>" class="btn btn-success btn-sm">Add Test</a>
     </div>

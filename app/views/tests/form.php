@@ -4,11 +4,6 @@ require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
 <a href="/index.php?controller=Project&action=show&id=<?php echo $test['project_id']; ?>" class="btn btn-secondary mb-4">← Back to Project</a>
-<?php if (!empty($context)): ?>
-    <p class="text-muted mb-4">
-        <strong>Project:</strong> <?php echo htmlspecialchars($context['product_under_test']); ?>
-    </p>
-<?php endif; ?>
 
     <h1><?php echo $test['id'] ? 'Edit' : 'Create'; ?> Test</h1>
 

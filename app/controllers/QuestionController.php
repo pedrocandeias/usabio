@@ -47,20 +47,35 @@ class QuestionController
             'text' => '',
             'question_type' => 'text',
             'question_options' => '',
-            'position' => 0,
-            'preset_type' => null
+            'preset_type' => '',
+            'position' => 0
         ];
     
-        // Fetch test + project info
-        $stmt = $this->pdo->prepare("
-            SELECT t.title AS test_title, t.id AS test_id, p.product_under_test AS project_name
-            FROM tests t
-            JOIN projects p ON t.project_id = p.id
-            WHERE t.id = ?
-        ");
-        $stmt->execute([$testId]);
+         // Load group + test context
+        $stmt = $this->pdo->prepare(
+            "
+            SELECT qg.test_id, t.title AS test_title, p.id AS project_id, p.product_under_test AS project_name
+            FROM questionnaire_groups qg
+            JOIN tests t ON t.id = qg.test_id
+            JOIN projects p ON p.id = t.project_id
+            WHERE qg.id = ?
+        "
+        );
+        $stmt->execute([$groupId]);
         $context = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
+            ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnaire-group-list', 'active' => false],
+            ['label' => 'Create Question', 'url' => '', 'active' => true],
+        ];
+
+        if (!$context || !$this->userCanAccessGroup($question['questionnaire_group_id'])) {
+            echo "Access denied or not found.";
+            exit;
+        }
+
         include __DIR__ . '/../views/questions/form.php';
     }
 
@@ -89,42 +104,57 @@ class QuestionController
     }
 
     public function edit()
-{
-    $id = $_GET['id'] ?? 0;
+    {
+        $id = $_GET['id'] ?? 0;
+        $testId = $_GET['test_id'] ?? 0;
 
-    $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE id = ?");
-    $stmt->execute([$id]);
-    $question = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE id = ?");
+        $stmt->execute([$id]);
+        $question = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$question) {
+            echo "Question not found.";
+            exit;
+        }
+        if (!$question || !$this->userCanAccessGroup($question['questionnaire_group_id'])) {
+            echo "Access denied or not found.";
+            exit;
+        }
 
-    if (!$question || !$this->userCanAccessGroup($question['questionnaire_group_id'])) {
-        echo "Access denied or not found.";
-        exit;
-    }
-
-    // Fetch test + project + group context
-    $stmt = $this->pdo->prepare("
-        SELECT 
-            qg.title AS group_title,
-            t.title AS test_title,
-            t.id AS test_id,
-            p.product_under_test AS project_name,
-            p.id AS project_id
+        $stmt = $this->pdo->prepare(
+            "
+        SELECT qg.test_id, qg.title AS questionnaire_group_title, t.title AS test_title, p.id AS project_id, p.product_under_test AS project_name
         FROM questionnaire_groups qg
         JOIN tests t ON t.id = qg.test_id
         JOIN projects p ON p.id = t.project_id
         WHERE qg.id = ?
-    ");
-    $stmt->execute([$question['questionnaire_group_id']]);
-    $context = $stmt->fetch(PDO::FETCH_ASSOC);
+    "
+        );
+        $stmt->execute([$question['questionnaire_group_id']]);
+        $context = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    include __DIR__ . '/../views/questions/form.php';
-}
+
+        $breadcrumbs = [
+        ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+        ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
+        ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnaire-group' . $question['questionnaire_group_id'], 'active' => false],
+        ['label' => $context['questionnaire_group_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnaire-group' . $question['questionnaire_group_id'], 'active' => false],
+        ['label' => 'Edit Question', 'url' => '', 'active' => true],
+        ];
+
+        include __DIR__ . '/../views/questions/form.php';
+    }
 
 
     public function update()
     {
         $data = $_POST;
-
+        $stmt = $this->pdo->prepare("SELECT questionnaire_group_id FROM questions WHERE id = ?");
+        $stmt->execute([$data['id']]);
+        $groupId = $stmt->fetchColumn();
+        if (!$this->userCanAccessGroup($groupId)) {
+            echo "Access denied.";
+            exit;
+        }
         $stmt = $this->pdo->prepare(
             "
             UPDATE questions SET
@@ -142,7 +172,7 @@ class QuestionController
             ]
         );
 
-        header("Location: /index.php?controller=Test&action=show&id=" . $data['test_id']);
+        header("Location: /index.php?controller=Test&action=show&id=" . $data['test_id'].'#questionnaire-group' . $groupId);
         exit;
     }
 

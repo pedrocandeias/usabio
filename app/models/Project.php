@@ -28,28 +28,50 @@ class Project
     {
         $stmt = $this->pdo->prepare("
             INSERT INTO projects (
-                title, description, product_under_test, business_case, test_objectives, participants,
-                equipment, responsibilities, location_dates, test_procedure
+                title,
+                description,
+                product_under_test,
+                business_case,
+                test_objectives,
+                participants,
+                equipment,
+                responsibilities,
+                location_dates,
+                test_procedure,
+                created_at,
+                updated_at
             ) VALUES (
-                :title, :description, :product_under_test, :business_case, :test_objectives, :participants,
-                :equipment, :responsibilities, :location_dates, :test_procedure
+                :title,
+                :description,
+                :product_under_test,
+                :business_case,
+                :test_objectives,
+                :participants,
+                :equipment,
+                :responsibilities,
+                :location_dates,
+                :test_procedure,
+                NOW(),
+                NOW()
             )
         ");
-
-        return $stmt->execute([
-            ':title'              => $data['title'],
-            ':description'        => $data['description'],
-            ':product_under_test' => $data['product_under_test'],
-            ':business_case'      => $data['business_case'],
-            ':test_objectives'    => $data['test_objectives'],
-            ':participants'       => $data['participants'],
-            ':equipment'          => $data['equipment'],
-            ':responsibilities'   => $data['responsibilities'],
-            ':location_dates'     => $data['location_dates'],
-            ':test_procedure'     => $data['test_procedure']
+    
+        $stmt->execute([
+            ':title' => $data['title'] ?? '',
+            ':description' => $data['description'] ?? '',
+            ':product_under_test' => $data['product_under_test'] ?? '',
+            ':business_case' => $data['business_case'] ?? '',
+            ':test_objectives' => $data['test_objectives'] ?? '',
+            ':participants' => $data['participants'] ?? '',
+            ':equipment' => $data['equipment'] ?? '',
+            ':responsibilities' => $data['responsibilities'] ?? '',
+            ':location_dates' => $data['location_dates'] ?? '',
+            ':test_procedure' => $data['test_procedure'] ?? '',
         ]);
+    
+        return $this->pdo->lastInsertId();
     }
-
+    
     public function update($id, $data)
     {
         $stmt = $this->pdo->prepare("
@@ -63,22 +85,23 @@ class Project
                 equipment = :equipment,
                 responsibilities = :responsibilities,
                 location_dates = :location_dates,
-                test_procedure = :test_procedure
+                test_procedure = :test_procedure,
+                updated_at = NOW()
             WHERE id = :id
         ");
 
-        return $stmt->execute([
-            ':id'                 => $id,
-            ':title'              => $data['title'],
-            ':description'        => $data['description'],
-            ':product_under_test' => $data['product_under_test'],
-            ':business_case'      => $data['business_case'],
-            ':test_objectives'    => $data['test_objectives'],
-            ':participants'       => $data['participants'],
-            ':equipment'          => $data['equipment'],
-            ':responsibilities'   => $data['responsibilities'],
-            ':location_dates'     => $data['location_dates'],
-            ':test_procedure'     => $data['test_procedure']
+        $stmt->execute([
+            ':id' => $id,
+            ':title' => $data['title'] ?? '',
+            ':description' => $data['description'] ?? '',
+            ':product_under_test' => $data['product_under_test'] ?? '',
+            ':business_case' => $data['business_case'] ?? '',
+            ':test_objectives' => $data['test_objectives'] ?? '',
+            ':participants' => $data['participants'] ?? '',
+            ':equipment' => $data['equipment'] ?? '',
+            ':responsibilities' => $data['responsibilities'] ?? '',
+            ':location_dates' => $data['location_dates'] ?? '',
+            ':test_procedure' => $data['test_procedure'] ?? '',
         ]);
     }
 

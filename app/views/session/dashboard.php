@@ -6,7 +6,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
 <div class="container py-5">
     <a href="/index.php?controller=Project&action=index" class="btn btn-secondary mb-4">← Back to Projects</a>
 
-    <h1 class="mb-4">Test Sessions</h1>
+    <h1 class="mb-4">Test Sessions for <?php echo htmlspecialchars($test['project_name']); ?></h1>
 
     <?php if (isset($_GET['success'])) : ?>
     <div class="alert alert-success">✅ Task session saved successfully!</div>
@@ -19,9 +19,6 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 <div class="col">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
-                            <p class="text-muted mb-2">
-                                Project: <?php echo htmlspecialchars($test['project_name']); ?>
-                            </p>   
                             <h5 class="card-title"><?php echo htmlspecialchars($test['title']); ?></h5>
                            
                             <p class="mb-1">

@@ -49,10 +49,22 @@ try {
         "CREATE TABLE IF NOT EXISTS moderators (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            last_login DATETIME DEFAULT NULL,
+            last_login_ip VARCHAR(45) DEFAULT NULL,
+            last_login_user_agent VARCHAR(255) DEFAULT NULL,
+            last_login_location VARCHAR(255) DEFAULT NULL,
+            fullname VARCHAR(255) DEFAULT NULL,
+            company VARCHAR(255) DEFAULT NULL,
             password_hash VARCHAR(255) NOT NULL,
+            reset_token VARCHAR(255)  DEFAULT NULL,
+            is_superadmin BOOLEAN NOT NULL DEFAULT 0,
             is_admin BOOLEAN NOT NULL DEFAULT 0
         ) ENGINE=InnoDB;" => "moderators",
-
+        
+        // === TABLE: project_user ===
         "CREATE TABLE IF NOT EXISTS project_user (
             project_id INT NOT NULL,
             moderator_id INT NOT NULL,
@@ -141,18 +153,18 @@ try {
         ) ENGINE=InnoDB;" => "responses",
 
         // === TABLE: tests_custom_fields ===
-        " CREATE TABLE IF NOT EXISTS test_custom_fields (
+        "CREATE TABLE IF NOT EXISTS test_custom_fields (
             id INT AUTO_INCREMENT PRIMARY KEY,
             test_id INT NOT NULL,
             label VARCHAR(100) NOT NULL,
             field_type ENUM('text', 'number', 'select') DEFAULT 'text',
-            options TEXT NULL,
+            options TEXT,
             position INT DEFAULT 0,
             FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB;" => "project_custom_fields",
+        ) ENGINE=InnoDB;" => "test_custom_fields",
 
         // === TABLE: evaluation_custom_data ===
-        " CREATE TABLE IF NOT EXISTS evaluation_custom_data (
+        "CREATE TABLE IF NOT EXISTS evaluation_custom_data (
             id INT AUTO_INCREMENT PRIMARY KEY,
             evaluation_id INT NOT NULL,
             field_id INT NOT NULL,
@@ -160,6 +172,33 @@ try {
             FOREIGN KEY (evaluation_id) REFERENCES evaluations(id) ON DELETE CASCADE,
             FOREIGN KEY (field_id) REFERENCES test_custom_fields(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "evaluation_custom_data",
+
+        // === TABLE: Participant table ===
+        "CREATE TABLE IF NOT EXISTS participants (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            project_id INT NOT NULL,
+            test_id INT DEFAULT NULL,
+            participant_name VARCHAR(255),
+            participant_age VARCHAR(20),
+            participant_gender VARCHAR(255),
+            participant_academic_level VARCHAR(100),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB;" => "participants",
+
+        // === TABLE: test_sessions ===
+        "CREATE TABLE IF NOT EXISTS test_sessions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            test_id INT NOT NULL,
+            participant_id INT NOT NULL,
+            session_start DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            session_end DATETIME DEFAULT NULL,
+            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
+            FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;" => "test_sessions",
+
     ];
 
     foreach ($tables as $sql => $name) {
@@ -167,7 +206,9 @@ try {
         $messages[] = "Table '<strong>$name</strong>' created or already exists.";
     }
 
+
     // Admin user
+
     $stmt = $pdo->prepare("SELECT id FROM moderators WHERE username = ?");
     $stmt->execute(['testgod']);
 
