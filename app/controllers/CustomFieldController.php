@@ -11,34 +11,45 @@ class CustomFieldController
 
     public function store()
     {
+        // Safely read from POST or GET
         $data = $_POST;
-
+        $projectId = $data['project_id'] ?? $_GET['project_id'] ?? $_GET['id'] ?? 0;
+    
+        if (!$projectId) {
+            echo "Missing project ID.";
+            exit;
+        }
+    
+        // Insert the custom field
         $stmt = $this->pdo->prepare("
-            INSERT INTO test_custom_fields (test_id, label, field_type, options, position)
+            INSERT INTO participants_custom_fields (project_id, label, field_type, options, position)
             VALUES (?, ?, ?, ?, ?)
         ");
-
+    
         $stmt->execute([
-            $data['test_id'],
+            $projectId,
             $data['label'],
             $data['field_type'],
             $data['options'] ?? null,
             $data['position'] ?? 0
         ]);
-
-        header("Location: /index.php?controller=Test&action=show&id=" . $data['test_id']. "#custom-fields-list");
+    
+        header("Location: /index.php?controller=Project&action=show&id=$projectId#custom-fields-list");
         exit;
     }
+    
+
+
 
     public function destroy()
     {
         $id = $_GET['id'];
-        $testId = $_GET['test_id'];
+        $projectId = $_GET['project_id'];
 
-        $stmt = $this->pdo->prepare("DELETE FROM test_custom_fields WHERE id = ?");
+        $stmt = $this->pdo->prepare("DELETE FROM participants_custom_fields WHERE id = ?");
         $stmt->execute([$id]);
 
-        header("Location: /index.php?controller=Test&action=show&id=" . $testId. "#custom-fields-list");
+        header("Location: /index.php?controller=Project&action=show&id=" . $projecttId. "#custom-fields-list");
         exit;
     }
 }

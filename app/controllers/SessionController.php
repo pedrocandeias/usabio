@@ -112,7 +112,7 @@ class SessionController
         $prefillCustomData = [];
         $previousEvaluation = [];
 
-        $stmt = $this->pdo->prepare("SELECT * FROM test_custom_fields WHERE test_id = ? ORDER BY position ASC");
+        $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
         $stmt->execute([$testId]);
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -215,7 +215,7 @@ class SessionController
             "
             SELECT f.label, d.value
             FROM evaluation_custom_data d
-            JOIN test_custom_fields f ON f.id = d.field_id
+            JOIN participants_custom_fields f ON f.id = d.field_id
             WHERE d.evaluation_id = ?
             ORDER BY f.position ASC
         "
@@ -376,7 +376,7 @@ class SessionController
             }
         }
 
-        $stmt = $this->pdo->prepare("SELECT * FROM test_custom_fields WHERE test_id = ? ORDER BY position ASC");
+        $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
         $stmt->execute([$testId]);
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
     

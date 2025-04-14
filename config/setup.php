@@ -153,15 +153,15 @@ try {
         ) ENGINE=InnoDB;" => "responses",
 
         // === TABLE: tests_custom_fields ===
-        "CREATE TABLE IF NOT EXISTS test_custom_fields (
+        "CREATE TABLE IF NOT EXISTS participants_custom_fields (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            test_id INT NOT NULL,
+            project_id INT NOT NULL,
             label VARCHAR(100) NOT NULL,
             field_type ENUM('text', 'number', 'select') DEFAULT 'text',
             options TEXT,
             position INT DEFAULT 0,
-            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB;" => "test_custom_fields",
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;" => "participants_custom_fields",
 
         // === TABLE: evaluation_custom_data ===
         "CREATE TABLE IF NOT EXISTS evaluation_custom_data (
@@ -170,7 +170,7 @@ try {
             field_id INT NOT NULL,
             value TEXT NOT NULL,
             FOREIGN KEY (evaluation_id) REFERENCES evaluations(id) ON DELETE CASCADE,
-            FOREIGN KEY (field_id) REFERENCES test_custom_fields(id) ON DELETE CASCADE
+            FOREIGN KEY (field_id) REFERENCES participants_custom_fields(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "evaluation_custom_data",
 
         // === TABLE: Participant table ===

@@ -30,16 +30,25 @@ class Participant
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function findInParticipants($id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+
     public function customFields($evaluationId)
     {
         $stmt = $this->pdo->prepare("
             SELECT f.label, f.field_type, d.value
             FROM evaluation_custom_data d
-            JOIN test_custom_fields f ON d.field_id = f.id
+            JOIN participants_custom_fields f ON d.field_id = f.id
             WHERE d.evaluation_id = ?
             ORDER BY f.position
         ");
         $stmt->execute([$evaluationId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 }

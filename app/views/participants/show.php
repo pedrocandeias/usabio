@@ -1,14 +1,12 @@
 <?php 
-$title = 'Participant: ' . htmlspecialchars($participantName);
+$title = 'Participant: ' . htmlspecialchars($participant['participant_name']);
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 
 <div class="container py-5">
     <h1 class="mb-4">Participant Details</h1>
 
-    <p class="text-muted">Project: <strong><?php echo htmlspecialchars($projectName); ?></strong></p>
-
-    <h4 class="mb-3"><?php echo htmlspecialchars($participantName); ?></h4>
+    <h4 class="mb-3"><?php echo htmlspecialchars($participant['participant_name'] ?? 'Participant'); ?></h4>
     <ul class="list-group mb-4">
         <li class="list-group-item">Age: <strong><?php echo htmlspecialchars($participant['participant_age']); ?></strong></li>
         <li class="list-group-item">Gender: <strong><?php echo htmlspecialchars($participant['participant_gender']); ?></strong></li>

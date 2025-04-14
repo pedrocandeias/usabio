@@ -2,7 +2,6 @@
 $title = 'Project details';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
-    aqui <?php echo $project['id']; ?>
 <div class="container py-5">
 
     <!-- Header + Edit Button -->
@@ -136,19 +135,22 @@ require __DIR__ . '/../layouts/header.php';
         </div>
     <?php endif; ?>
 
-
     <!-- Participants list List -->
-    
 
     <hr class="my-5">
     <div id="participant-list">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Participants</h3>
-            <a href="/index.php?controller=Participant&action=index&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
-                View All Participants
-            </a>
+            <div>
+                <a href="/index.php?controller=Participant&action=index&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
+                    View All Participants
+                </a>
+                <a href="/index.php?controller=Participant&action=create&project_id=<?php echo $project['id']; ?>" class="btn btn-success btn-sm">
+                    + Add Participant Manually
+                </a>
+            </div>
         </div>
-
+        <?php print_r($participants); ?>
         <?php if (!empty($participants)) : ?>
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-sm">
@@ -156,18 +158,16 @@ require __DIR__ . '/../layouts/header.php';
                     <tr>
                         <th>Name</th>
                         <th>Test Count</th>
-                        <th>Last Participation</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($participants as $p): ?>
+                    <?php foreach ($participants as $participant): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($p['participant_name']); ?></td>
-                            <td><?php echo (int) $p['evaluation_count']; ?></td>
-                            <td><?php echo htmlspecialchars($p['last_participation']); ?></td>
+                            <td><?php echo htmlspecialchars($participant['participant_name']); ?></td>
+                            <td><?php echo (int) $participant['evaluation_count']; ?></td>
                             <td>
-                                <a href="/index.php?controller=Participant&action=show&id=<?php echo $p['participant_id']; ?>&project_id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-primary">
+                                <a href="/index.php?controller=Participant&action=show&project_id=<?php echo $project['id']; ?>&id=<?php echo $participant['id']; ?>" class="btn btn-sm btn-outline-primary">
                                     View Participant
                                 </a>
                             </td>
@@ -183,6 +183,70 @@ require __DIR__ . '/../layouts/header.php';
         <?php endif; ?>
     </div>
 
+
+     <!-- Custom Participant Fields -->
+     <div id="custom-fields-list">
+        <hr class="my-5">
+        <h4 class="mb-3">Custom Participant Fields</h4>
+
+        <form method="POST" action="/index.php?controller=CustomField&action=store" class="row g-3 mb-4">
+            <input type="hidden" name="project_id" value="<?php echo $test['id']; ?>">
+
+            <div class="col-md-4">
+                <input type="text" name="label" class="form-control" placeholder="Field Label" required>
+            </div>
+
+            <div class="col-md-4">
+                <select name="field_type" class="form-select" required>
+                    <option value="text">Text</option>
+                    <option value="number">Number</option>
+                    <option value="select">Dropdown (select)</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <input type="text" name="options" class="form-control" placeholder="Options (for select, e.g. A;B;C)">
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+        </form>
+
+        <?php
+        $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
+        $stmt->execute([$test['id']]);
+        $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+
+        <?php if (!empty($customFields)) : ?>
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Type</th>
+                        <th>Options</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($customFields as $field): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($field['label']); ?></td>
+                            <td><?php echo $field['field_type']; ?></td>
+                            <td><?php echo htmlspecialchars($field['options']); ?></td>
+                            <td class="text-end">
+                                <a href="/index.php?controller=CustomField&action=destroy&id=<?php echo $field['id']; ?>&test_id=<?php echo $test['id']; ?>"
+                                class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this field?')">Remove</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="text-muted">No custom fields defined yet for this test.</p>
+        <?php endif; ?>
+    </div>
    
     <div class="mt-4">
         <a href="/index.php?controller=Project&action=index" class="btn btn-secondary">← Back to Project List</a>
