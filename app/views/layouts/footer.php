@@ -1,6 +1,6 @@
 </main>
 
-<footer class="footer bg-light text-center text-lg-start mt-auto">
+<footer class="footer bg-light text-center text-lg-start mt-auto fixed-bottom">
   <div class="text-center p-3 border-top bg-secondary">
     <small class="text-white">&copy; <?php echo date('Y'); ?> TestFlowUX / IPCA</small>
   </div>

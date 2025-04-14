@@ -59,7 +59,7 @@ class SessionController
 
         $stmt = $this->pdo->prepare(
             "
-        SELECT t.*, p.product_under_test AS project_name
+        SELECT t.*, p.product_under_test AS product_name, p.title AS project_name
         FROM tests t
         JOIN projects p ON t.project_id = p.id
         WHERE t.project_id = ?

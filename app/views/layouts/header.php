@@ -144,4 +144,4 @@
         </a>
     </header>
 <?php endif; ?>
-<main>
+<main class="mb-5">

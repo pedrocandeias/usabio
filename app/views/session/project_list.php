@@ -28,7 +28,14 @@
         </div>
     <?php else: ?>
         <p class="text-muted">No projects found or assigned to you.</p>
+        <a href="/index.php?controller=Project&action=create" class="btn btn-primary">
+            Create a New Project
+        </a>
     <?php endif; ?>
 </div>
-
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
+<?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
+
+</body>
+</html>
+

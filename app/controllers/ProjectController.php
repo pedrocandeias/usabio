@@ -139,6 +139,18 @@ class ProjectController
         $stmt->execute([$projectId]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Get participants for the project
+$stmt = $this->pdo->prepare("
+    SELECT e.*, t.title AS test_title
+    FROM evaluations e
+    JOIN tests t ON e.test_id = t.id
+    WHERE t.project_id = ?
+    ORDER BY e.timestamp DESC
+");
+$stmt->execute([$projectId]);
+$participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $project['title'], 'url' => '', 'active' => true],

@@ -5,15 +5,16 @@ require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
     <a href="/index.php?controller=Project&action=index" class="btn btn-secondary mb-4">← Back to Projects</a>
-
-    <h1 class="mb-4">Test Sessions for <?php echo htmlspecialchars($test['project_name']); ?></h1>
-
+    
+    
     <?php if (isset($_GET['success'])) : ?>
-    <div class="alert alert-success">✅ Task session saved successfully!</div>
+        <div class="alert alert-success">✅ Task session saved successfully!</div>
     <?php endif; ?>
 
-
     <?php if (!empty($tests)) : ?>
+        <?php $projectName = $tests[0]['project_name'] ?? 'Project'; ?>
+        <h1 class="mb-4">Test Sessions for <?php echo htmlspecialchars($projectName); ?></h1>
+   
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             <?php foreach ($tests as $test): ?>
                 <div class="col">
@@ -35,7 +36,9 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <?php endforeach; ?>
         </div>
     <?php else: ?>
-        <p class="text-muted">No tests available. Make sure you’re assigned to a project.</p>
+        <div class="alert alert-warning">
+            ⚠️ No tests available. Make sure you're assigned to a project with tests.
+        </div>
     <?php endif; ?>
 </div>
 

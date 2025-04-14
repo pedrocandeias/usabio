@@ -2,7 +2,7 @@
 $title = 'Project details';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
-
+    aqui <?php echo $project['id']; ?>
 <div class="container py-5">
 
     <!-- Header + Edit Button -->
@@ -84,7 +84,7 @@ require __DIR__ . '/../layouts/header.php';
         <div class="col-md-3">
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Assigned Users</h5>
+                    <h5 class="card-title">Assigned moderators</h5>
                     <?php if (!empty($assignedUsers)) : ?>
                         <ul class="list-group mb-4">
                             <?php foreach ($assignedUsers as $user): ?>
@@ -92,7 +92,7 @@ require __DIR__ . '/../layouts/header.php';
                             <?php endforeach; ?>
                         </ul>
                     <?php else: ?>
-                        <p class="text-muted">No users assigned to this project.</p>
+                        <p class="text-muted">No moderators assigned to this project.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -108,11 +108,6 @@ require __DIR__ . '/../layouts/header.php';
         </div>
     </div>
     
-    <a href="/index.php?controller=Participant&action=index&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-dark btn-sm">
-    👤 View Participants
-</a>
-
-
     <!-- Test List -->
     <div id="tests-list" class="d-flex justify-content-between align-items-center mb-3 mt-5">
         <h3>Tests</h3>
@@ -128,7 +123,7 @@ require __DIR__ . '/../layouts/header.php';
                         <small><?php echo htmlspecialchars($test['description']); ?></small>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="/index.php?controller=Test&action=show&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-outline-secondary">View</a>
+                        <a href="/index.php?controller=Test&action=show&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-outline-secondary">Manage tasks and questions</a>
                         <a href="/index.php?controller=Test&action=edit&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
                         <a href="/index.php?controller=Test&action=destroy&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this test?');">Delete</a>
                     </div>
@@ -136,9 +131,59 @@ require __DIR__ . '/../layouts/header.php';
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
-        <p class="text-muted">No tests found for this project.</p>
+        <div class="alert alert-warning" role="alert">
+        ⚠️ No tests found for this project.
+        </div>
     <?php endif; ?>
 
+
+    <!-- Participants list List -->
+    
+
+    <hr class="my-5">
+    <div id="participant-list">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Participants</h3>
+            <a href="/index.php?controller=Participant&action=index&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
+                View All Participants
+            </a>
+        </div>
+
+        <?php if (!empty($participants)) : ?>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Test Count</th>
+                        <th>Last Participation</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($participants as $p): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($p['participant_name']); ?></td>
+                            <td><?php echo (int) $p['evaluation_count']; ?></td>
+                            <td><?php echo htmlspecialchars($p['last_participation']); ?></td>
+                            <td>
+                                <a href="/index.php?controller=Participant&action=show&id=<?php echo $p['participant_id']; ?>&project_id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-primary">
+                                    View Participant
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php else: ?>
+            <div class="alert alert-warning" role="alert">
+                ⚠️ No participants found for this project.
+            </div>
+        <?php endif; ?>
+    </div>
+
+   
     <div class="mt-4">
         <a href="/index.php?controller=Project&action=index" class="btn btn-secondary">← Back to Project List</a>
     </div>

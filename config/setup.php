@@ -214,8 +214,8 @@ try {
 
     if ($stmt->rowCount() === 0) {
         $passwordHash = password_hash('testgod', PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO moderators (username, password_hash, is_admin) VALUES (?, ?, ?)");
-        $stmt->execute(['testgod', $passwordHash, 1]);
+        $stmt = $pdo->prepare("INSERT INTO moderators (fullname, company, email, username, password_hash, is_admin, is_superadmin) VALUES (?, ?, ?,?,?,?,?)");
+        $stmt->execute(['Test God', 'TestFlowUX','testgod@testflow.desing','testgod', $passwordHash, 1, 1]);
         $adminCreated = true;
     }
 
@@ -259,7 +259,7 @@ try {
             <?php endif; ?>
 
             <div class="text-center mt-5">
-                <a href="../admin/index.php" class="btn btn-primary btn-lg">
+                <a href="../index.php" class="btn btn-primary btn-lg">
                     🚀 Go to Admin Dashboard
                 </a>
             </div>
