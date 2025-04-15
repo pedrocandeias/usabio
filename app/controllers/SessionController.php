@@ -79,7 +79,7 @@ class SessionController
         
             return $test;
         }, $tests);
-                $breadcrumbs = [
+            $breadcrumbs = [
             ['label' => 'Moderator Dashboard', 'url' => '', 'active' => true],
             ];
 
@@ -88,9 +88,9 @@ class SessionController
       
     public function startTaskSession()
     {
-        $testId = $_GET['test_id'] ?? 0;
+        $test_id = $_GET['test_id'] ?? 0;
     
-        if (!$testId) {
+        if (!$test_id) {
             echo "Missing test ID.";
             exit;
         }
@@ -104,11 +104,12 @@ class SessionController
             WHERE t.id = ?
         "
         );
-        $stmt->execute([$testId]);
+        $stmt->execute([$test_id]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
         
         $test_id = $test['test_id'];
 
+        // Get participants assigned to this test
         $stmt = $this->pdo->prepare("
         SELECT p.*
         FROM participants p
@@ -117,8 +118,44 @@ class SessionController
         ORDER BY p.participant_name
         ");
         $stmt->execute([$test_id]);
-        $assignedParticipants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+        $rawParticipants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Get custom field values for all assigned participants
+        $participant_ids = array_column($rawParticipants, 'id');
+        $customDataByParticipant = [];
+
+        if (!empty($participant_ids)) {
+        $in = implode(',', array_fill(0, count($participant_ids), '?'));
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM participant_custom_data
+            WHERE participant_id IN ($in)
+        ");
+        $stmt->execute($participant_ids);
+
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $customDataByParticipant[$row['participant_id']][$row['field_id']] = $row['value'];
+        }
+        }
+
+        // Merge data into $assignedParticipants
+        $assignedParticipants = [];
+        foreach ($rawParticipants as $p) {
+        $p['custom_fields'] = $customDataByParticipant[$p['id']] ?? [];
+        $assignedParticipants[] = $p;
+        }
+
+// Who already did tasks
+$stmt = $this->pdo->prepare("SELECT DISTINCT participant_name FROM evaluations WHERE test_id = ? AND did_tasks = 1");
+$stmt->execute([$test['id']]);
+$taskCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
+
+// Who already did questionnaire
+$stmt = $this->pdo->prepare("SELECT DISTINCT participant_name FROM evaluations WHERE test_id = ? AND did_questionnaire = 1");
+$stmt->execute([$test['id']]);
+$questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
+
+
+
 
         if (!$test) {
             echo "Test not found.";
@@ -130,7 +167,7 @@ class SessionController
         $previousEvaluation = [];
 
         $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
-        $stmt->execute([$testId]);
+        $stmt->execute([$test_id]);
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Breadcrumbs
@@ -146,59 +183,116 @@ class SessionController
 
     
     public function beginTaskSession()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?controller=Session&action=dashboard');
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: /index.php?controller=Session&action=dashboard');
+        exit;
+    }
+
+    $test_id = $_POST['test_id'] ?? null;
+    $project_id = $_POST['project_id'] ?? null;
+    $participant_id = $_POST['participant_id'] ?? null;
+
+    if (!$test_id) {
+        echo "Missing test ID.";
+        exit;
+    }
+
+    // Defaults
+    $name = null;
+    $age = null;
+    $gender = null;
+    $academic_level = null;
+
+    if ($participant_id) {
+        // Existing participant
+        $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE id = ?");
+        $stmt->execute([$participant_id]);
+        $participant = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$participant) {
+            echo "Participant not found.";
             exit;
         }
-
-        $testId         = $_POST['test_id'];
-        $name           = $_POST['participant_name'];
-        $notes          = $_POST['moderator_observations'] ?? null;
-        $age            = $_POST['participant_age'] ?? null;
-        $gender         = $_POST['participant_gender'] ?? null;
+        $name = $participant['participant_name'];
+        $age = $participant['participant_age'];
+        $gender = $participant['participant_gender'];
+        $academic_level = $participant['participant_academic_level'];
+    } else {
+        // New participant
+        $name = trim($_POST['participant_name'] ?? '');
+        $age = $_POST['participant_age'] ?? null;
+        $gender = $_POST['participant_gender'] ?? null;
         $academic_level = $_POST['participant_academic_level'] ?? null;
-        
 
-        // Create a new evaluation record
-        $stmt = $this->pdo->prepare(
-            "
-        INSERT INTO evaluations (test_id, timestamp, participant_name, participant_age, participant_gender, participant_academic_level, moderator_observations)
-        VALUES (?, NOW(), ?, ?, ?, ?, ?)
-    "
-        );
+        $stmt = $this->pdo->prepare("
+            INSERT INTO participants (project_id, test_id, participant_name, participant_age, participant_gender, participant_academic_level, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+        $stmt->execute([$project_id, $test_id, $name, $age, $gender, $academic_level]);
+        $participant_id = $this->pdo->lastInsertId();
 
+        // Assign participant to test
+        $stmt = $this->pdo->prepare("INSERT INTO participant_test (participant_id, test_id) VALUES (?, ?)");
+        $stmt->execute([$participant_id, $test_id]);
 
-        $stmt->execute(
-            [
-            $testId,
-            $name,
-            $notes,
-            $age,
-            $gender,
-            $academic_level
-            ]
-        );
-
-        $evaluationId = $this->pdo->lastInsertId();
+        // Save participant custom fields
         if (!empty($_POST['custom_field'])) {
-            $stmt = $this->pdo->prepare(
-                "
-                INSERT INTO evaluation_custom_data (evaluation_id, field_id, value)
+            $stmt = $this->pdo->prepare("
+                INSERT INTO participant_custom_data (participant_id, field_id, value)
                 VALUES (?, ?, ?)
-            "
-            );
-        
-            foreach ($_POST['custom_field'] as $fieldId => $value) {
+            ");
+            foreach ($_POST['custom_field'] as $field_id => $value) {
                 if (trim($value) !== '') {
-                    $stmt->execute([$evaluationId, $fieldId, $value]);
+                    $stmt->execute([$participant_id, $field_id, $value]);
                 }
             }
         }
-        // Redirect to task tracking screen
-        header("Location: /index.php?controller=Session&action=trackTasks&evaluation_id=$evaluationId");
-        exit;
     }
+
+    $notes = $_POST['moderator_observations'] ?? null;
+
+    // Insert evaluation
+    $stmt = $this->pdo->prepare("
+    INSERT INTO evaluations (test_id, timestamp, participant_name, participant_age, participant_gender, participant_academic_level, moderator_observations, did_tasks)
+        VALUES (?, NOW(), ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->execute([
+        $test_id,
+        $name,
+        $age,
+        $gender,
+        $academic_level,
+        $notes,
+        1 // always 1 in beginTaskSession
+    ]);
+
+    $evaluation_id = $this->pdo->lastInsertId();
+
+    // Snapshot participant's custom fields
+    $stmt = $this->pdo->prepare("SELECT field_id, value FROM participant_custom_data WHERE participant_id = ?");
+    $stmt->execute([$participant_id]);
+    $custom_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!empty($custom_data)) {
+        $stmt = $this->pdo->prepare("INSERT INTO evaluation_custom_data (evaluation_id, field_id, value) VALUES (?, ?, ?)");
+        foreach ($custom_data as $row) {
+            $stmt->execute([$evaluation_id, $row['field_id'], $row['value']]);
+        }
+    }
+
+    // Include manually submitted overrides
+    if (!empty($_POST['custom_field'])) {
+        $stmt = $this->pdo->prepare("INSERT INTO evaluation_custom_data (evaluation_id, field_id, value) VALUES (?, ?, ?)");
+        foreach ($_POST['custom_field'] as $field_id => $value) {
+            if (trim($value) !== '') {
+                $stmt->execute([$evaluation_id, $field_id, $value]);
+            }
+        }
+    }
+
+    header("Location: /index.php?controller=Session&action=trackTasks&evaluation_id=$evaluation_id");
+    exit;
+}
 
     public function trackTasks()
     {
@@ -212,7 +306,7 @@ class SessionController
         // Fetch evaluation and test
         $stmt = $this->pdo->prepare(
             "
-        SELECT e.*, t.title AS test_title, p.product_under_test AS project_name
+        SELECT e.*, t.title AS test_title, t.project_id AS project_id, p.product_under_test AS project_name
         FROM evaluations e
         JOIN tests t ON e.test_id = t.id
         JOIN projects p ON t.project_id = p.id
@@ -307,8 +401,8 @@ class SessionController
 
             $stmt = $this->pdo->prepare(
                 "
-            INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors)
-            VALUES (?, ?, ?, ?, NULL)
+            INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors, type)
+            VALUES (?, ?, ?, ?, NULL, 'task')
         "
             );
             $stmt->execute(
@@ -337,9 +431,9 @@ class SessionController
 
     public function startQuestionnaire()
     {
-        $testId = $_GET['test_id'] ?? 0;
+        $test_id = $_GET['test_id'] ?? 0;
     
-        if (!$testId) {
+        if (!$test_id) {
             echo "Missing test ID.";
             exit;
         }
@@ -352,7 +446,7 @@ class SessionController
             WHERE t.id = ?
             "
         );
-        $stmt->execute([$testId]);
+        $stmt->execute([$test_id]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if (!$test) {
@@ -376,7 +470,7 @@ class SessionController
     LIMIT 1
 "
             );
-            $stmt->execute([$testId, $prefillName]);
+            $stmt->execute([$test_id, $prefillName]);
             $previousEvaluation = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($previousEvaluation) {
@@ -394,22 +488,39 @@ class SessionController
         }
 
         $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
-        $stmt->execute([$testId]);
+        $stmt->execute([$test_id]);
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-        // Fetch existing participants who completed tasks in this test
-        $stmt = $this->pdo->prepare(
-            "
-            SELECT DISTINCT participant_name
-            FROM evaluations
-            WHERE test_id = ? AND participant_name IS NOT NULL
-            ORDER BY participant_name
-        "
-        );
-        $stmt->execute([$testId]);
-        $existingParticipants = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        // Fetch participants assigned to this test
+$stmt = $this->pdo->prepare("
+SELECT p.*
+FROM participants p
+JOIN participant_test pt ON pt.participant_id = p.id
+WHERE pt.test_id = ?
+ORDER BY p.participant_name
+");
+$stmt->execute([$test_id]);
+$assignedParticipants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $breadcrumbs = [
+// Participants who already completed TASKS for this test
+$stmt = $this->pdo->prepare("
+    SELECT DISTINCT participant_name
+    FROM evaluations
+    WHERE test_id = ? AND did_tasks = 1
+");
+$stmt->execute([$test_id]);
+$taskCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
+
+// Participants who already completed the QUESTIONNAIRE for this test
+$stmt = $this->pdo->prepare("
+    SELECT DISTINCT participant_name
+    FROM evaluations
+    WHERE test_id = ? AND did_tasks IS NULL
+");
+$stmt->execute([$test_id]);
+$questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
+
+$breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $test['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $test['project_id'], 'active' => false],
             ['label' => $test['title'], 'url' => '/index.php?controller=Test&action=show&id=' . $test['id'], 'active' => false],
@@ -419,6 +530,145 @@ class SessionController
         include __DIR__ . '/../views/session/start_questionnaire.php';
     }
     
+    public function beginQuestionnaire()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: /index.php?controller=Session&action=dashboard');
+        exit;
+    }
+
+    $test_id = $_POST['test_id'] ?? null;
+    $project_id = $_POST['project_id'] ?? null;
+    $participant_id = $_POST['participant_id'] ?? null;
+
+    if (!$test_id) {
+        echo "Missing test ID.";
+        exit;
+    }
+
+    $name = null;
+    $age = null;
+    $gender = null;
+    $academic_level = null;
+
+    // A: If assigned participant selected
+    if ($participant_id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE id = ?");
+        $stmt->execute([$participant_id]);
+        $participant = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$participant) {
+            echo "Participant not found.";
+            exit;
+        }
+
+        $name = $participant['participant_name'];
+        $age = $participant['participant_age'];
+        $gender = $participant['participant_gender'];
+        $academic_level = $participant['participant_academic_level'];
+    } else {
+        // B: Custom/manual or anonymous participant
+        $name = trim($_POST['participant_name'] ?? '');
+        $age = $_POST['participant_age'] ?? null;
+        $gender = $_POST['participant_gender'] ?? null;
+        $academic_level = $_POST['participant_academic_level'] ?? null;
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO participants (
+                project_id, test_id, participant_name, participant_age,
+                participant_gender, participant_academic_level,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+        $stmt->execute([
+            $project_id,
+            $test_id,
+            $name,
+            $age,
+            $gender,
+            $academic_level
+        ]);
+
+        $participant_id = $this->pdo->lastInsertId();
+
+        // Assign to test
+        $stmt = $this->pdo->prepare("INSERT INTO participant_test (participant_id, test_id) VALUES (?, ?)");
+        $stmt->execute([$participant_id, $test_id]);
+
+        // Save participant custom data
+        if (!empty($_POST['custom_field'])) {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO participant_custom_data (participant_id, field_id, value)
+                VALUES (?, ?, ?)
+            ");
+            foreach ($_POST['custom_field'] as $field_id => $value) {
+                if (trim($value) !== '') {
+                    $stmt->execute([$participant_id, $field_id, $value]);
+                }
+            }
+        }
+    }
+
+    $notes = $_POST['moderator_observations'] ?? null;
+    $did_tasks = $_POST['did_tasks'] ?? null;
+
+    // C: Save evaluation
+    $stmt = $this->pdo->prepare("
+        INSERT INTO evaluations (
+            test_id, timestamp, participant_name, participant_age,
+            participant_gender, participant_academic_level,
+            moderator_observations, did_questionnaire
+        ) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->execute([
+        $test_id,
+        $name,
+        $age,
+        $gender,
+        $academic_level,
+        $notes,
+        $did_tasks === 'yes' ? 1 : 0
+    ]);
+
+    $evaluation_id = $this->pdo->lastInsertId();
+
+    // D: Snapshot custom data from participant profile
+    $stmt = $this->pdo->prepare("
+        SELECT field_id, value FROM participant_custom_data
+        WHERE participant_id = ?
+    ");
+    $stmt->execute([$participant_id]);
+    $custom_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!empty($custom_data)) {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO evaluation_custom_data (evaluation_id, field_id, value)
+            VALUES (?, ?, ?)
+        ");
+        foreach ($custom_data as $row) {
+            $stmt->execute([$evaluation_id, $row['field_id'], $row['value']]);
+        }
+    }
+
+    // E: Apply any updated custom field overrides from POST
+    if (!empty($_POST['custom_field'])) {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO evaluation_custom_data (evaluation_id, field_id, value)
+            VALUES (?, ?, ?)
+        ");
+        foreach ($_POST['custom_field'] as $field_id => $value) {
+            if (trim($value) !== '') {
+                $stmt->execute([$evaluation_id, $field_id, $value]);
+            }
+        }
+    }
+
+    // Redirect to questionnaire tracking
+    header("Location: /index.php?controller=Session&action=trackQuestionnaire&evaluation_id=$evaluation_id");
+    exit;
+}
+
+
 
     public function trackQuestionnaire()
     {
@@ -490,73 +740,6 @@ class SessionController
         include __DIR__ . '/../views/session/track_questionnaire.php';
     }
 
-    public function beginQuestionnaire()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?controller=Session&action=dashboard');
-            exit;
-        }
-
-        $testId = $_POST['test_id'];
-        $name = trim($_POST['participant_name']);
-        $notes = $_POST['moderator_observations'];
-        $age = $_POST['participant_age'] ?? null;
-        $gender = $_POST['participant_gender'] ?? null;
-        $academic_level = $_POST['participant_academic_level'] ?? null;
-        $notes = $_POST['moderator_observations'] ?? null;
-        $didTasks = $_POST['did_tasks'] ?? null;
-
-        $stmt = $this->pdo->prepare(
-            "
-       INSERT INTO evaluations (test_id, timestamp, participant_name, participant_age, participant_gender, participant_academic_level, moderator_observations, did_tasks)
-        VALUES (?, NOW(), ?, ?, ?, ?, ?, ?)
-    "
-        );
-
-        $stmt->execute(
-            [
-            $testId,
-            $name,
-            $age, 
-            $gender,
-            $academic_level,
-            $notes,
-            $didTasks === 'yes' ? 1 : 0
-            ]
-        );
-    
-        $stmt = $this->pdo->prepare("
-            SELECT p.*
-            FROM participants p
-            JOIN participant_test pt ON pt.participant_id = p.id
-            WHERE pt.test_id = ?
-            ORDER BY p.participant_name
-        ");
-        $stmt->execute([$test_id]);
-        $assignedParticipants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $evaluationId = $this->pdo->lastInsertId();
-        if (!empty($_POST['custom_field'])) {
-            $stmt = $this->pdo->prepare(
-                "
-                INSERT INTO evaluation_custom_data (evaluation_id, field_id, value)
-                VALUES (?, ?, ?)
-            "
-            );
-        
-            foreach ($_POST['custom_field'] as $fieldId => $value) {
-                if (trim($value) !== '') {
-                    $stmt->execute([$evaluationId, $fieldId, $value]);
-                }
-            }
-        }
-
-        $test_id = $_GET['test_id'] ?? null;
-
-
-        header("Location: /index.php?controller=Session&action=trackQuestionnaire&evaluation_id=" . $evaluationId);
-        exit;
-    }
 
     public function saveQuestionnaireResponses()
     {
@@ -589,8 +772,8 @@ class SessionController
             // Save the response
             $stmt = $this->pdo->prepare(
                 "
-            INSERT INTO responses (evaluation_id, question, answer, time_spent)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors, type)
+            VALUES (?, ?, ?, ?, NULL, 'question')
         "
             );
             $stmt->execute(

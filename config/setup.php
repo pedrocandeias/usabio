@@ -138,6 +138,7 @@ try {
             participant_gender VARCHAR(255),
             participant_academic_level VARCHAR(100) DEFAULT NULL,
             did_tasks BOOLEAN DEFAULT NULL,
+            did_questionnaire BOOLEAN DEFAULT NULL,
             FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "evaluations",
 
@@ -149,6 +150,7 @@ try {
             answer TEXT NOT NULL,
             time_spent INT NOT NULL,
             evaluation_errors TEXT NULL,
+            type ENUM('task', 'questionnaire') NOT NULL,
             FOREIGN KEY (evaluation_id) REFERENCES evaluations(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "responses",
 

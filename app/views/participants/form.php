@@ -56,7 +56,10 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         </div>
 
-        <?php if (!empty($customFields)) { ?>
+        <?php 
+        
+        
+        if (!empty($customFields)) { ?>
             <hr class="my-4">
             <h5>Custom Fields</h5>
             <?php foreach ($customFields as $field): ?>
@@ -88,6 +91,7 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         <?php } ?>
        
+        <div class="col-md-4">
         <?php if(!empty($tests)): ?>
             <hr class="my-4">
             <h5>Tests</h5>
@@ -109,7 +113,7 @@ require __DIR__ . '/../layouts/header.php';
                 ⚠️ No tests found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list">Create tests</a> to assign to participants.
             </div>
         <?php endif; ?>
-
+        </div>
         <div class="mt-2">
             <button type="submit" class="btn btn-primary">Save Participant</button>
             <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary">Cancel</a>
@@ -122,7 +126,7 @@ require __DIR__ . '/../layouts/header.php';
 
 <?php if (!empty($_GET['saved'])): ?>
     <!-- Toast -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div class="toast-container position-fixed bottom-0 end-0 mb-5 p-3">
         <div id="savedToast" class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body">

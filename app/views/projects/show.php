@@ -19,6 +19,9 @@ require __DIR__ . '/../layouts/header.php';
         <a href="/index.php?controller=Project&action=analysis&id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
             📊 View Full Project Analysis
         </a>
+        <a href="/index.php?controller=Export&action=index&project_id=1=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
+            📊 Export data
+        </a>
     </div>
 
     <!-- First Grid Section -->

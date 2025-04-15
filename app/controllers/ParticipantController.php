@@ -248,6 +248,20 @@ class ParticipantController
         $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
         $stmt->execute([$project_id]);
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch saved custom field values
+        $stmt = $this->pdo->prepare("
+        SELECT field_id, value
+        FROM participant_custom_data
+        WHERE participant_id = ?
+        ");
+        $stmt->execute([$participant_id]);
+
+        $customFieldValues = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $customFieldValues[$row['field_id']] = $row['value'];
+        }
+
     
 
         

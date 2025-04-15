@@ -5,185 +5,220 @@ require __DIR__ . '/../layouts/header.php';
 
 <div class="container py-5">
 <a href="/index.php?controller=Project&action=index" class="btn btn-secondary mb-4">← Back to Projects</a>
-    
 
 <h1 class="mb-4">Start Questionnaire</h1>
 
-   
-    <form method="POST" action="/index.php?controller=Session&action=beginQuestionnaire">
-        <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
+<form method="POST" action="/index.php?controller=Session&action=beginQuestionnaire">
+    <input type="hidden" name="test_id" value="<?= $test['id'] ?>">
+    <input type="hidden" name="project_id" value="<?= $test['project_id'] ?>">
 
+    <div class="mb-4">
+        <h4>Select Participant</h4>
 
+        <?php if (!empty($assignedParticipants)) : ?>
+            <div class="mb-3">
+                <label for="participant_mode" class="form-label">Who is doing this session?</label>
+                <select id="participant_mode" class="form-select" required>
+                    <option value="">-- Select --</option>
+                    <option value="assigned">Select assigned participant</option>
+                    <option value="custom">Enter custom participant</option>
+                    <option value="anonymous">Anonymous participant</option>
+                </select>
+            </div>
 
-        <div class="mb-4">
-    <h5>Assigned Participants</h5>
-    <?php if (!empty($assignedParticipants)): ?>
-        <ul class="list-group">
-            <?php foreach ($assignedParticipants as $participant): ?>
-                <li class="list-group-item">
-                    <?= htmlspecialchars($participant['participant_name']) ?>
-                    (<?= htmlspecialchars($participant['participant_gender']) ?>, <?= htmlspecialchars($participant['participant_age']) ?>)
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p class="text-muted">No participants are currently assigned to this test.</p>
-    <?php endif; ?>
-</div>
+            <!-- Assigned participant dropdown -->
+            <div id="assignedParticipantBlock" class="mb-3 d-none">
+                <label for="participant_id" class="form-label">Select Participant</label>
+                <select name="participant_id" id="participant_id" class="form-select">
+                    <option value="">-- Choose Participant --</option>
+                    <?php foreach ($assignedParticipants as $participant): ?>
+                        <?php
+                        $hasDoneTasks = in_array(strtolower($participant['participant_name']), $taskCompletedNames);
+                        $hasDoneQuestionnaire = in_array(strtolower($participant['participant_name']), $questionnaireCompletedNames);
+                        
+                        $label = htmlspecialchars($participant['participant_name']) .
+                            " (" . htmlspecialchars($participant['participant_gender']) . ", " . htmlspecialchars($participant['participant_age']) . ")";
+                        
+                        if ($hasDoneTasks) {
+                            $label .= " ✅ Tasks done!";
+                        }
+                        if ($hasDoneQuestionnaire) {
+                            $label .= " ✅ Questionnaire done!";
+                        }
+                        
+                        ?>
+                        <option value="<?= $participant['id'] ?>"><?= $label ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <?php if (!empty($existingParticipants)): ?>
-    <div class="mb-3">
-        <label class="form-label">Choose Previous Participant</label>
-        <select class="form-select" onchange="prefillParticipant(this)">
-            <option value="">-- Select a participant --</option>
-            <?php foreach ($existingParticipants as $p): ?>
-                <option value="<?php echo htmlspecialchars($p); ?>">
-                    <?php echo htmlspecialchars($p); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+            <?php $fieldIds = array_column($customFields, 'id'); ?>
+        <?php else: ?>
+            <p class="text-muted">No participants are currently assigned to this test.</p>
+        <?php endif; ?>
     </div>
-<?php endif; ?>
 
-<script>
-function prefillParticipant(select) {
-    const name = select.value;
-    if (name) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('test_id', '<?php echo $test['id']; ?>');
-        url.searchParams.set('name', name);
-        window.location.href = url.toString(); // force reload
-    }
-}
-</script>
-
-
-
+    <!-- Participant details section -->
+    <div id="participantDetails" class="d-none">
         <div class="mb-3">
             <label class="form-label">Participant Name</label>
-            <input type="text" name="participant_name" class="form-control"
-       value="<?php echo htmlspecialchars($previousEvaluation['participant_name'] ?? ''); ?>">
-
+            <input type="text" name="participant_name" class="form-control" value="<?= htmlspecialchars($previousEvaluation['participant_name'] ?? '') ?>" required>
         </div>
 
         <div class="row">
             <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label">Age</label>
-                    <input type="number" name="participant_age" class="form-control"
-       value="<?php echo htmlspecialchars($previousEvaluation['participant_age'] ?? ''); ?>">
-                </div>
+                <label class="form-label">Age</label>
+                <input type="number" name="participant_age" class="form-control" value="<?= htmlspecialchars($previousEvaluation['participant_age'] ?? '') ?>">
             </div>
             <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label">Gender</label>
-                    <select name="participant_gender" class="form-select">
-                        <option value="">Select</option>
-                        <option value="female" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'female' ? 'selected' : ''; ?>>Female</option>
-                        <option value="male" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'male' ? 'selected' : ''; ?>>Male</option>
-                        <option value="nonbinary" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'nonbinary' ? 'selected' : ''; ?>>Non-Binary</option>
-                        <option value="prefer_not_say" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'prefer_not_say' ? 'selected' : ''; ?>>Prefer not to say</option>
-                    </select>
-                </div>
+                <label class="form-label">Gender</label>
+                <select name="participant_gender" class="form-select">
+                    <option value="">Select</option>
+                    <option value="female" <?= ($previousEvaluation['participant_gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female</option>
+                    <option value="male" <?= ($previousEvaluation['participant_gender'] ?? '') === 'male' ? 'selected' : '' ?>>Male</option>
+                    <option value="nonbinary" <?= ($previousEvaluation['participant_gender'] ?? '') === 'nonbinary' ? 'selected' : '' ?>>Non-Binary</option>
+                    <option value="prefer_not_say" <?= ($previousEvaluation['participant_gender'] ?? '') === 'prefer_not_say' ? 'selected' : '' ?>>Prefer not to say</option>
+                </select>
             </div>
             <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label">Academic Qualification</label>
-                    <select name="participant_academic_level" class="form-select">
-                        <option value="">Select...</option>
-                        <?php
-                        $levels = [
-                            'Primary education',
-                            'Secondary education',
-                            'High school diploma',
-                            'Bachelors degree',
-                            'Masters degree',
-                            'Doctorate / PhD',
-                            'Other'
-                        ];
-                        $selected = $previousEvaluation['participant_academic_level'] ?? '';
-                        foreach ($levels as $level): ?>
-                            <option value="<?php echo htmlspecialchars($level); ?>"
-                                <?php echo ($selected === $level) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($level); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
+                <label class="form-label">Academic Qualification</label>
+                <select name="participant_academic_level" class="form-select">
+                    <option value="">Select...</option>
+                    <?php
+                    $levels = [
+                        'Primary education',
+                        'Secondary education',
+                        'High school diploma',
+                        'Bachelors degree',
+                        'Masters degree',
+                        'Doctorate / PhD',
+                        'Other'
+                    ];
+                    $selected = $previousEvaluation['participant_academic_level'] ?? '';
+                    foreach ($levels as $level): ?>
+                        <option value="<?= htmlspecialchars($level) ?>" <?= ($selected === $level) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($level) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
         </div>
 
         <?php if (!empty($customFields)) : ?>
-    <hr>
-    <h5 class="mt-4">Additional Participant Fields</h5>
+            <hr>
+            <h5 class="mt-4">Additional Participant Fields</h5>
+            <?php foreach ($customFields as $field): ?>
+                <?php $value = $prefillCustomData[$field['id']] ?? ''; ?>
+                <div class="mb-3">
+                    <label class="form-label"><?= htmlspecialchars($field['label']) ?></label>
+                    <?php if ($field['field_type'] === 'select') : ?>
+                        <select class="form-select" name="custom_field[<?= $field['id'] ?>]">
+                            <option value="">Select...</option>
+                            <?php foreach (explode(';', $field['options']) as $option): ?>
+                                <?php $option = trim($option); ?>
+                                <option value="<?= htmlspecialchars($option) ?>" <?= ($option === $value) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($option) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php elseif ($field['field_type'] === 'number') : ?>
+                        <input type="number" class="form-control" name="custom_field[<?= $field['id'] ?>]" value="<?= htmlspecialchars($value) ?>">
+                    <?php else: ?>
+                        <input type="text" class="form-control" name="custom_field[<?= $field['id'] ?>]" value="<?= htmlspecialchars($value) ?>">
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 
-    <?php foreach ($customFields as $field): ?>
-        <?php $value = $prefillCustomData[$field['id']] ?? ''; ?>
-        <div class="mb-3">
-            <label class="form-label"><?php echo htmlspecialchars($field['label']); ?></label>
+    <div class="mb-3">
+        <label class="form-label">Has this participant completed the tasks?</label>
+        <select name="did_tasks" class="form-select">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+    </div>
 
-            <?php if ($field['field_type'] === 'select') : ?>
-                <select class="form-select" name="custom_field[<?php echo $field['id']; ?>]">
-                    <option value="">Select...</option>
-                    <?php foreach (explode(';', $field['options']) as $option): ?>
-                        <?php $option = trim($option); ?>
-                        <option value="<?php echo htmlspecialchars($option); ?>" 
-                            <?php echo ($option === $value) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($option); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+    <div class="mb-3">
+        <label class="form-label">Moderator Notes</label>
+        <textarea name="moderator_observations" class="form-control" rows="3"></textarea>
+    </div>
 
-            <?php elseif ($field['field_type'] === 'number') : ?>
-                <input type="number" class="form-control" name="custom_field[<?php echo $field['id']; ?>]" 
-                       value="<?php echo htmlspecialchars($value); ?>">
-
-            <?php else: ?>
-                <input type="text" class="form-control" name="custom_field[<?php echo $field['id']; ?>]" 
-                       value="<?php echo htmlspecialchars($value); ?>">
-            <?php endif; ?>
-        </div>
-    <?php endforeach; ?>
-<?php endif; ?>
-
-
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="anonymous" onclick="toggleParticipantName()">
-            <label class="form-check-label" for="anonymous">
-                This is an anonymous session
-            </label>
-        </div>
-
-        <script>
-        function toggleParticipantName() {
-            const checkbox = document.getElementById('anonymous');
-            const input = document.querySelector('input[name="participant_name"]');
-            if (checkbox.checked) {
-                input.value = '';
-                input.disabled = true;
-            } else {
-                input.disabled = false;
-            }
-        }
-        </script>
-        <div class="mb-3">
-            <label class="form-label">Has this participant completed the tasks?</label>
-            <select name="did_tasks" class="form-select">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Moderator Notes</label>
-            <textarea name="moderator_observations" class="form-control" rows="3"></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Start Questionnaire</button>
-        <a href="/index.php?controller=Session&action=dashboard" class="btn btn-secondary">Cancel</a>
-    </form>
+    <button type="submit" class="btn btn-primary">Start Questionnaire</button>
+    <a href="/index.php?controller=Session&action=dashboard" class="btn btn-secondary">Cancel</a>
+</form>
 </div>
+
+<script>
+    const participants = <?= json_encode($assignedParticipants) ?>;
+    const customFieldIds = <?= json_encode(array_column($customFields, 'id')) ?>;
+
+    const modeSelector = document.getElementById('participant_mode');
+    const assignedBlock = document.getElementById('assignedParticipantBlock');
+    const participantDetails = document.getElementById('participantDetails');
+    const participantSelect = document.getElementById('participant_id');
+
+    const nameInput = document.querySelector('input[name="participant_name"]');
+    const ageInput = document.querySelector('input[name="participant_age"]');
+    const genderSelect = document.querySelector('select[name="participant_gender"]');
+    const academicSelect = document.querySelector('select[name="participant_academic_level"]');
+
+    const generateRandomName = () => 'Participant' + Math.floor(100000 + Math.random() * 900000);
+
+    function setFieldValue(selector, value, disabled = false) {
+        const input = document.querySelector(selector);
+        if (input) {
+            input.value = value || '';
+            input.disabled = disabled;
+        }
+    }
+
+    function clearParticipantFields() {
+        setFieldValue('input[name="participant_name"]', '', false);
+        setFieldValue('input[name="participant_age"]', '', false);
+        setFieldValue('select[name="participant_gender"]', '', false);
+        setFieldValue('select[name="participant_academic_level"]', '', false);
+        customFieldIds.forEach(id => setFieldValue(`[name="custom_field[${id}]"]`, '', false));
+    }
+
+    modeSelector.addEventListener('change', () => {
+        const mode = modeSelector.value;
+        assignedBlock.classList.add('d-none');
+        participantDetails.classList.add('d-none');
+        clearParticipantFields();
+
+        if (mode === 'assigned') {
+            assignedBlock.classList.remove('d-none');
+            participantDetails.classList.remove('d-none');
+        } else if (mode === 'custom') {
+            participantDetails.classList.remove('d-none');
+        } else if (mode === 'anonymous') {
+            participantDetails.classList.remove('d-none');
+            setFieldValue('input[name="participant_name"]', generateRandomName(), true);
+            setFieldValue('input[name="participant_age"]', '', true);
+            setFieldValue('select[name="participant_gender"]', '', true);
+            setFieldValue('select[name="participant_academic_level"]', '', true);
+            customFieldIds.forEach(id => setFieldValue(`[name="custom_field[${id}]"]`, '', true));
+            participantSelect.value = '';
+        }
+    });
+
+    participantSelect.addEventListener('change', function () {
+        const selectedId = this.value;
+        const participant = participants.find(p => p.id == selectedId);
+        if (!participant) return;
+
+        setFieldValue('input[name="participant_name"]', participant.participant_name, true);
+        setFieldValue('input[name="participant_age"]', participant.participant_age, true);
+        setFieldValue('select[name="participant_gender"]', participant.participant_gender, true);
+        setFieldValue('select[name="participant_academic_level"]', participant.participant_academic_level, true);
+
+        const customFields = participant.custom_fields || {};
+        customFieldIds.forEach(fieldId => {
+            setFieldValue(`[name="custom_field[${fieldId}]"]`, customFields[fieldId], true);
+        });
+    });
+</script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>

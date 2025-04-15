@@ -252,6 +252,7 @@ class ProjectController
         $stmt->execute([$projectId]);
         $assignedUsers = $stmt->fetchAll(PDO::FETCH_COLUMN);
     
+        
         include __DIR__ . '/../views/projects/form.php';
     }
     

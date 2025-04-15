@@ -1,10 +1,16 @@
 <?php $title = 'Task Session'; ?>
+<?php $project_id = $evaluation['project_id'] ?? ''; ?>
+<?php $test_id = $evaluation['test_id'] ?? ''; ?>
+
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
+<div class="container mt-3">
+       <a href="index.php?controller=Session&action=dashboard&project_id=<?php echo $project_id;?>" class="btn btn-secondary mb-4">← Back to Projects</a>    
+    </div>
+
 <div class="container py-5">
-     <p class="text-muted mb-3">
-        Project: <?php echo htmlspecialchars($evaluation['project_name']); ?><br>
-    </p>
+
+
 <?php if (!empty($evaluation['participant_name'])): ?>
     <h1>Task Session: <?php echo htmlspecialchars($evaluation['participant_name']); ?></h1>
 <?php else: ?>
@@ -163,9 +169,12 @@
             </div>
             <?php endif; ?>
         <?php endforeach; ?>
-
-        <button type="submit" class="btn btn-success">Finish Session</button>
-    </form>
+            <div class="w-100 ">
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-success btn-lg w-100">Finish Session</button>
+                </div>
+            </div>
+        </form>
 </div>
 
 <script>
