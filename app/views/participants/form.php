@@ -4,13 +4,18 @@ require __DIR__ . '/../layouts/header.php';
 ?>
 
 <div class="container py-5">
-<a href="/index.php?controller=Project&action=index" class="btn btn-secondary mb-4">← Back to Projects</a>
-    
-
+    <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary mb-4">← Back to Projects</a>
     <h1 class="mb-4"><?php echo $title; ?></h1>
-    <?php echo $projectId; ?>
-    <form method="POST" action="/index.php?controller=Participant&action=store">
-        <input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
+
+    <form method="POST" action="/index.php?controller=Participant&action=<?php echo !empty($participant_id) ? 'update' : 'store'; ?>">
+
+        <input type="hidden" name="project_id" value="<?php echo $participant_id; ?>">
+        <?php if (!empty($participant_id)): ?>
+            <input type="hidden" name="participant_id" value="<?php echo $participant_id; ?>">
+        <?php endif; ?>
+        <?php if (!empty($project_id)): ?>
+            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+        <?php endif; ?>
 
         <div class="mb-3">
             <label class="form-label">Participant Name</label>
@@ -39,7 +44,7 @@ require __DIR__ . '/../layouts/header.php';
                     <?php
                     $levels = [
                         'Primary education', 'Secondary education', 'High school diploma',
-                        'Bachelor’s degree', 'Master’s degree', 'Doctorate / PhD', 'Other'
+                        'Bachelors degree', 'Masters degree', 'Doctorate / PhD', 'Other'
                     ];
                     $selected = $participant['participant_academic_level'] ?? '';
                     foreach ($levels as $level): ?>
@@ -51,7 +56,7 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         </div>
 
-        <?php if (!empty($customFields)) : ?>
+        <?php if (!empty($customFields)) { ?>
             <hr class="my-4">
             <h5>Custom Fields</h5>
             <?php foreach ($customFields as $field): ?>
@@ -76,12 +81,59 @@ require __DIR__ . '/../layouts/header.php';
                     ?>
                 </div>
             <?php endforeach; ?>
+            
+        <?php } else { ?>
+            <div class="alert alert-warning mt-3 mb-3" role="alert">
+                ⚠️ No custom fields for participants found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list">Create custom fields</a> to collect additional information about participants.
+            </div>
+        <?php } ?>
+       
+        <?php if(!empty($tests)): ?>
+            <hr class="my-4">
+            <h5>Tests</h5>
+            <p class="text-muted">Select the tests that this participant will be assigned to.</p>
+        <div class="mb-3">
+            <label class="form-label">Assigned Tests</label>
+            <select name="test_ids[]" class="form-select" multiple>
+                <?php foreach ($tests as $test): ?>
+                    <option value="<?= $test['id'] ?>"
+                        <?= in_array($test['id'], $assignedTestIds ?? []) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($test['title']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <div class="form-text">Hold Ctrl / Cmd to select multiple.</div>
+        </div>
+        <?php else : ?>
+            <div class="alert alert-warning mt-3 mb-3" role="alert">
+                ⚠️ No tests found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list">Create tests</a> to assign to participants.
+            </div>
         <?php endif; ?>
 
-        <button type="submit" class="btn btn-primary">Save Participant</button>
-        <a href="/index.php?controller=Project&action=show&id=<?php echo $projectId; ?>#participant-list" class="btn btn-secondary">Cancel</a>
+        <div class="mt-2">
+            <button type="submit" class="btn btn-primary">Save Participant</button>
+            <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary">Cancel</a>
+        </div>
     </form>
+
+    <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary mt-4 mb-4">← Back to Projects</a>
+ 
 </div>
+
+<?php if (!empty($_GET['saved'])): ?>
+    <!-- Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="savedToast" class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ✅ Participant updated successfully!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>

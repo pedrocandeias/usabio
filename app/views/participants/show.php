@@ -1,11 +1,14 @@
 <?php 
 $title = 'Participant: ' . htmlspecialchars($participant['participant_name']);
+
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 
 <div class="container py-5">
-    <h1 class="mb-4">Participant Details</h1>
+    
+    <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id;?>#participant-list" class="btn btn-secondary mb-4">← Back to Projects</a>    
 
+    <h1 class="mb-4">Participant Details</h1>
     <h4 class="mb-3"><?php echo htmlspecialchars($participant['participant_name'] ?? 'Participant'); ?></h4>
     <ul class="list-group mb-4">
         <li class="list-group-item">Age: <strong><?php echo htmlspecialchars($participant['participant_age']); ?></strong></li>
@@ -30,8 +33,10 @@ require __DIR__ . '/../layouts/header.php';
         <p class="text-muted">No evaluations found.</p>
     <?php endif; ?>
 
-    <a href="/index.php?controller=Participant&action=index&project_id=<?php echo $projectId; ?>" class="btn btn-secondary">← Back to Participant List</a>
+    <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>" class="btn btn-secondary">← Back to Participant List</a>
 </div>
+
+
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>

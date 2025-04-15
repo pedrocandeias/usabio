@@ -142,22 +142,19 @@ require __DIR__ . '/../layouts/header.php';
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Participants</h3>
             <div>
-                <a href="/index.php?controller=Participant&action=index&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
-                    View All Participants
-                </a>
                 <a href="/index.php?controller=Participant&action=create&project_id=<?php echo $project['id']; ?>" class="btn btn-success btn-sm">
-                    + Add Participant Manually
+                    Add Participant
                 </a>
             </div>
         </div>
-        <?php print_r($participants); ?>
         <?php if (!empty($participants)) : ?>
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-sm">
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Test Count</th>
+                        <th>Assigned tests</th>
+                        <th>Complete tests</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -165,10 +162,36 @@ require __DIR__ . '/../layouts/header.php';
                     <?php foreach ($participants as $participant): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($participant['participant_name']); ?></td>
-                            <td><?php echo (int) $participant['evaluation_count']; ?></td>
-                            <td>
-                                <a href="/index.php?controller=Participant&action=show&project_id=<?php echo $project['id']; ?>&id=<?php echo $participant['id']; ?>" class="btn btn-sm btn-outline-primary">
-                                    View Participant
+                            <td><?php
+                                    $tests = $testsByParticipant[$participant['id']] ?? [];
+                                    if (!empty($tests)) { ?>
+                                        <?php foreach ($tests as $title): ?>
+                        <span class="badge bg-secondary"><?= htmlspecialchars($title) ?></span>
+                    <?php endforeach; ?>
+
+                                    <?php } else {
+                                        echo '<span class="text-muted">No tests assigned</span>';
+                                    }
+                                ?></td>
+                                <td>  <?php
+                            $completed = $completedTestsByParticipant[$participant['id']] ?? [];
+                            if (!empty($completed)) {
+                                foreach ($completed as $title) {
+                                    echo '<span class="badge bg-success me-1">' . htmlspecialchars($title) . '</span>';
+                                }
+                            } else {
+                                echo '<span class="text-muted">None</span>';
+                            }
+                        ?>
+                            </td>
+                            <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" href="/index.php?controller=Participant&action=show&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>">View</a>
+                       
+                       
+                       <a href="/index.php?controller=Participant&action=edit&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
+                       <a href="/index.php?controller=Participant&action=destroy&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>"
+                          class="btn btn-sm btn-outline-danger"
+                          onclick="return confirm('Are you sure you want to delete this participant?');">Delete</a>
                                 </a>
                             </td>
                         </tr>
@@ -188,9 +211,9 @@ require __DIR__ . '/../layouts/header.php';
      <div id="custom-fields-list">
         <hr class="my-5">
         <h4 class="mb-3">Custom Participant Fields</h4>
-
+       
         <form method="POST" action="/index.php?controller=CustomField&action=store" class="row g-3 mb-4">
-            <input type="hidden" name="project_id" value="<?php echo $test['id']; ?>">
+            <input type="hidden" name="project_id" value=" <?php echo $project['id']; ?>">
 
             <div class="col-md-4">
                 <input type="text" name="label" class="form-control" placeholder="Field Label" required>
@@ -213,12 +236,6 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         </form>
 
-        <?php
-        $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
-        $stmt->execute([$test['id']]);
-        $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        ?>
-
         <?php if (!empty($customFields)) : ?>
             <table class="table table-bordered table-sm">
                 <thead>
@@ -236,15 +253,20 @@ require __DIR__ . '/../layouts/header.php';
                             <td><?php echo $field['field_type']; ?></td>
                             <td><?php echo htmlspecialchars($field['options']); ?></td>
                             <td class="text-end">
-                                <a href="/index.php?controller=CustomField&action=destroy&id=<?php echo $field['id']; ?>&test_id=<?php echo $test['id']; ?>"
-                                class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this field?')">Remove</a>
+                            <a href="/index.php?controller=ParticipantCustomField&action=edit&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+<a href="/index.php?controller=ParticipantCustomField&action=destroy&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this field?')">Delete</a>
+
+
+                      
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         <?php else: ?>
-            <p class="text-muted">No custom fields defined yet for this test.</p>
+            <div class="alert alert-warning" role="alert">
+                ⚠️ No custom fields for participants found for this project.
+            </div>
         <?php endif; ?>
     </div>
    

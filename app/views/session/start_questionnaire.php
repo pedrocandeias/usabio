@@ -4,15 +4,32 @@ require __DIR__ . '/../layouts/header.php';
 ?>
 
 <div class="container py-5">
-    <h1 class="mb-4">Start Questionnaire</h1>
+<a href="/index.php?controller=Project&action=index" class="btn btn-secondary mb-4">← Back to Projects</a>
+    
 
-    <p class="text-muted">
-        <strong>Project:</strong> <?php echo htmlspecialchars($test['project_name']); ?><br>
-        <strong>Test:</strong> <?php echo htmlspecialchars($test['title']); ?>
-    </p>
+<h1 class="mb-4">Start Questionnaire</h1>
 
+   
     <form method="POST" action="/index.php?controller=Session&action=beginQuestionnaire">
         <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
+
+
+
+        <div class="mb-4">
+    <h5>Assigned Participants</h5>
+    <?php if (!empty($assignedParticipants)): ?>
+        <ul class="list-group">
+            <?php foreach ($assignedParticipants as $participant): ?>
+                <li class="list-group-item">
+                    <?= htmlspecialchars($participant['participant_name']) ?>
+                    (<?= htmlspecialchars($participant['participant_gender']) ?>, <?= htmlspecialchars($participant['participant_age']) ?>)
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p class="text-muted">No participants are currently assigned to this test.</p>
+    <?php endif; ?>
+</div>
 
         <?php if (!empty($existingParticipants)): ?>
     <div class="mb-3">
@@ -39,6 +56,9 @@ function prefillParticipant(select) {
     }
 }
 </script>
+
+
+
         <div class="mb-3">
             <label class="form-label">Participant Name</label>
             <input type="text" name="participant_name" class="form-control"

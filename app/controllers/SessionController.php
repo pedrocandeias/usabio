@@ -23,14 +23,10 @@ class SessionController
         $moderatorId = $_SESSION['user_id'];
         $isAdmin = $_SESSION['is_admin'] ?? false;
         $isSuperadmin = $_SESSION['is_superadmin'] ?? false;
-        $projectId = $_GET['project_id'] ?? null;
-
-        $breadcrumbs = [
-        ['label' => 'Moderator Dashboard', 'url' => '', 'active' => true],
-        ];
+        $project_id = $_GET['project_id'] ?? null;
 
         // CASE A: Show list of projects to pick from
-        if (!$projectId) {
+        if (!$project_id) {
             $query = $isAdmin || $isSuperadmin
             ? "SELECT * FROM projects ORDER BY created_at DESC"
             : "SELECT p.* FROM projects p
@@ -50,7 +46,7 @@ class SessionController
         // CASE B: Show tests for selected project
         if (!$isAdmin && !$isSuperadmin) {
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
-            $stmt->execute([$projectId, $moderatorId]);
+            $stmt->execute([$project_id, $moderatorId]);
             if (!$stmt->fetchColumn()) {
                 echo "Access denied.";
                 exit;
@@ -66,18 +62,26 @@ class SessionController
         ORDER BY t.id DESC
     "
         );
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach ($tests as &$test) {
-            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM task_groups WHERE test_id = ?");
+        $tests = array_map(function($test) {
+            // Use a local PDO connection inside this closure if needed
+            $pdo = $this->pdo;
+        
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM task_groups WHERE test_id = ?");
             $stmt->execute([$test['id']]);
             $test['task_group_count'] = $stmt->fetchColumn();
-
-            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM questionnaire_groups WHERE test_id = ?");
+        
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM questionnaire_groups WHERE test_id = ?");
             $stmt->execute([$test['id']]);
             $test['questionnaire_group_count'] = $stmt->fetchColumn();
-        }
+        
+            return $test;
+        }, $tests);
+                $breadcrumbs = [
+            ['label' => 'Moderator Dashboard', 'url' => '', 'active' => true],
+            ];
 
         include __DIR__ . '/../views/session/dashboard.php';
     }
@@ -94,7 +98,7 @@ class SessionController
         // Fetch test + project name
         $stmt = $this->pdo->prepare(
             "
-            SELECT t.*, p.product_under_test AS project_name 
+            SELECT t.*, t.id AS test_id, p.product_under_test AS project_name 
             FROM tests t 
             JOIN projects p ON p.id = t.project_id 
             WHERE t.id = ?
@@ -102,7 +106,20 @@ class SessionController
         );
         $stmt->execute([$testId]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+        
+        $test_id = $test['test_id'];
+
+        $stmt = $this->pdo->prepare("
+        SELECT p.*
+        FROM participants p
+        JOIN participant_test pt ON pt.participant_id = p.id
+        WHERE pt.test_id = ?
+        ORDER BY p.participant_name
+        ");
+        $stmt->execute([$test_id]);
+        $assignedParticipants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+
         if (!$test) {
             echo "Test not found.";
             exit;
@@ -311,10 +328,10 @@ class SessionController
         ");
         $stmt->execute([$evaluationId]);
         $evaluation = $stmt->fetch(PDO::FETCH_ASSOC);
-        $projectId = $evaluation['project_id'];
+        $project_id = $evaluation['project_id'];
 
         // Done! Redirect to dashboard or summary
-        header("Location: /index.php?controller=Session&action=dashboard&project_id=" . $projectId . "&success=1");
+        header("Location: /index.php?controller=Session&action=dashboard&project_id=" . $project_id . "&success=1");
         exit;
     }
 
@@ -508,6 +525,15 @@ class SessionController
             ]
         );
     
+        $stmt = $this->pdo->prepare("
+            SELECT p.*
+            FROM participants p
+            JOIN participant_test pt ON pt.participant_id = p.id
+            WHERE pt.test_id = ?
+            ORDER BY p.participant_name
+        ");
+        $stmt->execute([$test_id]);
+        $assignedParticipants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $evaluationId = $this->pdo->lastInsertId();
         if (!empty($_POST['custom_field'])) {
@@ -524,6 +550,10 @@ class SessionController
                 }
             }
         }
+
+        $test_id = $_GET['test_id'] ?? null;
+
+
         header("Location: /index.php?controller=Session&action=trackQuestionnaire&evaluation_id=" . $evaluationId);
         exit;
     }

@@ -188,6 +188,27 @@ try {
             FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE SET NULL
         ) ENGINE=InnoDB;" => "participants",
 
+        // === TABLE: participants_test ===
+        "CREATE TABLE IF NOT EXISTS participant_test (
+            participant_id INT NOT NULL,
+            test_id INT NOT NULL,
+            PRIMARY KEY (participant_id, test_id),
+            FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
+            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;" => "participant_test",
+
+        // === TABLE: participant_custom_data ===
+        "CREATE TABLE IF NOT EXISTS participant_custom_data (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            participant_id INT NOT NULL,
+            field_id INT NOT NULL,
+            value TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
+            FOREIGN KEY (field_id) REFERENCES participants_custom_fields(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;" => "participant_custom_data",
+
         // === TABLE: test_sessions ===
         "CREATE TABLE IF NOT EXISTS test_sessions (
             id INT AUTO_INCREMENT PRIMARY KEY,

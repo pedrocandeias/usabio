@@ -2,11 +2,30 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
+<a href="/index.php?controller=Project&action=index" class="btn btn-secondary mb-4">← Back to Projects</a>
+    
+
     <h1 class="mb-4">Start Task Session</h1>
 
     <form method="POST" action="/index.php?controller=Session&action=beginTaskSession">
         <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
+        <div class="mb-4">
+    <h5>Assigned Participants</h5>
+    <?php if (!empty($assignedParticipants)): ?>
+        <ul class="list-group">
+            <?php foreach ($assignedParticipants as $participant): ?>
+                <li class="list-group-item">
+                    <?= htmlspecialchars($participant['participant_name']) ?>
+                    (<?= htmlspecialchars($participant['participant_gender']) ?>, <?= htmlspecialchars($participant['participant_age']) ?>)
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p class="text-muted">No participants are currently assigned to this test.</p>
+    <?php endif; ?>
+</div>
+        
         <div class="mb-3">
             <label class="form-label">Participant Name</label>
             <input type="text" name="participant_name" class="form-control" value="<?php echo htmlspecialchars($previousEvaluation['participant_name'] ?? ''); ?>" required>

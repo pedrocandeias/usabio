@@ -96,32 +96,34 @@ class ProjectController
     {
         $projectId = $_GET['id'] ?? 0;
 
-    if (!$projectId) {
-        echo "Invalid project ID.";
-        exit;
-    }
-
-    // Superadmins can always access
-    if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
-        $stmt = $this->pdo->prepare("
-            SELECT 1 FROM project_user
-            WHERE project_id = ? AND moderator_id = ?
-        ");
-        $stmt->execute([$projectId, $_SESSION['user_id']]);
-        $authorized = $stmt->fetchColumn();
-
-        if (!$authorized) {
-            echo "Access denied: You are not assigned to this project.";
+        if (!$projectId) {
+            echo "Invalid project ID.";
             exit;
         }
-    }
 
-    // Fetch project
-    $project = $this->projectModel->find($projectId);
-    if (!$project) {
-        echo "Project not found.";
-        exit;
-    }
+        // Superadmins can always access
+        if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
+            $stmt = $this->pdo->prepare(
+                "
+            SELECT 1 FROM project_user
+            WHERE project_id = ? AND moderator_id = ?
+        "
+            );
+            $stmt->execute([$projectId, $_SESSION['user_id']]);
+            $authorized = $stmt->fetchColumn();
+
+            if (!$authorized) {
+                echo "Access denied: You are not assigned to this project.";
+                exit;
+            }
+        }
+
+        // Fetch project
+        $project = $this->projectModel->find($projectId);
+        if (!$project) {
+            echo "Project not found.";
+            exit;
+        }
 
         $stmt = $this->pdo->prepare(
             "
@@ -140,15 +142,62 @@ class ProjectController
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get participants for the project
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare(
+            "
             SELECT p.*, t.title AS test_title
             FROM participants p
             LEFT JOIN tests t ON p.test_id = t.id
             WHERE p.project_id = ?
             ORDER BY p.created_at DESC
-        ");
+        "
+        );
         $stmt->execute([$projectId]);
         $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch assigned tests per participant
+        $stmt = $this->pdo->prepare(
+            "
+            SELECT pt.participant_id, t.id AS test_id, t.title AS test_title
+            FROM participant_test pt
+            JOIN tests t ON pt.test_id = t.id
+            WHERE pt.participant_id IN (
+                SELECT id FROM participants WHERE project_id = ?
+            )
+        "
+        );
+        $stmt->execute([$projectId]);
+        $testAssignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Group tests per participant
+        $testsByParticipant = [];
+        foreach ($testAssignments as $row) {
+            $testsByParticipant[$row['participant_id']][] = $row['test_title'];
+        }
+
+        $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
+        $stmt->execute([$projectId]);
+        $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Get test titles for quick lookup
+        $stmt = $this->pdo->prepare("SELECT id, title FROM tests WHERE project_id = ?");
+        $stmt->execute([$projectId]);
+
+        $testTitleMap = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $test) {
+            $testTitleMap[$test['id']] = $test['title'];
+        }
+
+        // Group completed test titles per participant
+        $completedTestsByParticipant = [];
+
+        foreach ($participants as $p) {
+            $completedIds = array_filter(array_map('trim', explode(',', $p['completed_test_ids'] ?? '')));
+            foreach ($completedIds as $testId) {
+                if (isset($testTitleMap[$testId])) {
+                    $completedTestsByParticipant[$p['id']][] = $testTitleMap[$testId];
+                }
+            }
+        }
 
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
@@ -173,10 +222,12 @@ class ProjectController
     
         // Allow superadmins and admins, restrict for regular moderators
         if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
-            $stmt = $this->pdo->prepare("
+            $stmt = $this->pdo->prepare(
+                "
                 SELECT 1 FROM project_user
                 WHERE project_id = ? AND moderator_id = ?
-            ");
+            "
+            );
             $stmt->execute([$projectId, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
     

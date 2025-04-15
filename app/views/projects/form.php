@@ -34,7 +34,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <?php endforeach; ?>
 
             <div class="mb-3">
-    <label for="assigned_users" class="form-label">Assign Users to this Project</label>
+    <label for="assigned_users" class="form-label">Assign Moderators to this Project</label>
     <select id="assigned_users" name="assigned_users[]" class="form-select" multiple>
         <?php foreach ($allUsers as $user): ?>
             <option value="<?php echo $user['id']; ?>"

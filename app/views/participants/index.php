@@ -5,11 +5,11 @@ require __DIR__ . '/../layouts/header.php';
 
 <div class="container py-5">
     
-<a href="index.php?controller=Project&action=show&id=<?php echo $projectId; ?>#participant-list" class="btn btn-secondary mb-4">← Back to Projects</a>
+<a href="index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary mb-4">← Back to Projects</a>
    
 <h1 class="mb-4">Participants</h1>
 
-    <a href="/index.php?controller=Participant&action=export&project_id=<?php echo $projectId; ?>" class="btn btn-outline-secondary mb-3">📤 Export Participants</a>
+    <a href="/index.php?controller=Participant&action=export&project_id=<?php echo $project_id; ?>" class="btn btn-outline-secondary mb-3">📤 Export Participants</a>
 
     <?php if (!empty($participants)): ?>
         <div class="table-responsive">
@@ -42,11 +42,11 @@ require __DIR__ . '/../layouts/header.php';
                                 ? htmlspecialchars($participant['last_evaluation']) 
                                 : '<span class="text-muted fst-italic">N/A</span>'; ?>
                             </td>
-                            <td><a class="btn btn-sm btn-outline-primary" href="/index.php?controller=Participant&action=show&id=<?php echo $participant['id']; ?>&project_id=<?php echo $projectId; ?>">View</a>
+                            <td><a class="btn btn-sm btn-outline-primary" href="/index.php?controller=Participant&action=show&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>">View</a>
                        
                        
-    <a href="/index.php?controller=Participant&action=edit&id=<?php echo $participant['id']; ?>&project_id=<?php echo $projectId; ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
-    <a href="/index.php?controller=Participant&action=destroy&id=<?php echo $participant['id']; ?>&project_id=<?php echo $projectId; ?>"
+    <a href="/index.php?controller=Participant&action=edit&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
+    <a href="/index.php?controller=Participant&action=destroy&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>"
        class="btn btn-sm btn-outline-danger"
        onclick="return confirm('Are you sure you want to delete this participant?');">Delete</a>
 </td>
@@ -59,6 +59,10 @@ require __DIR__ . '/../layouts/header.php';
     <?php else: ?>
         <p class="text-muted">No participants found for this project.</p>
     <?php endif; ?>
+
+      
+<a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary mb-4">← Back to Projects</a>
+  
 </div>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
