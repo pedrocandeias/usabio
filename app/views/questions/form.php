@@ -40,9 +40,9 @@ require __DIR__ . '/../layouts/header.php';
                 <select class="form-select" id="preset-options">
                     <option value="">— Select a common type —</option>
                     <option value="Yes:yes;No:no">Yes / No</option>
-                    <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1–5)</option>
-                    <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1–5)</option>
-                    <option value="Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5">Satisfaction Scale (1–5)</option>
+                    <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
+                    <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
+                    <option value="Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5">Satisfaction Scale (1-5)</option>
                 </select>
                 <small class="form-text text-muted">This will auto-fill the response type and options below.</small>
             </div>

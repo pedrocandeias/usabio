@@ -6,7 +6,7 @@ require __DIR__ . '/../layouts/header.php';
 <div class="container py-5">
 
     <?php if (!empty($test)) : ?>
-        <a href="/index.php?controller=Project&action=show&id=<?php echo $test['project_id']; ?>" class="btn btn-secondary btn-xs mb-4">
+        <a href="/index.php?controller=Project&action=show&id=<?php echo $test['project_id']; ?>#tests-list" class="btn btn-secondary btn-xs mb-4">
             ← Back to Project
         </a>
         <p class="text-muted mb-4">
@@ -49,7 +49,10 @@ require __DIR__ . '/../layouts/header.php';
             <?php foreach ($taskGroups as $group): ?>
                 <div class="card mb-4 shadow-sm task-group" id="taskgroup<?php echo $group['id']; ?>" data-id="<?php echo $group['id']; ?>">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><?php echo htmlspecialchars($group['title']); ?></h5>
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="me-2" style="cursor: grab;">☰</span>
+                            <?php echo htmlspecialchars($group['title']); ?>
+                        </h5>
                         <div>
                             <a href="/index.php?controller=Response&action=exportCsvByTaskGroup&group_id=<?php echo $group['id']; ?>" class="btn btn-outline-secondary btn-sm">📥 Export answers</a>
                             <a href="/index.php?controller=TaskGroup&action=edit&id=<?php echo $group['id']; ?>" class="btn btn-sm btn-primary">Edit Group</a>
@@ -62,7 +65,8 @@ require __DIR__ . '/../layouts/header.php';
                             <?php foreach ($group['tasks'] as $task): ?>
                                 <li class="list-group-item d-flex justify-content-between task-item" data-id="<?php echo $task['id']; ?>">
                                     <div>
-                                        <strong><?php echo htmlspecialchars($task['task_text']); ?></strong>
+                                    <span class="me-2" style="cursor: grab;">☰</span>
+                                    <strong><?php echo htmlspecialchars($task['task_text']); ?></strong>
                                         <small class="text-muted">[<?php echo $task['task_type']; ?>]</small>
                                     </div>
                                     <div>
@@ -98,7 +102,7 @@ require __DIR__ . '/../layouts/header.php';
             <?php foreach ($questionnaireGroups as $qGroup): ?>
                 <div class="card mb-3 shadow-sm questionnaire-group" id="questionnaire-group<?php echo $qGroup['id']; ?>" data-id="<?php echo $qGroup['id']; ?>">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><?php echo htmlspecialchars($qGroup['title']); ?></h5>
+                        <h5 class="mb-0"><span class="me-2" style="cursor: grab;">☰</span><?php echo htmlspecialchars($qGroup['title']); ?></h5>
                         <div>
                             <a href="/index.php?controller=Response&action=exportCsvByQuestionnaireGroup&group_id=<?php echo $qGroup['id']; ?>" class="btn btn-outline-secondary btn-sm">📥 Export answers</a>
                             <a href="/index.php?controller=QuestionnaireGroup&action=edit&id=<?php echo $qGroup['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
@@ -112,6 +116,7 @@ require __DIR__ . '/../layouts/header.php';
                                 <?php foreach ($qGroup['questions'] as $question): ?>
                                     <li class="list-group-item d-flex justify-content-between question-item" data-id="<?php echo $question['id']; ?>">
                                         <div>
+                                            <span class="me-2" style="cursor: grab;">☰</span>
                                             <strong><?php echo htmlspecialchars($question['text']); ?></strong>
                                             <small class="text-muted">[<?php echo $question['question_type']; ?>]</small>
                                         </div>
@@ -141,9 +146,13 @@ require __DIR__ . '/../layouts/header.php';
             <p class="text-muted">No questionnaire groups yet. <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>">Add one</a>.</p>
         <?php endif; ?>
     </div>
-
 </div> <!-- Close .container -->
 
+<div class="container pb-5">
+<a href="/index.php?controller=Project&action=show&id=<?php echo $test['project_id']; ?>#tests-list" class="btn btn-secondary btn-xs">
+            ← Back to Project
+        </a>
+</div>
 <!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="savedToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">

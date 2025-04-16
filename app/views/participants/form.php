@@ -91,7 +91,7 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         <?php } ?>
        
-        <div class="col-md-4">
+        <div class="col-md-12">
         <?php if(!empty($tests)): ?>
             <hr class="my-4">
             <h5>Tests</h5>

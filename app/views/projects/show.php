@@ -1,30 +1,74 @@
+
 <?php 
 $title = 'Project details';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
+
 <div class="container py-5">
-
+<a href="/index.php?controller=Project&action=index" class="btn btn-secondary btn-xs mb-4">
+                    ← Back to Project List
+                </a>
     <!-- Header + Edit Button -->
+    <div class="mb-4 mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <a href="/index.php?controller=Project&action=edit&id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">
+                    Edit Project
+                </a>
+                <a href="/index.php?controller=Project&action=edit&id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">
+                    Delete Project
+                </a>
+            </div> 
+        </div>
+    </div>
     <div class="mb-4 d-flex justify-content-between align-items-center">
-        <h1 class="display-4"><?php echo htmlspecialchars($project['title']); ?></h1>
-        <a href="/index.php?controller=Project&action=edit&id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">Edit / Remove</a>
+        <div class="row w-100">
+            <div class="col-md-6">
+                <h1 class="display-4"><?php echo htmlspecialchars($project['title']); ?>
+                </h1>
+             
+            </div>
+            <div class="col-md-6 text-end">
+                 <a href="index.php?controller=Session&action=dashboard&project_id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">
+                    Start testing
+                </a>
+                <a href="/index.php?controller=Project&action=analysis&id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
+                    📊 View Full Project Analysis
+                </a>
+                <a href="/index.php?controller=Export&action=index&project_id=1=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
+                    📊 Export data
+                </a>
+            </div>
+        </div>
     </div>
 
-    <p class="lead"><?php echo nl2br(htmlspecialchars($project['description'])); ?></p>
-    <p>Created on: <strong><?php echo htmlspecialchars($project['created_at']); ?></strong></p>
-    <p>Updated on: <strong><?php echo htmlspecialchars($project['updated_at']); ?></strong></p>
 
-    <!-- Analysis Button -->
-    <div class="mb-4">
-        <a href="/index.php?controller=Project&action=analysis&id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
-            📊 View Full Project Analysis
-        </a>
-        <a href="/index.php?controller=Export&action=index&project_id=1=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
-            📊 Export data
-        </a>
-    </div>
 
     <!-- First Grid Section -->
+    <div class="row">
+    <div class="col-md-6">
+            <div class="card mb-4 p-1">
+                <div class="card-body">
+                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['description'])); ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="card-text">Created: <strong><?php echo htmlspecialchars($project['created_at']); ?></strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="card-text">Updated: <strong><?php echo htmlspecialchars($project['updated_at']); ?></strong></p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
     <div class="row">
         <div class="col-md-3">
             <div class="card mb-4">
@@ -280,3 +324,4 @@ require __DIR__ . '/../layouts/header.php';
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
+
