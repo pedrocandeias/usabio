@@ -4,6 +4,9 @@ session_start();
 // Base config
 require_once __DIR__ . '/config/db.php'; // Adjust to your setup
 
+// Load environment variables
+require_once __DIR__ . '/config/config.php';
+
 // Enable error reporting during dev
 ini_set('display_errors', 1);
 error_reporting(E_ALL);

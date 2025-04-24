@@ -12,11 +12,12 @@ require __DIR__ . '/../layouts/header.php';
     <div class="mb-4 mt-4">
         <div class="row">
             <div class="col-md-12">
-                <a href="/index.php?controller=Project&action=edit&id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">
+                <a href="/index.php?controller=Project&action=edit&id=<?php echo $project['id']; ?>" class="btn btn-warning btn-sm">
                     Edit Project
-                </a>
-                <a href="/index.php?controller=Project&action=edit&id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">
-                    Delete Project
+                <a href="/index.php?controller=Project&action=destroy&id=<?php echo $project['id']; ?>" 
+                    class="btn btn-danger btn-sm" 
+                    onclick="return confirm('Are you sure you want to delete this project?');">
+                     Delete Project
                 </a>
             </div> 
         </div>
@@ -28,7 +29,12 @@ require __DIR__ . '/../layouts/header.php';
                 </h1>
              
             </div>
-            <div class="col-md-6 text-end">
+            <div class="col-md-6 text-end"> 
+                <a href="/index.php?controller=Import&action=uploadForm&project_id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-secondary">Import</a>
+                       
+              <a href="/index.php?controller=Export&action=printProject&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-secondary btn-sm">
+                    Print Project
+</a>
                  <a href="index.php?controller=Session&action=dashboard&project_id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">
                     Start testing
                 </a>
@@ -169,6 +175,7 @@ require __DIR__ . '/../layouts/header.php';
                         <small><?php echo htmlspecialchars($test['description']); ?></small>
                     </div>
                     <div class="d-flex gap-2">
+                        <a href="/index.php?controller=Test&action=show&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-outline-secondary">Duplicate</a>
                         <a href="/index.php?controller=Test&action=show&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-outline-secondary">Manage tasks and questions</a>
                         <a href="/index.php?controller=Test&action=edit&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
                         <a href="/index.php?controller=Test&action=destroy&id=<?php echo $test['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this test?');">Delete</a>

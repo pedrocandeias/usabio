@@ -6,6 +6,8 @@
     <link
   rel="stylesheet"
   href="dist/css/styles.css" />
+  <link rel="stylesheet" href="dist/css/print.css" media="print">
+
 
 </head>
 
@@ -41,7 +43,12 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <!-- Left-aligned menu items -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <?php if (isset($_SESSION['username'])): ?>
+          <li class="nav-item">
+          <a class="nav-link" href="/index.php?controller=Project&action=newOptions">
+    New Project
+</a>
+</li>    
+         <?php if (isset($_SESSION['username'])): ?>
           <li class="nav-item">
               <a class="nav-link" href="/index.php?controller=Session&action=dashboard">Test Sessions</a>
           </li>
@@ -66,13 +73,14 @@
                   <a class="dropdown-item" href="/?controller=Project&action=create">
                 Create New Project
                   </a>
+                  <li>
+                  <a href="/index.php?controller=Duplicate&action=selectProject"class="dropdown-item" >
+    Duplicate a Project
+</a>
                 </li>
               </ul>
             </li>
           </ul>
-
-        
-        
           <!-- Right-aligned user info and logout -->
           <?php if (!empty($_SESSION['is_superadmin'])): ?>
             <div class="nav-item dropdown me-2">
@@ -81,7 +89,9 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/index.php?controller=User&action=index">User Management</a></li>
-                    <!-- <li><a class="dropdown-item" href="#">System Settings</a></li> -->
+                    <li class="nav-item">
+        <a class="dropdown-item" href="/index.php?controller=Settings&action=index">Admin Settings</a>
+    </li>
                 </ul>
           </div>
          

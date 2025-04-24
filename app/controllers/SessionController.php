@@ -224,6 +224,12 @@ $questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetch
         $gender = $_POST['participant_gender'] ?? null;
         $academic_level = $_POST['participant_academic_level'] ?? null;
 
+        if (!$project_id && $test_id) {
+            $stmt = $this->pdo->prepare("SELECT project_id FROM tests WHERE id = ?");
+            $stmt->execute([$test_id]);
+            $project_id = $stmt->fetchColumn();
+        }
+
         $stmt = $this->pdo->prepare("
             INSERT INTO participants (project_id, test_id, participant_name, participant_age, participant_gender, participant_academic_level, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
@@ -333,8 +339,7 @@ $questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetch
         );
         $stmt->execute([$evaluationId]);
         $customData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
+        
         // Load task groups + tasks
         $stmt = $this->pdo->prepare(
             "
@@ -349,6 +354,7 @@ $questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetch
         $stmt->execute([$evaluation['test_id']]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    
         // Structure: group_id => { title, tasks[] }
         $taskGroups = [];
         foreach ($rows as $row) {
@@ -375,6 +381,7 @@ $questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetch
                 ];
             }
         }
+
 
         include __DIR__ . '/../views/session/track_tasks.php';
     }

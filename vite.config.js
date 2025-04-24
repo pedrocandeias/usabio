@@ -11,6 +11,7 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'assets/js/app.js'),
         styles: path.resolve(__dirname, 'assets/css/app.css'),
+        print: path.resolve(__dirname, 'assets/css/print_projects.css'),
       },
       output: {
         entryFileNames: 'js/[name].js',
@@ -29,3 +30,4 @@ export default defineConfig({
     })
   ]
 });
+

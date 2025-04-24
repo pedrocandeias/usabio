@@ -16,12 +16,14 @@
 
         <div class="mb-4">
             <h4>Select Participant</h4>
-            <?php if (!empty($assignedParticipants)) : ?>
+            
             <div class="mb-3">
                 <label for="participant_mode" class="form-label">Who is doing this session?</label>
                 <select id="participant_mode" class="form-select" required>
                     <option value="">-- Select --</option>
+                    <?php if (!empty($assignedParticipants)) : ?>
                     <option value="assigned">Select assigned participant</option>
+                    <?php endif; ?>
                     <option value="custom">Enter custom participant</option>
                     <option value="anonymous">Anonymous participant</option>
                 </select>
@@ -51,18 +53,13 @@
                         
                         <option value="<?php echo $participant['id'] ?>">
                         <?php echo $label ?>
-        </option>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
                 <?php
                 $fieldIds = array_column($customFields, 'id');
                 ?>
-
-        
-    <?php else: ?>
-        <p class="text-muted">No participants are currently assigned to this test.</p>
-    <?php endif; ?>
         </div>
         <div id="participantDetails" class="d-none">    
             <div class="mb-3">

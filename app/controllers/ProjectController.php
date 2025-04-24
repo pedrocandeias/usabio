@@ -532,4 +532,9 @@ class ProjectController
         include __DIR__ . '/../views/projects/analysis.php';
     }
 
+    public function newOptions()
+    {
+        include __DIR__ . '/../views/projects/new_options.php';
+    }
+
 }

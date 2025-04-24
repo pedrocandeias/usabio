@@ -1,0 +1,11 @@
+{
+    "name": "pec/testflow",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Pedro Candeias",
+            "email": "pedrocandeias@gmail.com"
+        }
+    ],
+    "require": {}
+}

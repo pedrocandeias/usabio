@@ -9,18 +9,20 @@ require __DIR__ . '/../layouts/header.php';
 <h1 class="mb-4">Start Questionnaire</h1>
 
 <form method="POST" action="/index.php?controller=Session&action=beginQuestionnaire">
-    <input type="hidden" name="test_id" value="<?= $test['id'] ?>">
-    <input type="hidden" name="project_id" value="<?= $test['project_id'] ?>">
+    <input type="hidden" name="test_id" value="<?php echo $test['id'] ?>">
+    <input type="hidden" name="project_id" value="<?php echo $test['project_id'] ?>">
 
     <div class="mb-4">
         <h4>Select Participant</h4>
 
-        <?php if (!empty($assignedParticipants)) : ?>
+        
             <div class="mb-3">
                 <label for="participant_mode" class="form-label">Who is doing this session?</label>
                 <select id="participant_mode" class="form-select" required>
                     <option value="">-- Select --</option>
+                    <?php if (!empty($assignedParticipants)) : ?>
                     <option value="assigned">Select assigned participant</option>
+                    <?php endif; ?>
                     <option value="custom">Enter custom participant</option>
                     <option value="anonymous">Anonymous participant</option>
                 </select>
@@ -47,37 +49,35 @@ require __DIR__ . '/../layouts/header.php';
                         }
                         
                         ?>
-                        <option value="<?= $participant['id'] ?>"><?= $label ?></option>
+                        <option value="<?php echo $participant['id'] ?>"><?php echo $label ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
 
             <?php $fieldIds = array_column($customFields, 'id'); ?>
-        <?php else: ?>
-            <p class="text-muted">No participants are currently assigned to this test.</p>
-        <?php endif; ?>
+       
     </div>
 
     <!-- Participant details section -->
     <div id="participantDetails" class="d-none">
         <div class="mb-3">
             <label class="form-label">Participant Name</label>
-            <input type="text" name="participant_name" class="form-control" value="<?= htmlspecialchars($previousEvaluation['participant_name'] ?? '') ?>" required>
+            <input type="text" name="participant_name" class="form-control" value="<?php echo htmlspecialchars($previousEvaluation['participant_name'] ?? '') ?>" required>
         </div>
 
         <div class="row">
             <div class="col-md-4">
                 <label class="form-label">Age</label>
-                <input type="number" name="participant_age" class="form-control" value="<?= htmlspecialchars($previousEvaluation['participant_age'] ?? '') ?>">
+                <input type="number" name="participant_age" class="form-control" value="<?php echo htmlspecialchars($previousEvaluation['participant_age'] ?? '') ?>">
             </div>
             <div class="col-md-4">
                 <label class="form-label">Gender</label>
                 <select name="participant_gender" class="form-select">
                     <option value="">Select</option>
-                    <option value="female" <?= ($previousEvaluation['participant_gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female</option>
-                    <option value="male" <?= ($previousEvaluation['participant_gender'] ?? '') === 'male' ? 'selected' : '' ?>>Male</option>
-                    <option value="nonbinary" <?= ($previousEvaluation['participant_gender'] ?? '') === 'nonbinary' ? 'selected' : '' ?>>Non-Binary</option>
-                    <option value="prefer_not_say" <?= ($previousEvaluation['participant_gender'] ?? '') === 'prefer_not_say' ? 'selected' : '' ?>>Prefer not to say</option>
+                    <option value="female" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female</option>
+                    <option value="male" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'male' ? 'selected' : '' ?>>Male</option>
+                    <option value="nonbinary" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'nonbinary' ? 'selected' : '' ?>>Non-Binary</option>
+                    <option value="prefer_not_say" <?php echo ($previousEvaluation['participant_gender'] ?? '') === 'prefer_not_say' ? 'selected' : '' ?>>Prefer not to say</option>
                 </select>
             </div>
             <div class="col-md-4">
@@ -96,8 +96,8 @@ require __DIR__ . '/../layouts/header.php';
                     ];
                     $selected = $previousEvaluation['participant_academic_level'] ?? '';
                     foreach ($levels as $level): ?>
-                        <option value="<?= htmlspecialchars($level) ?>" <?= ($selected === $level) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($level) ?>
+                        <option value="<?php echo htmlspecialchars($level) ?>" <?php echo ($selected === $level) ? 'selected' : '' ?>>
+                            <?php echo htmlspecialchars($level) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -110,21 +110,21 @@ require __DIR__ . '/../layouts/header.php';
             <?php foreach ($customFields as $field): ?>
                 <?php $value = $prefillCustomData[$field['id']] ?? ''; ?>
                 <div class="mb-3">
-                    <label class="form-label"><?= htmlspecialchars($field['label']) ?></label>
+                    <label class="form-label"><?php echo htmlspecialchars($field['label']) ?></label>
                     <?php if ($field['field_type'] === 'select') : ?>
-                        <select class="form-select" name="custom_field[<?= $field['id'] ?>]">
+                        <select class="form-select" name="custom_field[<?php echo $field['id'] ?>]">
                             <option value="">Select...</option>
                             <?php foreach (explode(';', $field['options']) as $option): ?>
                                 <?php $option = trim($option); ?>
-                                <option value="<?= htmlspecialchars($option) ?>" <?= ($option === $value) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($option) ?>
+                                <option value="<?php echo htmlspecialchars($option) ?>" <?php echo ($option === $value) ? 'selected' : '' ?>>
+                                    <?php echo htmlspecialchars($option) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     <?php elseif ($field['field_type'] === 'number') : ?>
-                        <input type="number" class="form-control" name="custom_field[<?= $field['id'] ?>]" value="<?= htmlspecialchars($value) ?>">
+                        <input type="number" class="form-control" name="custom_field[<?php echo $field['id'] ?>]" value="<?php echo htmlspecialchars($value) ?>">
                     <?php else: ?>
-                        <input type="text" class="form-control" name="custom_field[<?= $field['id'] ?>]" value="<?= htmlspecialchars($value) ?>">
+                        <input type="text" class="form-control" name="custom_field[<?php echo $field['id'] ?>]" value="<?php echo htmlspecialchars($value) ?>">
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -150,8 +150,8 @@ require __DIR__ . '/../layouts/header.php';
 </div>
 
 <script>
-    const participants = <?= json_encode($assignedParticipants) ?>;
-    const customFieldIds = <?= json_encode(array_column($customFields, 'id')) ?>;
+    const participants = <?php echo json_encode($assignedParticipants) ?>;
+    const customFieldIds = <?php echo json_encode(array_column($customFields, 'id')) ?>;
 
     const modeSelector = document.getElementById('participant_mode');
     const assignedBlock = document.getElementById('assignedParticipantBlock');

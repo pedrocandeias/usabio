@@ -493,82 +493,11 @@ public function exportTaskResponsesByTest()
     exit;
 }
 
-public function exportQuestionnaireResponsesByTest()
-{
-    $test_id = $_GET['test_id'] ?? 0;
-
-    // Get test info
-    $stmt = $this->pdo->prepare("SELECT t.*, p.title AS project_title FROM tests t JOIN projects p ON p.id = t.project_id WHERE t.id = ?");
-    $stmt->execute([$test_id]);
-    $test = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$test) {
-        echo "Test not found.";
-        exit;
-    }
-
-    // Get questionnaire evaluations
-    $stmt = $this->pdo->prepare("
-        SELECT * FROM evaluations
-        WHERE test_id = ? AND did_questionnaire = 1
-    ");
-    $stmt->execute([$test_id]);
-    $evaluations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Get responses
-    $evaluationIds = array_column($evaluations, 'id');
-    $responseMap = [];
-    $allQuestions = [];
-
-    if (!empty($evaluationIds)) {
-        $in = implode(',', array_fill(0, count($evaluationIds), '?'));
-        $stmt = $this->pdo->prepare("SELECT * FROM responses WHERE evaluation_id IN ($in)");
-        $stmt->execute($evaluationIds);
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-            $responseMap[$r['evaluation_id']][$r['question']] = $r['answer'];
-            $allQuestions[$r['question']] = true;
-        }
-    }
-
-    // Output CSV
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=questionnaire_responses_test_' . $test_id . '.csv');
-    $output = fopen('php://output', 'w');
-
-    $header = ['Test ID', 'Test Title', 'Participant Name', 'Age', 'Gender', 'Academic Level', 'Timestamp'];
-    foreach (array_keys($allQuestions) as $q) {
-        $header[] = $q;
-    }
-    fputcsv($output, $header);
-
-    foreach ($evaluations as $eval) {
-        $row = [
-            $test['id'],
-            $test['title'],
-            $eval['participant_name'],
-            $eval['participant_age'],
-            $eval['participant_gender'],
-            $eval['participant_academic_level'],
-            $eval['timestamp']
-        ];
-
-        foreach (array_keys($allQuestions) as $q) {
-            $row[] = $responseMap[$eval['id']][$q] ?? '';
-        }
-
-        fputcsv($output, $row);
-    }
-
-    fclose($output);
-    exit;
-}
-
-
 public function susCSV()
 {
     $project_id = $_GET['project_id'] ?? 0;
 
-    // 1. Get all questionnaire groups in the project
+    // Fetch all SUS questions in this project
     $stmt = $this->pdo->prepare("
         SELECT qg.id AS group_id
         FROM questionnaire_groups qg
@@ -583,7 +512,7 @@ public function susCSV()
     foreach ($groups as $group) {
         $groupId = $group['group_id'];
 
-        // 2. Get SUS questions
+        // Get SUS questions
         $stmt = $this->pdo->prepare("
             SELECT id, text FROM questions
             WHERE questionnaire_group_id = ? AND preset_type = 'SUS'
@@ -592,9 +521,11 @@ public function susCSV()
         $stmt->execute([$groupId]);
         $susQuestions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (count($susQuestions) !== 10) continue;
+        if (count($susQuestions) !== 10) {
+            continue;
+        }
 
-        // 3. Fetch responses for evaluations in this project
+        // Fetch all responses to these questions
         $stmt = $this->pdo->prepare("
             SELECT e.id AS evaluation_id, e.participant_name, r.question, r.answer
             FROM evaluations e
@@ -604,14 +535,13 @@ public function susCSV()
         $stmt->execute([$project_id]);
         $allResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 4. Group responses by evaluation
+        // Group responses by evaluation
         $byEval = [];
         foreach ($allResponses as $resp) {
             $byEval[$resp['evaluation_id']]['participant'] = $resp['participant_name'] ?: 'Anonymous';
             $byEval[$resp['evaluation_id']]['answers'][$resp['question']] = (int) $resp['answer'];
         }
 
-        // 5. Score SUS per participant
         foreach ($byEval as $evalId => $entry) {
             $participant = $entry['participant'];
             $answers = $entry['answers'];
@@ -647,31 +577,188 @@ public function susCSV()
         }
     }
 
-    // ✅ Output CSV
+    // Output CSV
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename=sus_scores_project_' . $project_id . '.csv');
     $output = fopen('php://output', 'w');
 
     // Header
-    $header = ['Participant'];
-    for ($i = 1; $i <= 10; $i++) $header[] = "Q$i";
-    $header[] = 'SUS Score';
-    $header[] = 'Label';
+    $header = ['Participant', 'SUS Score', 'Label'];
+    for ($i = 1; $i <= 10; $i++) {
+        $header[] = "Q$i";
+    }
     fputcsv($output, $header);
 
     // Rows
-    foreach ($susBreakdown as $row) {
-        $line = [$row['participant']];
-        foreach ($row['answers'] as $a) $line[] = $a;
-        $line[] = $row['score'];
-        $line[] = $row['label'];
-        fputcsv($output, $line);
+    foreach ($susBreakdown as $entry) {
+        $row = [
+            $entry['participant'],
+            $entry['score'],
+            $entry['label']
+        ];
+        foreach ($entry['answers'] as $a) {
+            $row[] = $a;
+        }
+        fputcsv($output, $row);
     }
 
     fclose($output);
     exit;
 }
 
+public function exportProjectJSON()
+{
+    $project_id = $_GET['project_id'] ?? 0;
+
+    // Get project
+    $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
+    $stmt->execute([$project_id]);
+    $project = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$project) {
+        echo "Project not found.";
+        exit;
+    }
+
+    // Get all tests
+    $stmt = $this->pdo->prepare("SELECT * FROM tests WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($tests as &$test) {
+        // Task Groups
+        $stmt = $this->pdo->prepare("SELECT * FROM task_groups WHERE test_id = ? ORDER BY position ASC");
+        $stmt->execute([$test['id']]);
+        $test['task_groups'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($test['task_groups'] as &$tg) {
+            $stmt = $this->pdo->prepare("SELECT * FROM tasks WHERE task_group_id = ? ORDER BY position ASC");
+            $stmt->execute([$tg['id']]);
+            $tg['tasks'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Questionnaire Groups
+        $stmt = $this->pdo->prepare("SELECT * FROM questionnaire_groups WHERE test_id = ? ORDER BY position ASC");
+        $stmt->execute([$test['id']]);
+        $test['questionnaire_groups'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($test['questionnaire_groups'] as &$qg) {
+            $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE questionnaire_group_id = ? ORDER BY position ASC");
+            $stmt->execute([$qg['id']]);
+            $qg['questions'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+
+    // Get participants
+    $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get custom fields
+    $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $fieldMap = [];
+    foreach ($customFields as $f) {
+        $fieldMap[$f['id']] = $f;
+    }
+
+    // Get custom data
+    $participantIds = array_column($participants, 'id');
+    $customData = [];
+    if (!empty($participantIds)) {
+        $in = implode(',', array_fill(0, count($participantIds), '?'));
+        $stmt = $this->pdo->prepare("SELECT * FROM participant_custom_data WHERE participant_id IN ($in)");
+        $stmt->execute($participantIds);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $customData[$row['participant_id']][$row['field_id']] = $row['value'];
+        }
+    }
+
+    // Merge custom data into participants
+    foreach ($participants as &$p) {
+        $p['custom_fields'] = [];
+        foreach ($customData[$p['id']] ?? [] as $field_id => $value) {
+            $label = $fieldMap[$field_id]['label'] ?? 'unknown';
+            $p['custom_fields'][$label] = $value;
+        }
+    }
+
+    // Build structure
+    $output = [
+        'project' => $project,
+        'tests' => $tests,
+        'participants' => $participants,
+        'custom_fields' => $customFields
+    ];
+
+    // Output
+    header('Content-Type: application/json');
+    header('Content-Disposition: attachment; filename=project_' . $project_id . '.json');
+    echo json_encode($output, JSON_PRETTY_PRINT);
+    exit;
+}
+
+public function printProject()
+{
+    $project_id = $_GET['project_id'] ?? 0;
+
+    // Load project
+    $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
+    $stmt->execute([$project_id]);
+    $project = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$project) {
+        echo "Project not found.";
+        exit;
+    }
+
+    // Load tasks
+    $stmt = $this->pdo->prepare("SELECT * FROM task_groups WHERE test_id IN (SELECT id FROM tests WHERE project_id = ?) ORDER BY position ASC");
+    $stmt->execute([$project_id]);
+    $taskGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $tasksByGroup = [];
+    foreach ($taskGroups as $group) {
+        $stmt = $this->pdo->prepare("SELECT * FROM tasks WHERE task_group_id = ? ORDER BY position ASC");
+        $stmt->execute([$group['id']]);
+        $tasksByGroup[$group['id']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Load questionnaire groups
+    $stmt = $this->pdo->prepare("SELECT * FROM questionnaire_groups WHERE test_id IN (SELECT id FROM tests WHERE project_id = ?) ORDER BY position ASC");
+    $stmt->execute([$project_id]);
+    $questionnaireGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $questionsByGroup = [];
+    foreach ($questionnaireGroups as $group) {
+        $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE questionnaire_group_id = ? ORDER BY position ASC");
+        $stmt->execute([$group['id']]);
+        $questionsByGroup[$group['id']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Load participants
+    $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE project_id = ? ORDER BY participant_name ASC");
+    $stmt->execute([$project_id]);
+    $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Load custom field labels
+    $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
+    $stmt->execute([$project_id]);
+    $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Load participant custom data
+    $participantIds = array_column($participants, 'id');
+    $customData = [];
+    if (!empty($participantIds)) {
+        $in = implode(',', array_fill(0, count($participantIds), '?'));
+        $stmt = $this->pdo->prepare("SELECT * FROM participant_custom_data WHERE participant_id IN ($in)");
+        $stmt->execute($participantIds);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $customData[$row['participant_id']][$row['field_id']] = $row['value'];
+        }
+    }
+
+    include __DIR__ . '/../views/export/print_project.php';
+}
 
 }
 

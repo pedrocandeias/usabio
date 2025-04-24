@@ -27,8 +27,6 @@
     </div>
 <?php endif; ?>
 
-   
-
     <form method="POST" action="/index.php?controller=Session&action=saveTaskResponses">
         <input type="hidden" name="evaluation_id" value="<?php echo $evaluation['id']; ?>">
 
@@ -84,7 +82,7 @@
                                     <button type="button" class="btn btn-outline-warning btn-sm" onclick="pauseTimer(<?php echo $task['id']; ?>)">⏸ Pause</button>
                                     <span class="ms-2 fs-5">⏱ <span id="time-<?php echo $task['id']; ?>">0</span> sec</span>
                                     <button type="button" class="btn btn-outline-success btn-sm" id="btn-<?php echo $task['id']; ?>" onclick="toggleComplete(<?php echo $task['id']; ?>)">
-                                        ✅ Mark as Complete
+                                        Mark as Complete
                                     </button>
                                     <input type="hidden" name="time_spent[<?php echo $task['id']; ?>]" id="input-<?php echo $task['id']; ?>" value="0">
                                 </div>
@@ -195,6 +193,7 @@ function pauseTimer(id) {
     clearInterval(timers[id]);
     delete timers[id];
 }
+
 
 function toggleComplete(id) {
     const card = document.getElementById(`task-${id}`);

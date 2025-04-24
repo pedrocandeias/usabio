@@ -222,6 +222,21 @@ try {
             FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "test_sessions",
 
+        // === TABLE: settings ===
+      "CREATE TABLE IF NOT EXISTS settings (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            setting_key VARCHAR(100) NOT NULL UNIQUE,
+            setting_value TEXT NOT NULL,
+            enable_apikey BOOLEAN DEFAULT 0,
+            enable_registration BOOLEAN DEFAULT 0,
+            enable_login BOOLEAN DEFAULT 0,
+            default_language VARCHAR(10) DEFAULT 'en',
+            ui_theme VARCHAR(50) DEFAULT 'default',
+            feature_flags TEXT DEFAULT NULL,
+            allow_registration BOOLEAN DEFAULT 0,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB;" => "settings",
+        
     ];
 
     foreach ($tables as $sql => $name) {
@@ -246,6 +261,21 @@ try {
     echo "<pre style='color:red'>Error: " . $e->getMessage() . "</pre>";
     exit;
 }
+// Write .env file if it doesn't exist
+$envPath = dirname(__DIR__) . '/.env';
+if (!file_exists($envPath)) {
+    $secretKey = bin2hex(random_bytes(32)); // Generate a 64-character random key
+    $defaultEnv = <<<ENV
+SUPER_SECRET_KEY=$secretKey
+
+ENV;
+
+    file_put_contents($envPath, $defaultEnv);
+    $messages[] = "📄 <strong>.env</strong> file created successfully in the project root.";
+} else {
+    $messages[] = "📄 <strong>.env</strong> file already exists. Skipped creation.";
+}
+
 ?>
 
 <!DOCTYPE html>
