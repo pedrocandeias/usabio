@@ -1,49 +1,243 @@
-
 <?php 
-$title = 'Project details';
+$menuActive = 'overview';
+$title = 'Project details - Overview';
+$pageTitle = 'Project details - Overview';
+$pageDescription = 'Manage your project and test sessions.';
+$headerNavbuttons = [
+    'Back to projects list' => [
+        'url' => '/index.php?controller=Project&action=index',
+        'icon' => 'ki-duotone ki-home fs-2',
+        'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
+        'id' => 'kt_back_home_primary_button',
+    ],
+];
+
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 
-<div class="container py-5">
-<a href="/index.php?controller=Project&action=index" class="btn btn-secondary btn-xs mb-4">
-                    ← Back to Project List
-                </a>
-    <!-- Header + Edit Button -->
-    <div class="mb-4 mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <a href="/index.php?controller=Project&action=edit&id=<?php echo $project['id']; ?>" class="btn btn-warning btn-sm">
-                    Edit Project
-                <a href="/index.php?controller=Project&action=destroy&id=<?php echo $project['id']; ?>" 
-                    class="btn btn-danger btn-sm" 
-                    onclick="return confirm('Are you sure you want to delete this project?');">
-                     Delete Project
-                </a>
-            </div> 
+<!--begin::Container-->
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <!--begin::Post-->
+    <div class="content flex-row-fluid" id="kt_content">
+        <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>
+        <!--begin::Row-->
+        <div class="row g-5 g-xl-8">
+            <!--begin::Col-->
+            <div class="col-xl-4">
+                <!--begin::text-->
+                <div class="card card-xl-stretch mb-xl-3  shadow-sm">
+                    <!--begin::Beader-->
+                    <div class="card-header py-5 bg-primary">
+                        <h3 class="card-title">
+                            <span class="card-label fw-bold fs-3 mb-1 text-white">Product under test</span>
+                        </h3>
+                    </div>
+                    <!--end::Header-->
+                    <!--begin::Body-->
+                    <div class="card-body d-flex flex-column">
+                        <div class="fw-semibold fs-6">
+                            <?php echo htmlspecialchars($project['product_under_test']); ?>
+                        </div>
+                    </div>
+                    <!--end::Body-->
+                </div>
+                <!--end::text-->
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-xl-8">
+                <!--begin::Row-->
+                <div class="row gx-5 gx-xl-8 mb-5">
+                    <div class="col-xl-4 mb-5 mb-xl-0">
+                            <!--begin::text-->
+                        <div class="card card-xl-stretch mb-xl-3 shadow-sm">
+                            <!--begin::Beader-->
+                            <div class="card-header bg-primary">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 text-white">Test Objectives</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex flex-column">
+                            <div class="fw-semibold fs-6">
+                            
+                            <?php echo nl2br(htmlspecialchars($project['test_objectives'])); ?>
+    
+                            </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::text-->
+                    </div>
+                    <div class="col-xl-8">
+                            <!--begin::text-->
+                            <div class="card card-xl-stretch shadow-sm">
+                            <!--begin::Beader-->
+                            <div class="card-header bg-primary bg-primary ">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 text-white">Business case</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex flex-column">
+                            <div class="fw-semibold fs-6">
+                            
+                            <?php echo nl2br(htmlspecialchars($project['business_case'])); ?>
+    
+                            </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::text-->
+                    </div>
+                </div>
+                <!--end::Row-->
+                <!--begin::Row-->
+                <div class="row gx-5 gx-xl-8 mb-5 mb-xl-8">
+                    <!--begin::Col-->
+                    <div class="col-xl-6 mb-xl-8">
+                        <!--begin::text-->
+                        <div class="card card-xl-stretch mb-xl-8 shadow-sm">
+                            <!--begin::Beader-->
+                            <div class="card-header bg-primary">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 text-white">Participants</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex flex-column">
+                            <div class="fw-semibold fs-6">
+                            
+                            <?php echo nl2br(htmlspecialchars($project['participants'])); ?>
+    
+                            </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::text-->
+                        
+                        
+                                <!--begin::text-->
+                            <div class="card card-xl-stretch mb-1">
+                            <!--begin::Beader-->
+                            <div class="card-header bg-primary shadow-sm">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 text-white">Location & dates</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex flex-column">
+                            <div class="fw-semibold fs-6">
+                            
+                            <?php echo nl2br(htmlspecialchars($project['location_dates'])); ?>
+    
+                            </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::text-->
+                        
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-xl-6">
+                        <!--begin::text-->
+                        <div class="card card-xl-stretch mb-xl-8 shadow-sm">
+                            <!--begin::Beader-->
+                            <div class="card-header bg-primary ">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 text-white">Responsabilities</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex flex-column">
+                                <div class="fw-semibold fs-6">
+                                    <?php echo nl2br(htmlspecialchars($project['responsibilities'])); ?>
+                                </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::text-->
+
+                        <!--begin::text-->
+                        <div class="card card-xl-stretch mb-1 shadow-sm">
+                            <!--begin::Beader-->
+                            <div class="card-header bg-primary ">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 text-white">Equipment</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex flex-column">
+                                <div class="fw-semibold fs-6">
+                                    <?php echo nl2br(htmlspecialchars($project['equipment'])); ?>
+                                </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::text-->
+                    </div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Row-->
+            </div>
+            <!--end::Col-->
+            <!--begin::Row-->
+            <div class="rowmb-5 mb-xl-8">
+                    <!--begin::Col-->
+                    <div class="col-xl-12 mb-xl-8">
+                        <div class="card card-xl-stretch mb-xl-8 shadow-sm">
+                            <!--begin::Header-->
+                            <div class="card-header bg-primary">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 text-white">Tests procedures</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex flex-column">
+                                <div class="fw-semibold fs-6">
+                                    <?php echo nl2br(htmlspecialchars($project['test_procedure'] ?? 'No additional information available.')); ?>
+                                </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::text-->
+                    </div>
+                    <!--end::Col-->
+                </div> 
+                <!--end::Row-->
         </div>
-    </div>
+        <!--end::Row-->
+                          
+     </div>
+    <!--end::Post-->
+</div>
+<!--end::Container-->
+
+<?php require __DIR__ . '/../layouts/footer.php'; ?>
+<?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
+
+
+<div class="container py-5">
+
+    <!-- Header + Edit Button -->
+    
     <div class="mb-4 d-flex justify-content-between align-items-center">
         <div class="row w-100">
             <div class="col-md-6">
-                <h1 class="display-4"><?php echo htmlspecialchars($project['title']); ?>
+                <h1 class="display-4">
                 </h1>
              
             </div>
             <div class="col-md-6 text-end"> 
-                <a href="/index.php?controller=Import&action=uploadForm&project_id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-secondary">Import</a>
-                       
-              <a href="/index.php?controller=Export&action=printProject&project_id=<?php echo $project['id']; ?>" class="btn btn-outline-secondary btn-sm">
-                    Print Project
-</a>
-                 <a href="index.php?controller=Session&action=dashboard&project_id=<?php echo $project['id']; ?>" class="btn btn-primary btn-sm">
-                    Start testing
-                </a>
-                <a href="/index.php?controller=Project&action=analysis&id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
-                    📊 View Full Project Analysis
-                </a>
-                <a href="/index.php?controller=Export&action=index&project_id=1=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
-                    📊 Export data
-                </a>
+              
             </div>
         </div>
     </div>
@@ -51,85 +245,7 @@ require __DIR__ . '/../layouts/header.php';
 
 
     <!-- First Grid Section -->
-    <div class="row">
-    <div class="col-md-6">
-            <div class="card mb-4 p-1">
-                <div class="card-body">
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['description'])); ?></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <p class="card-text">Created: <strong><?php echo htmlspecialchars($project['created_at']); ?></strong></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <p class="card-text">Updated: <strong><?php echo htmlspecialchars($project['updated_at']); ?></strong></p>
-                </div>
-            </div>
-        </div>
-        
-    </div>
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Product under test</h5>
-                    <p class="card-text"><?php echo htmlspecialchars($project['product_under_test']); ?></p>
-                </div>
-            </div>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Business Case</h5>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['business_case'])); ?></p>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-3 d-flex flex-column">
-            <div class="card mb-4 flex-grow-1">
-                <div class="card-body">
-                    <h5 class="card-title">Test Objectives</h5>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['test_objectives'])); ?></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Participants</h5>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['participants'])); ?></p>
-                </div>
-            </div>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Equipment</h5>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['equipment'])); ?></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Responsibilities</h5>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['responsibilities'])); ?></p>
-                </div>
-            </div>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Location & Dates</h5>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['location_dates'])); ?></p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Assigned Users + Procedure -->
     <div class="row">
@@ -150,14 +266,7 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         </div>
 
-        <div class="col-md-9">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Procedure</h5>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($project['test_procedure'])); ?></p>
-                </div>
-            </div>
-        </div>
+        
     </div>
     
     <!-- Test List -->
@@ -218,25 +327,25 @@ require __DIR__ . '/../layouts/header.php';
                             <td><?php echo htmlspecialchars($participant['participant_name']); ?></td>
                             <td><?php
                                     $tests = $testsByParticipant[$participant['id']] ?? [];
-                                    if (!empty($tests)) { ?>
+                            if (!empty($tests)) { ?>
                                         <?php foreach ($tests as $title): ?>
-                        <span class="badge bg-secondary"><?= htmlspecialchars($title) ?></span>
-                    <?php endforeach; ?>
+                        <span class="badge bg-secondary"><?php echo htmlspecialchars($title) ?></span>
+                                        <?php endforeach; ?>
 
-                                    <?php } else {
+                            <?php } else {
                                         echo '<span class="text-muted">No tests assigned</span>';
-                                    }
-                                ?></td>
-                                <td>  <?php
-                            $completed = $completedTestsByParticipant[$participant['id']] ?? [];
-                            if (!empty($completed)) {
-                                foreach ($completed as $title) {
-                                    echo '<span class="badge bg-success me-1">' . htmlspecialchars($title) . '</span>';
-                                }
-                            } else {
-                                echo '<span class="text-muted">None</span>';
                             }
-                        ?>
+                            ?></td>
+                                <td>  <?php
+                                $completed = $completedTestsByParticipant[$participant['id']] ?? [];
+                                if (!empty($completed)) {
+                                    foreach ($completed as $title) {
+                                        echo '<span class="badge bg-success me-1">' . htmlspecialchars($title) . '</span>';
+                                    }
+                                } else {
+                                    echo '<span class="text-muted">None</span>';
+                                }
+                                ?>
                             </td>
                             <td class="text-end">
                             <a class="btn btn-sm btn-outline-primary" href="/index.php?controller=Participant&action=show&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>">View</a>
@@ -324,11 +433,5 @@ require __DIR__ . '/../layouts/header.php';
         <?php endif; ?>
     </div>
    
-    <div class="mt-4">
-        <a href="/index.php?controller=Project&action=index" class="btn btn-secondary">← Back to Project List</a>
-    </div>
+    
 </div>
-
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
-<?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
-

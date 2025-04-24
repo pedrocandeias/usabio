@@ -22,6 +22,8 @@ try {
             id INT AUTO_INCREMENT PRIMARY KEY,
             title VARCHAR(255) NOT NULL,
             description TEXT,
+            image VARCHAR(255),
+            status ENUM('complete', 'inprogress') DEFAULT 'inprogress',
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             product_under_test TEXT NOT NULL,
@@ -41,6 +43,7 @@ try {
             title VARCHAR(255) NOT NULL,
             description TEXT,
             layout_image VARCHAR(255),
+            status VARCHAR(50) DEFAULT 'draft',
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "tests",

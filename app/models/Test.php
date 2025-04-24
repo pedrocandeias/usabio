@@ -11,48 +11,44 @@ class Test
 
     public function create($data)
     {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO tests (
-                project_id,
-                title,
-                description,
-                layout_image,
-                created_at
-            ) VALUES (
-                :project_id,
-                :title,
-                :description,
-                :layout_image,
-                NOW()
-            )
-        ");
+        $stmt = $this->pdo->prepare(
+            "
+        INSERT INTO tests (project_id, title, description, layout_image, status, created_at)
+        VALUES (:project_id, :title, :description, :layout_image, :status, NOW())
+    "
+        );
 
         $stmt->execute([
             ':project_id' => $data['project_id'],
-            ':title' => $data['title'] ?? '',
-            ':description' => $data['description'] ?? '',
+            ':title' => $data['title'],
+            ':description' => $data['description'],
             ':layout_image' => $data['layout_image'] ?? '',
+            ':status' => $data['status'] ?? 'not_started',
         ]);
-
+    
         return $this->pdo->lastInsertId();
     }
 
     public function update($id, $data)
     {
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare(
+            "
             UPDATE tests SET
                 title = :title,
                 description = :description,
                 layout_image = :layout_image,
                 updated_at = NOW()
             WHERE id = :id
-        ");
+        "
+        );
 
-        $stmt->execute([
+        $stmt->execute(
+            [
             ':id' => $id,
             ':title' => $data['title'] ?? '',
             ':description' => $data['description'] ?? '',
             ':layout_image' => $data['layout_image'] ?? '',
-        ]);
+            ]
+        );
     }
 }

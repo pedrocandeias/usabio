@@ -1,27 +1,26 @@
 <?php
-
+require_once __DIR__ . '/BaseController.php'; // carrega o base
 require_once __DIR__ . '/../models/Project.php';
 
-class ProjectController
+class ProjectController extends BaseController
+
 {
-    private $pdo;
-    private $projectModel;
+
+    protected $projectModel;
 
     public function __construct($pdo)
     {
-        // Start session if needed
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-
-        // Redirect to login if not authenticated
+    
         if (!isset($_SESSION['username'])) {
             header('Location: /index.php?controller=Auth&action=login&error=Please+login+first');
             exit;
         }
-
-        $this->pdo = $pdo;
-        $this->projectModel = new Project($pdo);
+        parent::__construct($pdo); // Inicializa $this->pdo antes de usá-lo
+        $this->projectModel = new Project($this->pdo); // usa $this->pdo já inicializado
+    
     }
 
     /**
@@ -29,6 +28,10 @@ class ProjectController
      */
     public function index()
     {
+        $breadcrumbs = [
+            ['label' => 'My Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+        ];
+
         $projects = $this->projectModel->all();
         include __DIR__ . '/../views/projects/index.php';
     }
@@ -43,6 +46,8 @@ class ProjectController
             'id' => 0,
             'title' => '',
             'description' => '',
+            'image' => '',
+            'status' => '',
             'product_under_test' => '',
             'business_case' => '',
             'test_objectives' => '',
@@ -58,6 +63,14 @@ class ProjectController
         $allUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $assignedUsers = []; // for create
         
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $test['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $test['project_id'], 'active' => false],
+            ['label' => $test['title'], 'url' => '/index.php?controller=Test&action=show&id=' . $test['id'], 'active' => false],
+            ['label' => 'Start Questionnaire', 'url' => '', 'active' => true],
+        ];
+
+
         include __DIR__ . '/../views/projects/form.php';
 
     }
@@ -75,28 +88,28 @@ class ProjectController
         $data = $_POST;
     
         // Create the project and get its ID
-        $projectId = $this->projectModel->create($data);
+        $project_id = $this->projectModel->create($data);
     
         // Assign users if provided
         $assignedUsers = $_POST['assigned_users'] ?? [];
         if (!empty($assignedUsers)) {
             $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-            foreach ($assignedUsers as $userId) {
-                $stmt->execute([$projectId, $userId]);
+            foreach ($assignedUsers as $user_id) {
+                $stmt->execute([$project_id, $user_id]);
             }
         }
     
         // Redirect to project detail view
-        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
+        header("Location: /index.php?controller=Project&action=show&id=" . $project_id);
         exit;
     }
     
 
     public function show()
     {
-        $projectId = $_GET['id'] ?? 0;
+        $project_id = $_GET['id'] ?? 0;
 
-        if (!$projectId) {
+        if (!$project_id) {
             echo "Invalid project ID.";
             exit;
         }
@@ -109,7 +122,7 @@ class ProjectController
             WHERE project_id = ? AND moderator_id = ?
         "
             );
-            $stmt->execute([$projectId, $_SESSION['user_id']]);
+            $stmt->execute([$project_id, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
 
             if (!$authorized) {
@@ -119,7 +132,7 @@ class ProjectController
         }
 
         // Fetch project
-        $project = $this->projectModel->find($projectId);
+        $project = $this->projectModel->find($project_id);
         if (!$project) {
             echo "Project not found.";
             exit;
@@ -133,12 +146,12 @@ class ProjectController
             WHERE pu.project_id = ?
         "
         );
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $assignedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Fetch related tests
         $stmt = $this->pdo->prepare("SELECT * FROM tests WHERE project_id = ?");
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get participants for the project
@@ -151,7 +164,7 @@ class ProjectController
             ORDER BY p.created_at DESC
         "
         );
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Fetch assigned tests per participant
@@ -165,7 +178,7 @@ class ProjectController
             )
         "
         );
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $testAssignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Group tests per participant
@@ -175,12 +188,12 @@ class ProjectController
         }
 
         $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get test titles for quick lookup
         $stmt = $this->pdo->prepare("SELECT id, title FROM tests WHERE project_id = ?");
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
 
         $testTitleMap = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $test) {
@@ -199,10 +212,32 @@ class ProjectController
             }
         }
 
+        // Fetch total evaluations
+$stmt = $this->pdo->prepare("
+SELECT
+    SUM(CASE WHEN did_tasks = 1 THEN 1 ELSE 0 END) AS total_tasks,
+    SUM(CASE WHEN did_questionnaire = 1 THEN 1 ELSE 0 END) AS total_questionnaires
+FROM evaluations
+WHERE test_id IN (
+    SELECT id FROM tests WHERE project_id = ?
+)
+");
+$stmt->execute([$project_id]);
+$evaluationTotals = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$totalTaskEvaluations = $evaluationTotals['total_tasks'] ?? 0;
+$totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
+
+
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $project['title'], 'url' => '', 'active' => true],
         ];
+
+        $projectBase = $this->projectBase;
+        $projectTests = $this->projectTests;
+        $projectParticipants = $this->projectParticipants;
+        $projectAssignedUsers = $this->projectAssignedUsers;
 
         include __DIR__ . '/../views/projects/show.php';
     }
@@ -213,9 +248,9 @@ class ProjectController
      */
     public function edit()
     {
-        $projectId = $_GET['id'] ?? 0;
+        $project_id = $_GET['id'] ?? 0;
     
-        if (!$projectId) {
+        if (!$project_id) {
             echo "Invalid project ID.";
             exit;
         }
@@ -228,7 +263,7 @@ class ProjectController
                 WHERE project_id = ? AND moderator_id = ?
             "
             );
-            $stmt->execute([$projectId, $_SESSION['user_id']]);
+            $stmt->execute([$project_id, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
     
             if (!$authorized) {
@@ -237,7 +272,7 @@ class ProjectController
             }
         }
     
-        $project = $this->projectModel->find($projectId);
+        $project = $this->projectModel->find($project_id);
         if (!$project) {
             echo "Project not found.";
             exit;
@@ -249,7 +284,7 @@ class ProjectController
     
         // Fetch currently assigned users
         $stmt = $this->pdo->prepare("SELECT moderator_id FROM project_user WHERE project_id = ?");
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $assignedUsers = $stmt->fetchAll(PDO::FETCH_COLUMN);
     
         
@@ -267,9 +302,9 @@ class ProjectController
             exit;
         }
     
-        $projectId = $_POST['id'] ?? 0;
+        $project_id = $_POST['id'] ?? 0;
     
-        if (!$projectId) {
+        if (!$project_id) {
             echo "Missing project ID.";
             exit;
         }
@@ -277,7 +312,7 @@ class ProjectController
         // Access control
         if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
-            $stmt->execute([$projectId, $_SESSION['user_id']]);
+            $stmt->execute([$project_id, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
     
             if (!$authorized) {
@@ -288,24 +323,24 @@ class ProjectController
     
         // Update project data
         $data = $_POST;
-        $this->projectModel->update($projectId, $data);
+        $this->projectModel->update($project_id, $data);
     
         // Update assigned users
         $assignedUsers = $_POST['assigned_users'] ?? [];
     
         // Clear old assignments
         $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
     
         // Insert new ones
         if (!empty($assignedUsers)) {
             $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-            foreach ($assignedUsers as $userId) {
-                $stmt->execute([$projectId, $userId]);
+            foreach ($assignedUsers as $user_id) {
+                $stmt->execute([$project_id, $user_id]);
             }
         }
     
-        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
+        header("Location: /index.php?controller=Project&action=show&id=" . $project_id);
         exit;
     }
     
@@ -336,12 +371,12 @@ class ProjectController
 
     public function analysis()
     {
-        $projectId = $_GET['id'] ?? 0;
+        $project_id = $_GET['id'] ?? 0;
 
         // Check access
         if (!$_SESSION['is_admin']) {
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
-            $stmt->execute([$projectId, $_SESSION['user_id']]);
+            $stmt->execute([$project_id, $_SESSION['user_id']]);
             if (!$stmt->fetchColumn()) {
                 echo "Access denied.";
                 exit;
@@ -350,7 +385,7 @@ class ProjectController
 
         // Fetch project info
         $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $project = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$project) {
             echo "Project not found.";
@@ -359,7 +394,7 @@ class ProjectController
 
         // Fetch all test IDs in this project
         $stmt = $this->pdo->prepare("SELECT id FROM tests WHERE project_id = ?");
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $testIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
 
         $testIdList = $testIds ? implode(',', $testIds) : '0';
@@ -409,7 +444,7 @@ class ProjectController
     WHERE t.project_id = ?
 "
         );
-        $stmt->execute([$projectId]);
+        $stmt->execute([$project_id]);
         $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($groups as $group) {
@@ -427,7 +462,7 @@ class ProjectController
     WHERE t.project_id = ?
 "
             );
-            $stmt->execute([$projectId]);
+            $stmt->execute([$project_id]);
             $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($groups as $group) {
@@ -456,7 +491,7 @@ class ProjectController
         WHERE e.test_id IN (SELECT id FROM tests WHERE project_id = ?)
     "
                 );
-                $stmt->execute([$projectId]);
+                $stmt->execute([$project_id]);
                 $allResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Group responses by evaluation

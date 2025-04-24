@@ -140,3 +140,6 @@ dist
 /.ddev
 
 /vendor/
+
+# Local dev files
+/indev/*

@@ -1,4 +1,50 @@
-</main>
+					<!--begin::Footer-->
+					<div class="footer py-4 d-flex flex-lg-column" id="kt_footer">
+						<!--begin::Container-->
+						<div class="container-xxl d-flex flex-column flex-md-row align-items-center justify-content-between">
+							<!--begin::Copyright-->
+							<div class="text-gray-900 order-2 order-md-1">
+                <span class="text-muted fw-semibold me-1">&copy; <?php echo date('Y'); ?></span>
+								<a href="https://testflow.design" target="_blank" class="text-gray-800 text-hover-primary">TestFlow UX</a>
+							</div>
+							<!--end::Copyright-->
+							<!--begin::Menu-->
+							<ul class="menu menu-gray-600 menu-hover-primary fw-semibold order-1">
+								<li class="menu-item">
+									<a href="about.html" target="_blank" class="menu-link px-2">About</a>
+								</li>
+								<li class="menu-item">
+									<a href="help.html" target="_blank" class="menu-link px-2">Help</a>
+								</li>
+								<li class="menu-item">
+									<a href="Privacy Policty" target="_blank" class="menu-link px-2">Privacy Policty</a>
+								</li>
+								<li class="menu-item">
+									<a href="Terms and Conditions" target="_blank" class="menu-link px-2">Terms & Conditions</a>
+								</li>
+							</ul>
+							<!--end::Menu-->
+						</div>
+						<!--end::Container-->
+					</div>
+					<!--end::Footer-->
+				</div>
+				<!--end::Wrapper-->
+			</div>
+			<!--end::Page-->
+		</div>
+	 <!--end::Root-->
+	</div>
+    
+  <!--begin::Scrolltop-->
+  <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+    <i class="ki-duotone ki-arrow-up">
+      <span class="path1"></span>
+      <span class="path2"></span>
+    </i>
+  </div>
+  <!--end::Scrolltop-->
+
 
 
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -11,9 +57,3 @@
     </div>
   </div>
 </div>
-
-<footer class="footer bg-light text-center text-lg-start mt-auto fixed-bottom">
-  <div class="text-center p-3 border-top bg-secondary">
-    <small class="text-white">&copy; <?php echo date('Y'); ?> TestFlowUX / IPCA</small>
-  </div>
-</footer>

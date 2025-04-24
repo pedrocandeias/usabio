@@ -26,8 +26,8 @@ if (file_exists($controllerFile)) {
     if (method_exists($controller, $actionName)) {
         $controller->$actionName();
     } else {
-        echo "❌ Action '$actionName' not found in $controllerClass.";
+        echo "Action '$actionName' not found in $controllerClass.";
     }
 } else {
-    echo "❌ Controller '$controllerClass' not found.";
+    echo "Controller '$controllerClass' not found.";
 }

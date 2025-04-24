@@ -1,43 +1,380 @@
 <?php 
-$title = 'Test for project';
-require __DIR__ . '/../layouts/header.php'; ?>
+$title = 'Project details - Tests';
 
-<div class="container py-5">
-<?php if (!empty($context)): ?>
-    <p class="text-muted mb-4">
-        <strong>Project:</strong> <?php echo htmlspecialchars($context['product_under_test']); ?>
-    </p>
-<?php endif; ?>
+$pageTitle = 'Project details - Tests';
+$pageDescription = 'Manage your project and test sessions.';
+$menuActive = 'tests';
+$headerNavbuttons = [
+    'Back to projects list' => [
+        'url' => '/index.php?controller=Project&action=index',
+        'icon' => 'ki-duotone ki-home fs-2',
+        'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
+        'id' => 'kt_back_home_primary_button',
+    ],
+];
 
-    <h1>Tests for Project #<?php echo htmlspecialchars($_GET['project_id'] ?? ''); ?></h1>
-
-    <a href="/index.php?controller=Test&action=create&project_id=<?php echo $_GET['project_id']; ?>" class="btn btn-success mb-3">Add Test</a>
-
-    <?php if (!empty($test['layout_image'])): ?>
-    <img src="/uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" style="max-width: 150px;" alt="Test Layout">
-<?php endif; ?>
+require __DIR__ . '/../layouts/header.php'; 
+?>
 
 
-    <?php if (!empty($tests)): ?>
-        <ul class="list-group">
-            <?php foreach ($tests as $test): ?>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>
-                        <strong><?php echo htmlspecialchars($test['title']); ?></strong><br>
-                        <small><?php echo htmlspecialchars($test['description']); ?></small>
-                    </span>
-                    <span>
-                        <a href="/index.php?controller=Test&action=edit&id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                        <a href="/index.php?controller=Test&action=destroy&id=<?php echo $test['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this test?');">Delete</a>
-                    </span>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p class="text-muted">No tests found for this project.</p>
-    <?php endif; ?>
+<!--begin::Container-->
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <!--begin::Post-->
+    <div class="content flex-row-fluid" id="kt_content">
+        <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>
+         <!--begin::Row-->
+        <div class="row g-5 g-xl-8">
+
+            <!--begin::Toolbar-->
+            <div class="d-flex flex-wrap flex-stack pt-10 pb-8">
+                <!--begin::Heading-->
+                <h3 class="fw-bold my-2">Tests
+                <span class="fs-6 text-gray-500 fw-semibold ms-1">by Recent Updates ↓</span></h3>
+                <!--end::Heading-->
+                <!--begin::Controls-->
+                <div class="d-flex flex-wrap my-1">
+                   <a href="/index.php?controller=Test&action=create&project_id=<?php echo $project['id']; ?>" class="btn btn-light bg-white me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_create_test">+ Create New Test</a>
+                </div>
+                <!--end::Controls-->
+            </div>
+            <!--end::Toolbar-->
+                <div id="kt_project_targets_card_pane" class="tab-pane fade show active">
+                    <!--begin::Row-->
+                    <div class="row g-9">
+
+                    <?php if (!empty($tests)) : ?>
+                    <?php foreach ($tests as $test): ?>
+                        
+                        <!--begin::Col-->
+                        <div class="col-md-4 col-lg-12 col-xl-4">    
+                            <!--begin::Card-->
+                            <div class="card mb-6 mb-xl-9">
+                                <!--begin::Card body-->
+                                <div class="card-body">
+                                    <!--begin::Header-->
+                                    <div class="d-flex flex-stack mb-3">
+                                        <!--begin::Badge-->
+                                        <?php if ($test['status'] == 'complete') : ?>
+                                            <div class="badge badge-light-success">Completed</div>
+                                        <?php else : ?>
+                                            <?php if ($test['session_count'] > 0) : ?>
+                                                <div class="badge badge-light-warning">In Progress</div>
+                                            <?php elseif ($test['session_count'] == 0) : ?>
+                                                <div class="badge badge-light-info-">Not yet started</div>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                      
+                                        <!--end::Badge-->
+                                        <!--begin::Menu-->
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                <i class="ki-duotone ki-element-plus fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                    <span class="path5"></span>
+                                                </i>
+                                            </button>
+                                            <!--begin::Menu 3-->
+                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                                                <!--begin::Heading-->
+                                                <div class="menu-item px-3">
+                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">Settings</div>
+                                                </div>
+                                                <!--end::Heading-->
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
+                                                    <!--begin::Switch-->
+                                                    <label class="form-check form-switch form-check-custom form-check-solid">
+                                                        <input 
+                                                            class="form-check-input w-30px h-20px toggle-test-status"
+                                                            type="checkbox"
+                                                            value="1"
+                                                            data-test-id="<?php echo $test['id']; ?>"
+                                                            <?php if ($test['status'] == 'complete') : ?>checked<?php endif; ?>
+                                                        />
+                                                        <span class="form-check-label text-muted fs-6">Completed</span>
+                                                    </label>
+                                                    <!--end::Switch-->
+                                                </div>
+                                                <!--end::Menu item-->
+                                                <div class="separator my-2"></div>
+                                                <!--end:Menu item-->
+                                                <!--begin::Menu item-->
+                                                
+                                                
+                                                <div class="menu-item px-3">
+                                                    <a href="/index.php?controller=Test&action=edit&id=<?php echo $test['id']; ?>" class="menu-link bg-outline-warning px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_test_<?php echo $test['id']; ?>">Edit test</a>
+                                                </div>
+                                                <div class="menu-item px-3">
+                                                    <a href="/index.php?controller=Test&action=show&id=<?php echo $test['id']; ?>" class="menu-link bg-outline-warning px-3">Tasks & Questions</a>
+                                                </div>
+                                                <div class="menu-item px-3">
+                                                    <a href="/index.php?controller=Test&action=duplicate&id=<?php echo $test['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate test</a>
+                                                </div>
+                                                <div class="menu-item px-3">
+                                                    <a href="/index.php?controller=Test&action=destroy&id=<?php echo $test['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this test?');">Delete test</a>
+                                                </div>
+                                                <!--end::Menu item-->
+                                            
+                                            </div>
+                                            <!--end::Menu 3-->
+                                        </div>
+                                        <!--end::Menu-->
+                                    </div>
+                                    <!--end::Header-->
+                                    <!--begin::Title-->
+                                    <div class="mb-2">
+                                        <a href="/index.php?controller=Test&action=show&id=<?php echo $test['id']; ?>" class="fs-4 fw-bold mb-1 text-gray-900 text-hover-primary"><?php echo htmlspecialchars($test['title']); ?></a>
+                                    </div>
+                                    <!--end::Title-->
+                                    <!--begin::Content-->
+                                    <div class="fs-6 fw-semibold text-gray-600 mb-5"><?php echo htmlspecialchars($test['description']); ?></div>
+                                    <!--end::Content-->
+                                    <!--begin::Footer-->
+                                    <div class="d-flex flex-stack flex-wrapr">
+                                        <!--begin::Stats-->
+                                        <div class="d-flex my-1">
+                                          <!--begin::Stat-->
+                                          <div class="border border-dashed border-gray-300 d-flex align-items-center rounded py-2 px-3  my-1 " data-bs-toggle="tooltip" data-bs-placement="top" title="Tasks in test">
+                                                <i class="bi bi-list-task fs-3"></i>
+                                                <span class="ms-1 fs-7 fw-bold text-gray-600" ><?php echo $test['task_count']; ?></span>
+                                            </div>
+                                        
+                                            <!--begin::Stat-->
+                                            <div class="border border-dashed border-gray-300 rounded d-flex align-items-center py-2 px-3 my-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Questions test">
+                                                <i class="bi bi-patch-question fs-3"></i>
+                                                <span class="ms-1 fs-7 fw-bold text-gray-600"><?php echo $test['question_count']; ?></span>
+                                            </div>
+                                            <!--end::Stat-->
+                                            </div>
+                                            <div class="d-flex my-1">
+                                            <!--begin::Stat-->
+                                            <div class="border border-dashed border-gray-300 rounded d-flex align-items-center py-2 px-3  my-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Sessions done">
+                                                <i class="bi bi-check2-square fs-3"></i>
+                                                <span class="ms-1 fs-7 fw-bold text-gray-600">
+                                
+                                                <?php echo $test['session_count']; ?></span>
+                                            </div>
+                                        
+                                            <!--end::Stat-->
+                                        </div>
+                                        <!--end::Stats-->
+                                    </div>
+                                    <!--end::Footer-->
+                                    <div class="d-flex mt-5">
+                                            <div class="separator"></div>
+                                            <a href="/index.php?controller=Test&action=show&id=<?php echo $test['id']; ?>" class="btn btn-info opacity-50 w-100"><i class="bi bi-gear fs-3"></i> Manage Tasks & Questions</a>
+                                        </div>
+
+                                        
+                                            <!--end::Stat-->
+                                            <div class="separator my-3"></div>
+                                        <!--begin::Actions-->
+                                        <div class="d-flex mt-5">
+                                            <div class="separator"></div>
+                                            <a href="/index.php?controller=Session&action=startTaskSession&test_id=<?php echo $test['id']; ?>" class="btn btn-primary w-100">Start task session</a>
+                                        </div>
+                                         <!--begin::Actions-->
+                                         <div class="d-flex my-1">
+                                            <div class="separator"></div>
+                                            <a href="/index.php?controller=Session&action=startQuestionnaire&test_id=<?php echo $test['id']; ?>" class="btn btn-secondary w-100">Start Questionnaire session</a>
+                                        </div>
+                                        <!--end::Actions-->
+                                        <!--end::Actions-->
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::Card-->
+                        </div>
+                        <!--end::Col-->
+                        
+                        
+                       
+                    <?php endforeach; ?>
+            <?php else: ?>
+                <div class="alert alert-warning">No tests created yet for this project.</div>
+            <?php endif; ?>
+
+                    
+                        
+                    
+                    
+                        
+                    </div>
+                    <!--end::Row-->
+
+              
+            </div>
+            <!--end::Tab Content-->                    
+            <!--end::Row-->
+        </div>
+
+
+    </div>
+    <!--end::Post-->
 </div>
+<!--end::Container-->
+
+        <!--begin::Modals-->
+        <!--begin::Modal - Create test-->
+        <div class="modal fade" id="kt_modal_create_test" tabindex="-1" aria-hidden="true">
+            <!--begin::Modal dialog-->
+            <div class="modal-dialog modal-dialog-centered mw-900px">
+                <!--begin::Modal content-->
+                <div class="modal-content">
+                    <!--begin::Modal header-->
+                    <div class="modal-header">
+                        <!--begin::Modal title-->
+                        <h2>Create a new test</h2>
+                        <!--end::Modal title-->
+                        <!--begin::Close-->
+                        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                            <i class="ki-duotone ki-cross fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+                    <!--end::Modal header-->
+                    <!--begin::Modal body-->
+                    <div class="modal-body py-lg-10 px-lg-10">
+                        <div class="row g-4">
+
+                        <form method="POST" enctype="multipart/form-data" action="/index.php?controller=Test&action=store">
+                                <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
+                                <input type="hidden" name="status" value="incomplete">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <div class="mb-3">
+                                            <label class="form-label">Title</label>
+                                            <input type="text" name="title" class="form-control" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea name="description" class="form-control" rows="3"></textarea>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-5">
+                                        <div class="mb-3">
+                                            <label class="form-label">Layout Image</label>
+                                            <input type="file" name="layout_image" class="form-control" accept="image/*">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-primary">Create Test</button>
+                                </div>
+                            </form>
+
+
+                        </div>
+                    </div>
+                    <!--end::Modal body-->
+                </div>
+                <!--end::Modal content-->
+            </div>
+            <!--end::Modal dialog-->
+        </div>
+        <!--end::Modal - Create project-->
+
+        <?php foreach ($tests as $test): ?>
+    <!-- Modal de edição -->
+    <div class="modal fade" id="kt_modal_edit_test_<?php echo $test['id']; ?>" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-900px">
+            <div class="modal-content">
+                <div class="modal-header">
+                <?php echo $test['id']; ?>
+                    <h2>Edit Test</h2>
+                    <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
+                </div>
+                <div class="modal-body py-lg-10 px-lg-10">
+                    <form method="POST" enctype="multipart/form-data" action="/index.php?controller=Test&action=update">
+                        <input type="hidden" name="id" value="<?php echo $test['id']; ?>">
+                        <input type="hidden" name="project_id" value="<?php echo $test['project_id']; ?>">
+                        <input type="hidden" name="existing_layout_image" value="<?php echo htmlspecialchars($test['layout_image']); ?>">
+
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="mb-3">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" name="title" class="form-control" required value="<?php echo htmlspecialchars($test['title']); ?>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="description" class="form-control" rows="3"><?php echo htmlspecialchars($test['description']); ?></textarea>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="status" value="complete" <?php if ($test['status'] == 'complete') echo 'checked'; ?>>
+                                    <label class="form-check-label">Mark as completed</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label class="form-label">Replace Layout Image</label>
+                                    <input type="file" name="layout_image" class="form-control" accept="image/*">
+                                </div>
+                                <?php if ($test['layout_image']): ?>
+                                    <div class="mb-3">
+                                        <img src="/uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" class="img-fluid" alt="Current layout">
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
+        <!--end::Modals-->
+
+
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+  const statusToggles = document.querySelectorAll('.toggle-test-status');
+
+  statusToggles.forEach(input => {
+    input.addEventListener('change', async (e) => {
+      const testId = e.target.dataset.testId;
+      const isComplete = e.target.checked;
+
+      const response = await fetch('/index.php?controller=Test&action=toggleStatus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: testId,
+          status: isComplete ? 'complete' : 'incomplete'
+        })
+      });
+
+      if (!response.ok) {
+        alert('❌ Failed to update test status.');
+        // Revert checkbox
+        e.target.checked = !isComplete;
+      }
+    });
+  });
+});
+    </script>
+
 </body>
 </html>

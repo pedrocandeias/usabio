@@ -179,7 +179,7 @@ class TaskController
         );
         $stmt->execute([$data['task_group_id']]);
         $testId = $stmt->fetchColumn();
-
+        $_SESSION['toast_success'] = "Task created successfully!";
         header("Location: /index.php?controller=Test&action=show&id=" . $testId. "#taskgroup" . $taskGroupId);
         exit;
     }
@@ -293,7 +293,7 @@ class TaskController
         );
         $stmt->execute([$data['task_group_id']]);
         $testId = $stmt->fetchColumn();
-
+        $_SESSION['toast_success'] = "Task updated successfully!";
         header("Location: /index.php?controller=Test&action=show&id=" . $testId. "#taskgroup". $taskGroupId);
         exit;
     }
@@ -325,7 +325,7 @@ class TaskController
 
         $stmt = $this->pdo->prepare("DELETE FROM tasks WHERE id = ?");
         $stmt->execute([$id]);
-
+        $_SESSION['toast_success'] = "Task removed successfully!";
         header("Location: /index.php?controller=Test&action=show&id=" . $meta['test_id'] . "#taskgroup" . $groupId);
         exit;
     }
