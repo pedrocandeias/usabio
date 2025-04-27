@@ -67,7 +67,7 @@ class QuestionController
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
-            ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnaire-group-list', 'active' => false],
+            ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnairegroup', 'active' => false],
             ['label' => 'Create Question', 'url' => '', 'active' => true],
         ];
 
@@ -136,8 +136,8 @@ class QuestionController
         $breadcrumbs = [
         ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
         ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
-        ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnaire-group' . $question['questionnaire_group_id'], 'active' => false],
-        ['label' => $context['questionnaire_group_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnaire-group' . $question['questionnaire_group_id'], 'active' => false],
+        ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnairegroup' . $question['questionnaire_group_id'], 'active' => false],
+        ['label' => $context['questionnaire_group_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $context['test_id'] . '#questionnairegroup' . $question['questionnaire_group_id'], 'active' => false],
         ['label' => 'Edit Question', 'url' => '', 'active' => true],
         ];
 
@@ -172,7 +172,7 @@ class QuestionController
             ]
         );
 
-        header("Location: /index.php?controller=Test&action=show&id=" . $data['test_id'].'#questionnaire-group' . $groupId);
+        header("Location: /index.php?controller=Test&action=show&id=" . $data['test_id'].'#questionnairegroup' . $groupId);
         exit;
     }
 

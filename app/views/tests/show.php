@@ -41,7 +41,7 @@ require __DIR__ . '/../layouts/header.php';
                                 <a class="nav-link fw-bold fs-3" data-bs-toggle="tab" href="#taskgroup">Task Groups & Tasks</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fw-bold fs-3" data-bs-toggle="tab" href="#questiongroup">Questionnaire Groups & Questions</a>
+                                <a class="nav-link fw-bold fs-3" data-bs-toggle="tab" href="#questionnairegroup">Questionnaire Groups & Questions</a>
                             </li>
                         </ul>
                     </div>
@@ -69,58 +69,63 @@ require __DIR__ . '/../layouts/header.php';
                         </div>
 
                         <div class="tab-pane fade" id="taskgroup" role="tabpanel">
-                             <!-- Task Groups -->
+                        <!-- Task Groups -->
                         <?php if (!empty($taskGroups)) : ?>
                             <div id="task-group-list">
                                 <?php foreach ($taskGroups as $group): ?>
                                     <div class="card mb-4 shadow-sm task-group" id="taskgroup<?php echo $group['id']; ?>" data-id="<?php echo $group['id']; ?>">
-                                        <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h5 class="mb-0 d-flex align-items-center">
-                                                <span class="me-2" style="cursor: grab;">☰</span>
-                                                <?php echo htmlspecialchars($group['title']); ?>
-                                            </h5>
-                                            <div class="text-end">
-                                        <a href="/index.php?controller=Task&action=create&group_id=<?php echo $group['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_task<?php echo $group['id']; ?>">+ Add New Task</a>
-                                        <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                                                <i class="ki-duotone ki-element-plus fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                    <span class="path3"></span>
-                                                    <span class="path4"></span>
-                                                    <span class="path5"></span>
-                                                </i>
-                                            </button>
-                                            <!--begin::Menu 3-->
-                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
-                                                <!--begin::Heading-->
-                                                <div class="menu-item px-3">
-                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">Settings</div>
+                                        <div class="card-header d-flex justify-content-between align-items-center p-4">
+                                            <div class="d-flex align-items-center">
+                                                <div> 
+                                                    <i class="ki-duotone ki-abstract-14 fs-2x">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
                                                 </div>
-                                                <!--end::Heading-->
-                                                <div class="separator my-2"></div>
-                                                <!--end:Menu item-->
-                                                <!--begin::Menu item-->
-                                                
-                                                
-                                                <div class="menu-item px-3">
-                                                    <a href="/index.php?controller=Response&action=exportCsvByTaskGroup&group_id=<?php echo $group['id']; ?>" class="menu-link bg-outline-warning px-3">📥 Export answers</a>
+                                                <div class="mx-4">
+                                                    <h3 class="text-start"><?php echo htmlspecialchars($group['title']); ?></h3>
                                                 </div>
-                                                <div class="menu-item px-3">
-                                                    <a href="/index.php?controller=TaskGroup&action=edit&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task_group<?php echo $group['id']; ?>">Edit Task Group</a>
+                                            </div>   
+                                            <div class="d-flex text-end">
+                                                <a href="/index.php?controller=Task&action=create&group_id=<?php echo $group['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_task<?php echo $group['id']; ?>">+ Add New Task</a>
+                                                <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <i class="ki-duotone ki-element-plus fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                        <span class="path4"></span>
+                                                        <span class="path5"></span>
+                                                    </i>
+                                                </button>
+                                                <!--begin::Menu 3-->
+                                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                                                    <!--begin::Heading-->
+                                                    <div class="menu-item px-3">
+                                                        <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">Settings</div>
+                                                    </div>
+                                                    <!--end::Heading-->
+                                                    <div class="separator my-2"></div>
+                                                    <!--end:Menu item-->
+                                                    <!--begin::Menu item-->
+                                                    
+                                                    
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=Response&action=exportCsvByTaskGroup&group_id=<?php echo $group['id']; ?>" class="menu-link bg-outline-warning px-3">📥 Export answers</a>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=TaskGroup&action=edit&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task_group<?php echo $group['id']; ?>">Edit Task Group</a>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=TaskGroup&action=duplicate&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate Task Group</a>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=TaskGroup&action=destroy&id=<?php echo $group['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this test?');">Delete test</a>
+                                                    </div>
+                                                    <!--end::Menu item-->
                                                 </div>
-                                                <div class="menu-item px-3">
-                                                    <a href="/index.php?controller=TaskGroup&action=duplicate&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate Task Group</a>
-                                                </div>
-                                                <div class="menu-item px-3">
-                                                    <a href="/index.php?controller=TaskGroup&action=destroy&id=<?php echo $group['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this test?');">Delete test</a>
-                                                </div>
-                                                <!--end::Menu item-->
-                                            
+                                                <!--end::Menu 3-->                       
                                             </div>
-                                            <!--end::Menu 3-->                       
-
-                                    </div>
-                                                                                   </div>
+                                        </div>
 
                                         <ul class="list-group list-group-flush task-list" data-group-id="<?php echo $group['id']; ?>">
                                             <?php if (!empty($group['tasks'])) : ?>
@@ -139,109 +144,219 @@ require __DIR__ . '/../layouts/header.php';
                                                         </div>   
                                                        
                                                         <div class="text-end">
-                                                            <a href="/index.php?controller=Task&action=edit&id=<?php echo $task['id']; ?>" class="btn btn-sm btn-outline-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task<?php echo $task['id']; ?>">Edit</a>
-                                                            <a href="/index.php?controller=Task&action=destroy&id=<?php echo $task['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this task?');">Delete</a>
+                                                            <a href="#" class="btn btn-sm btn-secondary"  data-bs-toggle="modal" data-bs-target="#kt_modal_view_task<?php echo $task['id']; ?>">View Task</a>
+                                                            <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                                <i class="ki-duotone ki-element-plus fs-2">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                    <span class="path3"></span>
+                                                                    <span class="path4"></span>
+                                                                    <span class="path5"></span>
+                                                                </i>
+                                                            </button>
+                                                            <!--begin::Menu 3-->
+                                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                                                                <!--begin::Heading-->
+                                                                <div class="menu-item px-3">
+                                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase text-start">Settings</div>
+                                                                </div>
+                                                                <!--end::Heading-->
+                                                                <div class="separator my-2"></div>
+                                                                <!--end:Menu item-->
+                                                                <!--begin::Menu item-->
+                                                                
+                                                                
+                                                            
+                                                                <div class="menu-item px-3">
+                                                                    <a href="/index.php?controller=Task&action=edit&id=<?php echo $task['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task<?php echo $task['id']; ?>">Edit task</a>
+                                                                </div>
+                                                                <div class="menu-item px-3">
+                                                                    <a href="/index.php?controller=Task&action=duplicate&id=<?php echo $task['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate task</a>
+                                                                </div>
+                                                                <div class="menu-item px-3">
+                                                                    <a href="/index.php?controller=Task&action=destroy&id=<?php echo $task['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this test?');">Delete task</a>
+                                                                </div>
+                                                                <!--end::Menu item-->
+                                                            
+                                                            </div>
+                                                            <!--end::Menu 3-->                       
+
                                                         </div>
                                                     </li>
-                                                     <!--begin::Modal - Create new task -->
-                                <div class="modal fade" id="kt_modal_edit_task<?php echo $task['id']; ?>" tabindex="-1" aria-hidden="true">
-                                    <!--begin::Modal dialog-->
-                                    <div class="modal-dialog modal-dialog-centered mw-900px">
-                                        <!--begin::Modal content-->
-                                        <div class="modal-content">
-                                            <!--begin::Modal header-->
-                                            <div class="modal-header">
-                                                <!--begin::Modal title-->
-                                                <h2>Edit Task</h2>
-                                                <!--end::Modal title-->
-                                                <!--begin::Close-->
-                                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
-                                                    <i class="ki-duotone ki-cross fs-1">
-                                                        <span class="path1"></span>
-                                                        <span class="path2"></span>
-                                                    </i>
+                                                     <!--begin::Modal - Create edit/new task -->
+                                                        <div class="modal fade" id="kt_modal_edit_task<?php echo $task['id']; ?>" tabindex="-1" aria-hidden="true">
+                                                            <!--begin::Modal dialog-->
+                                                            <div class="modal-dialog modal-dialog-centered mw-900px">
+                                                                <!--begin::Modal content-->
+                                                                <div class="modal-content">
+                                                                    <!--begin::Modal header-->
+                                                                    <div class="modal-header">
+                                                                        <!--begin::Modal title-->
+                                                                        <h2>Edit Task</h2>
+                                                                        <!--end::Modal title-->
+                                                                        <!--begin::Close-->
+                                                                        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                            <i class="ki-duotone ki-cross fs-1">
+                                                                                <span class="path1"></span>
+                                                                                <span class="path2"></span>
+                                                                            </i>
+                                                                        </div>
+                                                                        <!--end::Close-->
+                                                                    </div>
+                                                                    <!--end::Modal header-->
+                                                                    <!--begin::Modal body-->
+                                                                    <div class="modal-body py-lg-10 px-lg-10">
+                                                                    <form method="POST" action="/index.php?controller=Task&action=<?php echo $task['id'] ? 'update' : 'store'; ?>">
+                                                                        <?php if ($task['id']) : ?>
+                                                                            <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
+                                                                        <?php endif; ?>
+                                                                        <input type="hidden" name="task_group_id" value="<?php echo $group['id']; ?>">
+
+                                                                        <div class="row mb-3">
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Task Text</label>
+                                                                                <textarea name="task_text" class="form-control" required rows="4"><?php echo htmlspecialchars($task['task_text']); ?></textarea>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Scenario</label>
+                                                                                <textarea name="scenario" class="form-control" rows="4"><?php echo htmlspecialchars($task['scenario']); ?></textarea>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="row mb-3">
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Script (what moderator should say)</label>
+                                                                                <textarea name="script" class="form-control" rows="3"><?php echo htmlspecialchars($task['script']); ?></textarea>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Metrics (what to observe)</label>
+                                                                                <textarea name="metrics" class="form-control" rows="3"><?php echo htmlspecialchars($task['metrics']); ?></textarea>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="row mb-3">
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Type of Evaluation</label>
+                                                                                <select name="task_type" id="task_type" class="form-select">
+                                                                                    <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
+                                                                                        <option value="<?php echo $type; ?>" <?php echo $task['task_type'] === $type ? 'selected' : ''; ?>>
+                                                                                            <?php echo ucfirst($type); ?>
+                                                                                        </option>
+                                                                                    <?php endforeach; ?>
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Predefined Evaluation Type (optional)</label>
+                                                                                <select class="form-select" id="preset-options">
+                                                                                    <option value="">— Select a common type —</option>
+                                                                                    <option value="Yes:yes;No:no">Yes / No</option>
+                                                                                    <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
+                                                                                    <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
+                                                                                    <option value="Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5">Satisfaction Scale (1-5)</option>
+                                                                                </select>
+                                                                                <small class="form-text text-muted">Choosing one will auto-fill the options below.</small>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Evaluation Options</label>
+                                                                            <textarea name="task_options" id="task_options" class="form-control" rows="3"><?php echo htmlspecialchars($task['task_options']); ?></textarea>
+                                                                            <small class="form-text text-muted">Use the format: <code>Label:Value;Label:Value;</code></small>
+                                                                        </div>
+
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Position</label>
+                                                                            <input type="number" name="position" class="form-control" value="<?php echo $task['position']; ?>">
+                                                                        </div>
+
+                                                                        <div class="d-flex gap-2 mt-4">
+                                                                            <input type="hidden" name="preset_type" id="preset_type" value="">
+                                                                            <button type="submit" class="btn btn-primary">Save Task</button>
+                                                                            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                                <!--end::Modal body-->
+                                                            </div>
+                                                            <!--end::Modal content-->
+                                                        </div>
+                                                        <!--end::Modal dialog-->
+                                                    </div>
+                                                    <!--end::Modal - Create new task-->
+
+
+                                                    <!--begin::Modal - view task -->
+                                                    <div class="modal fade" id="kt_modal_view_task<?php echo $task['id']; ?>" tabindex="-1" aria-hidden="true">
+                                                        <!--begin::Modal dialog-->
+                                                        <div class="modal-dialog modal-dialog-centered mw-900px">
+                                                            <!--begin::Modal content-->
+                                                            <div class="modal-content">
+                                                                <!--begin::Modal header-->
+                                                                <div class="modal-header">
+                                                                    <!--begin::Modal title-->
+                                                                    <h2>View Task</h2>
+                                                                    <!--end::Modal title-->
+                                                                    <!--begin::Close-->
+                                                                    <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                        <i class="ki-duotone ki-cross fs-1">
+                                                                            <span class="path1"></span>
+                                                                            <span class="path2"></span>
+                                                                        </i>
+                                                                    </div>
+                                                                    <!--end::Close-->
+                                                                </div>
+                                                                <!--end::Modal header-->
+                                                                <!--begin::Modal body-->
+                                                                <div class="modal-body py-lg-10 px-lg-10 fs-3">
+                                                                    
+                                                                    <div class="row mb-3 gx-5">
+                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Task Text</p>
+                                                                            <p><?php echo htmlspecialchars($task['task_text']); ?></p>
+                                                                        </div>
+                                                                        <div class="col-md-6  border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Scenario</p>
+                                                                            <p><?php echo htmlspecialchars($task['scenario']); ?></p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row mb-3">
+                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3 ">
+                                                                            <p class="fw-bold">Script (what moderator should say)</p>
+                                                                            <p><?php echo htmlspecialchars($task['script']); ?></p>
+                                                                        </div>
+                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Metrics (what to observe)</p>
+                                                                            <p><?php echo htmlspecialchars($task['metrics']); ?></p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row mb-3  border border-1 border-gray-300 rounded p-3">
+                                                                        <div class="col-md-6">
+                                                                            <p class="fw-bold">Type of Evaluation:</p>
+                                                                            <p><?php echo $task['task_type']; ?></p>
+                                                                        </div>
+
+                
+                                                                    </div>
+
+                                                                    <div class="mb-3 border border-1 border-gray-300 rounded p-3">
+                                                                        <p class="fw-bold">Evaluation Options</p>
+                                                                        <p><?php echo htmlspecialchars($task['task_options']); ?></p>
+                                                                    </div>
+
+                                                                
+                                                            </div>
+                                                            <!--end::Modal body-->
+                                                        </div>
+                                                        <!--end::Modal content-->
+                                                    </div>
+                                                    <!--end::Modal dialog-->
                                                 </div>
-                                                <!--end::Close-->
-                                            </div>
-                                            <!--end::Modal header-->
-                                            <!--begin::Modal body-->
-                                            <div class="modal-body py-lg-10 px-lg-10">
-                                                <form method="POST" action="/index.php?controller=Task&action=<?php echo $task['id'] ? 'update' : 'store'; ?>">
-                                                    <?php if ($task['id']) : ?>
-                                                        <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
-                                                    <?php endif; ?>
-                                                    <input type="hidden" name="task_group_id" value="<?php echo $group['id']; ?>">
+                                                <!--end::Modal - View task-->
 
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Task Text</label>
-                                                            <textarea name="task_text" class="form-control" required rows="4"><?php echo htmlspecialchars($task['task_text']); ?></textarea>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Scenario</label>
-                                                            <textarea name="scenario" class="form-control" rows="4"><?php echo htmlspecialchars($task['scenario']); ?></textarea>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Script (what moderator should say)</label>
-                                                            <textarea name="script" class="form-control" rows="3"><?php echo htmlspecialchars($task['script']); ?></textarea>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Metrics (what to observe)</label>
-                                                            <textarea name="metrics" class="form-control" rows="3"><?php echo htmlspecialchars($task['metrics']); ?></textarea>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Type of Evaluation</label>
-                                                            <select name="task_type" id="task_type" class="form-select">
-                                                                <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
-                                                                    <option value="<?php echo $type; ?>" <?php echo $task['task_type'] === $type ? 'selected' : ''; ?>>
-                                                                        <?php echo ucfirst($type); ?>
-                                                                    </option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                        </div>
-
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Predefined Evaluation Type (optional)</label>
-                                                            <select class="form-select" id="preset-options">
-                                                                <option value="">— Select a common type —</option>
-                                                                <option value="Yes:yes;No:no">Yes / No</option>
-                                                                <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
-                                                                <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
-                                                                <option value="Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5">Satisfaction Scale (1-5)</option>
-                                                            </select>
-                                                            <small class="form-text text-muted">Choosing one will auto-fill the options below.</small>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Evaluation Options</label>
-                                                        <textarea name="task_options" id="task_options" class="form-control" rows="3"><?php echo htmlspecialchars($task['task_options']); ?></textarea>
-                                                        <small class="form-text text-muted">Use the format: <code>Label:Value;Label:Value;</code></small>
-                                                    </div>
-
-                                                        <input type="hidden" name="position" class="form-control" value="0">
-                                                
-                                                    <div class="d-flex gap-2 mt-4">
-                                                        <input type="hidden" name="preset_type" id="preset_type" value="">
-                                                        <button type="submit" class="btn btn-primary">Save Task</button>
-                                                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
-                                                    </div>
-                                                </form>
-                                        </div>
-                                        <!--end::Modal body-->
-                                    </div>
-                                    <!--end::Modal content-->
-                                </div>
-                                <!--end::Modal dialog-->
-                            </div>
-                            <!--end::Modal - Create new task-->
-                                                <?php endforeach; ?>
+                                            <?php endforeach; ?>
                                             <?php else: ?>
                                                 <li class="list-group-item text-muted">No tasks in this group yet.</li>
                                             <?php endif; ?>
@@ -287,10 +402,9 @@ require __DIR__ . '/../layouts/header.php';
                                                         <input type="text" name="title" class="form-control" required value="<?php echo htmlspecialchars($group['title']); ?>">
                                                     </div>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Position</label>
-                                                        <input type="number" name="position" class="form-control" value="<?php echo htmlspecialchars($group['position']); ?>">
-                                                    </div>
+                                                  
+                                                        <input type="hidden" name="position" class="form-control" value="<?php echo htmlspecialchars($group['position']); ?>">
+                                                  
 
                                                     <button type="submit" class="btn btn-primary">Save</button>
                                                    
@@ -415,13 +529,455 @@ require __DIR__ . '/../layouts/header.php';
                       
                             </div>
                         <?php else: ?>
-                            <p class="text-muted">No task groups yet. <a href="/index.php?controller=TaskGroup&action=create&test_id=<?php echo $test['id']; ?>">Add one</a>.</p>
+                            <div class="alert alert-warning text-center py-3">No task groups yet. <a href="/index.php?controller=TaskGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_task_group">+ Add Task Group</a>
+                            </div>
                         <?php endif; ?>
                         </div>
 
-                        <div class="tab-pane fade" id="questiongroup" role="tabpanel">
-                              <!-- Questionnaire Groups -->
-                            <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+                        <div class="tab-pane fade" id="questionnairegroup" role="tabpanel">
+                            <!-- Questionnaire Groups -->
+                            <!-- Task Groups -->
+                            <?php if (!empty($questionnaireGroups)) : ?>
+                            
+                            <div id="questions-group-list">
+                                <?php foreach ($questionnaireGroups as $qGroup): ?>
+                                     <div class="card mb-4 shadow-sm task-group" id="questionnairegroup<?php echo $qgroup['id']; ?>" data-id="<?php echo $qGroup['id']; ?>">
+                                        <div class="card-header d-flex justify-content-between align-items-center p-4">
+                                            <div class="d-flex align-items-center">
+                                                <div> 
+                                                    <i class="ki-duotone ki-abstract-14 fs-2x">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </div>
+                                                <div class="mx-4">
+                                                    <h3 class="text-start"><?php echo htmlspecialchars($qGroup['title']); ?></h3>
+                                                </div>
+                                            </div>   
+                                            <div class="d-flex text-end">
+                                                <a href="/index.php?controller=Question&action=create&group_id=<?php echo $qGroup['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_question<?php echo $qGroup['id']; ?>">+ Add New Question</a>
+                                                <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <i class="ki-duotone ki-element-plus fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                        <span class="path4"></span>
+                                                        <span class="path5"></span>
+                                                    </i>
+                                                </button>
+                                                <!--begin::Menu 3-->
+                                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                                                    <!--begin::Heading-->
+                                                    <div class="menu-item px-3">
+                                                        <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">Settings</div>
+                                                    </div>
+                                                    <!--end::Heading-->
+                                                    <div class="separator my-2"></div>
+                                                    <!--end:Menu item-->
+                                                    <!--begin::Menu item-->
+                                                    
+                                                    
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=Response&action=exportCsvByQuestionnaireGroup&group_id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-warning px-3">📥 Export answers</a>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=QuestionnaireGroup&action=edit&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_questionnaire_group<?php echo $qGroup['id']; ?>">Edit Questionnaire</a>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=QuestionnaireGroup&action=duplicate&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-info text-start px-3">Duplicate Questionnaire</a>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a href="/index.php?controller=QuestionnaireGroup&action=destroy&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this Questionnaire?');">Delete Questionnaire</a>
+                                                    </div>
+                                                    <!--end::Menu item-->
+                                                </div>
+                                                <!--end::Menu 3-->                       
+                                            </div>
+                                        </div>
+
+                                        <ul class="list-group list-group-flush task-list" data-group-id="<?php echo $qGroup['id']; ?>">
+                                            <?php if (!empty($qGroup['questions'])) : ?>
+                                                <?php foreach ($qGroup['questions'] as $question): ?>
+                                                    <li class="list-group-item d-flex justify-content-between task-item draggable" data-id="<?php echo $question['id']; ?>">
+                                                        <div class="d-flex align-items-center">
+                                                            <div> 
+                                                                <i class="ki-duotone ki-abstract-14 fs-2x">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                </i>
+                                                            </div>
+                                                            <div class="mx-4">
+                                                                <h4 class="text-start"><?php echo htmlspecialchars($question['text']); ?></h4>
+                                                            </div>
+                                                        </div>   
+                                                       
+                                                        <div class="text-end">
+                                                            <a href="#" class="btn btn-sm btn-secondary"  data-bs-toggle="modal" data-bs-target="#kt_modal_view_question<?php echo $question['id']; ?>">View Question</a>
+                                                            <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                                <i class="ki-duotone ki-element-plus fs-2">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                    <span class="path3"></span>
+                                                                    <span class="path4"></span>
+                                                                    <span class="path5"></span>
+                                                                </i>
+                                                            </button>
+                                                            <!--begin::Menu 3-->
+                                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                                                                <!--begin::Heading-->
+                                                                <div class="menu-item px-3">
+                                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase text-start">Settings</div>
+                                                                </div>
+                                                                <!--end::Heading-->
+                                                                <div class="separator my-2"></div>
+                                                                <!--end:Menu item-->
+                                                                <!--begin::Menu item-->
+                                                                
+                                                                
+                                                            
+                                                                <div class="menu-item px-3">
+                                                                    <a href="/index.php?controller=Question&action=edit&id=<?php echo $question['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_question<?php echo $question['id']; ?>">Edit question</a>
+                                                                </div>
+                                                                <div class="menu-item px-3">
+                                                                    <a href="/index.php?controller=Question&action=duplicate&id=<?php echo $question['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate question</a>
+                                                                </div>
+                                                                <div class="menu-item px-3">
+                                                                    <a href="/index.php?controller=Question&action=destroy&id=<?php echo $question['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this questionnaire group?');">Delete question</a>
+                                                                </div>
+                                                                <!--end::Menu item-->
+                                                            
+                                                            </div>
+                                                            <!--end::Menu 3-->                       
+
+                                                        </div>
+                                                    </li>
+                                                     <!--begin::Modal - Edit question -->
+                                                        <div class="modal fade" id="kt_modal_edit_question<?php echo $question['id']; ?>" tabindex="-1" aria-hidden="true">
+                                                            <!--begin::Modal dialog-->
+                                                            <div class="modal-dialog modal-dialog-centered mw-900px">
+                                                                <!--begin::Modal content-->
+                                                                <div class="modal-content">
+                                                                    <!--begin::Modal header-->
+                                                                    <div class="modal-header">
+                                                                        <!--begin::Modal title-->
+                                                                        <h2>Edit Question</h2>
+                                                                        <!--end::Modal title-->
+                                                                        <!--begin::Close-->
+                                                                        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                            <i class="ki-duotone ki-cross fs-1">
+                                                                                <span class="path1"></span>
+                                                                                <span class="path2"></span>
+                                                                            </i>
+                                                                        </div>
+                                                                        <!--end::Close-->
+                                                                    </div>
+                                                                    <!--end::Modal header-->
+                                                                    <!--begin::Modal body-->
+                                                                    <div class="modal-body py-lg-10 px-lg-10">
+        <form method="POST" action="/index.php?controller=Question&action=update">
+        <?php if ($question['id']) : ?>
+            <input type="hidden" name="id" value="<?php echo $question['id']; ?>">
+        <?php endif; ?>
+
+        <input type="hidden" name="questionnaire_group_id" value="<?php echo $qGroup['id']; ?>">
+        <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
+        <input type="hidden" name="preset_type" id="preset_type" value="<?php echo htmlspecialchars($question['preset_type'] ?? ''); ?>">
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Question Text</label>
+                <textarea name="text" class="form-control" required rows="4"><?php echo htmlspecialchars($question['text']); ?></textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Type of Response</label>
+                <select name="question_type" id="question_type" class="form-select">
+                    <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
+                        <option value="<?php echo $type; ?>" <?php echo $question['question_type'] === $type ? 'selected' : ''; ?>>
+                            <?php echo ucfirst($type); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label class="form-label mt-4">Predefined Evaluation Type (optional)</label>
+                <select class="form-select" id="preset-options">
+                    <option value="">— Select a common type —</option>
+                    <option value="Yes:yes;No:no">Yes / No</option>
+                    <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
+                    <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
+                    <option value="Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5">Satisfaction Scale (1-5)</option>
+                </select>
+                <small class="form-text text-muted">This will auto-fill the response type and options below.</small>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Response Options</label>
+            <textarea name="question_options" id="question_options" class="form-control" rows="3"><?php echo htmlspecialchars($question['question_options']); ?></textarea>
+            <small class="form-text text-muted">Use <code>Label:Value;Label:Value</code> format for choice-based questions.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Position</label>
+            <input type="number" name="position" class="form-control" value="<?php echo $question['position']; ?>">
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Save Question</button>
+           
+<a href="#" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+
+
+
+
+                                                                </div>
+                                                                <!--end::Modal body-->
+                                                            </div>
+                                                            <!--end::Modal content-->
+                                                        </div>
+                                                        <!--end::Modal dialog-->
+                                                    </div>
+                                                    <!--end::Modal - Create new task-->
+
+
+                                                    <!--begin::Modal - view task -->
+                                                    <div class="modal fade" id="kt_modal_view_question<?php echo $question['id']; ?>" tabindex="-1" aria-hidden="true">
+                                                        <!--begin::Modal dialog-->
+                                                        <div class="modal-dialog modal-dialog-centered mw-900px">
+                                                            <!--begin::Modal content-->
+                                                            <div class="modal-content">
+                                                                <!--begin::Modal header-->
+                                                                <div class="modal-header">
+                                                                    <!--begin::Modal title-->
+                                                                    <h2>View Question</h2>
+                                                                    <!--end::Modal title-->
+                                                                    <!--begin::Close-->
+                                                                    <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                        <i class="ki-duotone ki-cross fs-1">
+                                                                            <span class="path1"></span>
+                                                                            <span class="path2"></span>
+                                                                        </i>
+                                                                    </div>
+                                                                    <!--end::Close-->
+                                                                </div>
+                                                                <!--end::Modal header-->
+                                                                <!--begin::Modal body-->
+                                                                <div class="modal-body py-lg-10 px-lg-10 fs-3">
+                                                                    
+                                                                    <div class="row mb-3 gx-5">
+                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Task Text</p>
+                                                                            <p><?php echo htmlspecialchars($task['task_text']); ?></p>
+                                                                        </div>
+                                                                        <div class="col-md-6  border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Scenario</p>
+                                                                            <p><?php echo htmlspecialchars($task['scenario']); ?></p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row mb-3">
+                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3 ">
+                                                                            <p class="fw-bold">Script (what moderator should say)</p>
+                                                                            <p><?php echo htmlspecialchars($task['script']); ?></p>
+                                                                        </div>
+                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Metrics (what to observe)</p>
+                                                                            <p><?php echo htmlspecialchars($task['metrics']); ?></p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row mb-3  border border-1 border-gray-300 rounded p-3">
+                                                                        <div class="col-md-6">
+                                                                            <p class="fw-bold">Type of Evaluation:</p>
+                                                                            <p><?php echo $task['task_type']; ?></p>
+                                                                        </div>
+
+                
+                                                                    </div>
+
+                                                                    <div class="mb-3 border border-1 border-gray-300 rounded p-3">
+                                                                        <p class="fw-bold">Evaluation Options</p>
+                                                                        <p><?php echo htmlspecialchars($task['task_options']); ?></p>
+                                                                    </div>
+
+                                                                
+                                                            </div>
+                                                            <!--end::Modal body-->
+                                                        </div>
+                                                        <!--end::Modal content-->
+                                                    </div>
+                                                    <!--end::Modal dialog-->
+                                                </div>
+                                                <!--end::Modal - View task-->
+
+                                            <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <li class="list-group-item text-muted">No tasks in this group yet.</li>
+                                            <?php endif; ?>
+                                        </ul>
+
+                                  
+                                </div>
+
+                        <!--begin::Modals-->
+                            <!--begin::Modal - Edit task group-->
+                            <div class="modal fade" id="kt_modal_edit_questionnaire_group<?php echo $qGroup['id'];?>" tabindex="-1" aria-hidden="true">
+                                <!--begin::Modal dialog-->
+                                <div class="modal-dialog modal-dialog-centered mw-900px">
+                                    <!--begin::Modal content-->
+                                    <div class="modal-content">
+                                        <!--begin::Modal header-->
+                                        <div class="modal-header">
+                                            <!--begin::Modal title-->
+                                            <h2>Edit Questionnaire Group</h2>
+                                            <!--end::Modal title-->
+                                            <!--begin::Close-->
+                                            <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                <i class="ki-duotone ki-cross fs-1">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </div>
+                                            <!--end::Close-->
+                                        </div>
+                                        <!--end::Modal header-->
+                                        <!--begin::Modal body-->
+                                        <div class="modal-body py-lg-10 px-lg-10">
+                                            <div class="row g-4">
+                                            <?php echo $qGroup['id']; ?>
+                                                <form method="POST" action="/index.php?controller=TaskGroup&action=<?php echo $qGroup['id'] ? 'update' : 'store'; ?>">
+                                                    <?php if ($qGroup['id']) : ?>
+                                                        <input type="hidden" name="id" value="<?php echo $qGroup['id']; ?>">
+                                                    <?php endif; ?>
+                                                    <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Title</label>
+                                                        <input type="text" name="title" class="form-control" required value="<?php echo htmlspecialchars($qGroup['title']); ?>">
+                                                    </div>
+
+                                                  
+                                                        <input type="hidden" name="position" class="form-control" value="<?php echo htmlspecialchars($qGroup['position']); ?>">
+                                                  
+
+                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                   
+                                                    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                        <!--end::Modal body-->
+                                    </div>
+                                    <!--end::Modal content-->
+                                </div>
+                                <!--end::Modal dialog-->
+                            </div>
+                            <!--end::Modal - Edit task group-->
+
+
+                            <!--begin::Modals-->
+                            <!--begin::Modal - Create new question -->
+                            <div class="modal fade" id="kt_modal_add_question<?php echo $qGroup['id'];?>" tabindex="-1" aria-hidden="true">
+                                <!--begin::Modal dialog-->
+                                <div class="modal-dialog modal-dialog-centered mw-900px">
+                                    <!--begin::Modal content-->
+                                    <div class="modal-content">
+                                        <!--begin::Modal header-->
+                                        <div class="modal-header">
+                                            <!--begin::Modal title-->
+                                            <h2>Add Question</h2>
+                                            <!--end::Modal title-->
+                                            <!--begin::Close-->
+                                            <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                <i class="ki-duotone ki-cross fs-1">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </div>
+                                            <!--end::Close-->
+                                        </div>
+                                        <!--end::Modal header-->
+                                        <!--begin::Modal body-->
+                                        <div class="modal-body py-lg-10 px-lg-10">
+                                        <form method="POST" action="/index.php?controller=Question&action=store">
+                                          <input type="hidden" name="questionnaire_group_id" value="<?php echo $qGroup['id']; ?>">
+        <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
+        <input type="hidden" name="preset_type" id="preset_type" value="">
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Question Text</label>
+                <textarea name="text" class="form-control" required rows="4"><?php echo htmlspecialchars($question['text']); ?></textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Type of Response</label>
+                <select name="question_type" id="question_type" class="form-select">
+                    <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
+                        <option value="<?php echo $type; ?>" <?php echo $question['question_type'] === $type ? 'selected' : ''; ?>>
+                            <?php echo ucfirst($type); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label class="form-label mt-4">Predefined Evaluation Type (optional)</label>
+                <select class="form-select" id="preset-options">
+                    <option value="">— Select a common type —</option>
+                    <option value="Yes:yes;No:no">Yes / No</option>
+                    <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
+                    <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
+                    <option value="Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5">Satisfaction Scale (1-5)</option>
+                </select>
+                <small class="form-text text-muted">This will auto-fill the response type and options below.</small>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Response Options</label>
+            <textarea name="question_options" id="question_options" class="form-control" rows="3"><?php echo htmlspecialchars($question['question_options']); ?></textarea>
+            <small class="form-text text-muted">Use <code>Label:Value;Label:Value</code> format for choice-based questions.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Position</label>
+            <input type="number" name="position" class="form-control" value="<?php echo $question['position']; ?>">
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Save Question</button>
+            <?php
+$anchor = $question['id'] ? '#questionnaire-group' . $question['questionnaire_group_id'] : '#questionnaire-group-list';
+$cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] . $anchor;
+?>
+<a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+
+                                        </div>
+                                        <!--end::Modal body-->
+                                    </div>
+                                    <!--end::Modal content-->
+                                </div>
+                                <!--end::Modal dialog-->
+                            </div>
+                            <!--end::Modal - Create new task-->
+                            <!--end::Modals-->
+
+                                <?php endforeach; ?>
+                            <div class="my-3 text-end">
+                                <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ Add Questionnaire Group</a>
+                            </div>
+                      
+                            </div>
+                        <?php else: ?>
+                            <div class="alert alert-warning text-center py-3">No Questionnaire Groups yet. <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ Add Questionnaire Group</a>
+                            </div>
+                        <?php endif; ?>
+
+                            <!------ acaba aqui a cena -->
+                              <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
                                 <h2 class="mb-0">Questionnaire Groups</h2>
                                 <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-success btn-sm">+ Add Questionnaire Group</a>
                             </div>
@@ -534,6 +1090,54 @@ require __DIR__ . '/../layouts/header.php';
         <!--end::Modal - Create task group -->
 
 
+        <!--begin::Modal - Create Questionnaire Group-->
+        <div class="modal fade" id="kt_modal_create_questionnaire_group" tabindex="-1" aria-hidden="true">
+            <!--begin::Modal dialog-->
+            <div class="modal-dialog modal-dialog-centered mw-900px">
+                <!--begin::Modal content-->
+                <div class="modal-content">
+                    <!--begin::Modal header-->
+                    <div class="modal-header">
+                        <!--begin::Modal title-->
+                        <h2>Create a new questionnaire group</h2>
+                        <!--end::Modal title-->
+                        <!--begin::Close-->
+                        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                            <i class="ki-duotone ki-cross fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+                    <!--end::Modal header-->
+                    <!--begin::Modal body-->
+                    <div class="modal-body py-lg-10 px-lg-10">
+                        
+                    <form method="POST" action="/index.php?controller=QuestionnaireGroup&action=store">
+                        <input type="hidden" name="test_id" value="<?php echo $qGroup['test_id']; ?>">
+
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" required value="">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+
+                    </form>
+                    
+                    </div>
+                    <!--end::Modal body-->
+                </div>
+                <!--end::Modal content-->
+            </div>
+            <!--end::Modal dialog-->
+        </div>
+        <!--end::Modal - Create task group -->
+
+
+
 <!--begin::Toast Container-->
 <div id="kt_toast_container" class="toast-container position-fixed bottom-0 end-0 p-3">
     <!-- Placeholder toast template -->
@@ -569,7 +1173,22 @@ require __DIR__ . '/../layouts/header.php';
 
                 // Faz scroll suave até ao grupo
                 const target = document.querySelector(hash);
-                if (target) {
+                if (target) {$group['id']
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 300); // aguarda a transição da tab
+                }
+            }
+        }
+        if (hash.startsWith("#questionnairegroup")) {
+            const questionTab = document.querySelector('a[data-bs-toggle="tab"][href="#questionnairegroup"]');
+            if (questionTab) {
+                const tab = new bootstrap.Tab(questionTab);
+                tab.show();
+
+                // Faz scroll suave até ao grupo
+                const target = document.querySelector(hash);
+                if (target) {$qGroup['id']
                     setTimeout(() => {
                         target.scrollIntoView({ behavior: "smooth", block: "start" });
                     }, 300); // aguarda a transição da tab
@@ -577,6 +1196,7 @@ require __DIR__ . '/../layouts/header.php';
             }
         }
     });
+
     <?php if (!empty($_SESSION['toast_success'])) : ?>
 
 window.addEventListener('DOMContentLoaded', () => {

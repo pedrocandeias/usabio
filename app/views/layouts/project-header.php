@@ -26,7 +26,7 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                 <!--begin::Head-->
                 <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
                     <!--begin::Details-->
-                    <div class="d-flex flex-column">
+                    <div class="d-flex flex-column  min-w-0 flex-grow-1">
                         <!--begin::Status-->
                         <div class="row">
                             <div class="col-md-9">

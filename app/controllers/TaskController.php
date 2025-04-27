@@ -329,4 +329,65 @@ class TaskController
         header("Location: /index.php?controller=Test&action=show&id=" . $meta['test_id'] . "#taskgroup" . $groupId);
         exit;
     }
+
+    public function duplicate()
+    {
+        $taskId = $_GET['id'] ?? 0;
+    
+        // Obter tarefa original
+        $stmt = $this->pdo->prepare("SELECT * FROM tasks WHERE id = ?");
+        $stmt->execute([$taskId]);
+        $original = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$original) {
+            echo "Task not found.";
+            exit;
+        }
+    
+        $groupId = $original['task_group_id'];
+    
+        // Verifica permissões
+        if (!$this->userCanAccessGroup($groupId)) {
+            echo "Access denied.";
+            exit;
+        }
+    
+        // Duplicar tarefa
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO tasks (task_group_id, task_text, script, scenario, metrics, task_type, task_options, position, preset_type)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+    
+        $stmt->execute([
+            $original['task_group_id'],
+            $original['task_text'] . ' (Copy)',
+            $original['script'],
+            $original['scenario'],
+            $original['metrics'],
+            $original['task_type'],
+            $original['task_options'],
+            $original['position'],
+            $original['preset_type']
+        ]);
+    
+        $newTaskId = $this->pdo->lastInsertId();
+    
+        // Obter test_id para redirecionar corretamente
+        $stmt = $this->pdo->prepare(
+            "
+            SELECT t.id AS test_id
+            FROM task_groups tg
+            JOIN tests t ON t.id = tg.test_id
+            WHERE tg.id = ?
+        "
+        );
+        $stmt->execute([$groupId]);
+        $testId = $stmt->fetchColumn();
+    
+        $_SESSION['toast_success'] = "Task duplicated successfully!";
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId . "#taskgroup" . $groupId);
+        exit;
+    }
+    
+
 }

@@ -100,7 +100,7 @@ class QuestionnaireGroupController
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $context['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $context['project_id'], 'active' => false],
-            ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $testId . '#questionnaire-group-list', 'active' => false],
+            ['label' => $context['test_title'], 'url' => '/index.php?controller=Test&action=show&id=' . $testId . '#questionnairegroup', 'active' => false],
             ['label' => 'Create Questionnaire Group', 'url' => '', 'active' => true],
         ];
     
@@ -121,7 +121,7 @@ class QuestionnaireGroupController
             ]
         );
 
-        header("Location: /index.php?controller=Test&action=show&id=" . $testId."#questionnaire-group-list");
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId."#questionnairegroup");
 
         exit;
     }
@@ -217,7 +217,7 @@ class QuestionnaireGroupController
         $stmt = $this->pdo->prepare("DELETE FROM questionnaire_groups WHERE id = ?");
         $stmt->execute([$id]);
        
-        header("Location: /index.php?controller=Test&action=show&id=" . $testId."#questionnaire-group-list");
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId."#questionnairegroup");
         exit;
     }
 }

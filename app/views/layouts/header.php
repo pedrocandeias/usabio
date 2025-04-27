@@ -333,7 +333,7 @@ if (!empty($_SESSION['fullname']) ) {
                             </div>
                         <?php endif; ?>
                         <div class="btn btn-icon btn-active-light-primary btn-custom w-30px h-30px w-md-40px h-md-40px" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-                            <img class="h-30px w-30px rounded" src="assets/media/avatars/300-2.jpg" alt="" />
+                            <img class="h-30px w-30px rounded" src="assets/media/avatars/blank.png" alt="" />
                         </div>
                         <!--begin::User account menu-->
                         <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
@@ -344,7 +344,7 @@ if (!empty($_SESSION['fullname']) ) {
         
                                 <!--begin::Avatar-->
                                     <div class="symbol symbol-50px me-5">
-                                        <img alt="Logo" src="assets/media/avatars/300-2.jpg" />
+                                        <img alt="Logo" src="assets/media/avatars/blank.png" />
                                     </div>
                                     <!--end::Avatar-->
                                 
@@ -445,15 +445,12 @@ if (!empty($_SESSION['fullname']) ) {
                     <?php foreach ($headerNavbuttons as $label => $button) : ?>
                         <!--begin::Button-->
                         <a href="<?php echo htmlspecialchars($button['url']); ?>" 
-                                class="<?php if (!empty($button['class'])) : ?> 
-                                    <?php echo htmlspecialchars($button['class']); ?>
-                               <?php endif; ?>" 
-                            id="<?php echo !empty($button['id']) ? htmlspecialchars($button['id']) : ''; ?>"
-                            <?php if (!empty($button['data'])) : ?>
-                                <?php foreach ($button['data'] as $key => $value) : ?>
-                                    data-<?php echo htmlspecialchars($key); ?>="<?php echo htmlspecialchars($value); ?>"
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                                class="<?php if (!empty($button['class'])) :  echo htmlspecialchars($button['class']); endif; ?>" 
+                                id="<?php echo !empty($button['id']) ? htmlspecialchars($button['id']) : ''; ?>"
+                                <?php if (!empty($button['data'])) :
+                                foreach ($button['data'] as $key => $value) : 
+                                   echo 'data-'.htmlspecialchars($key).'"'.htmlspecialchars($value).'"';
+                                endforeach; endif; ?>
                             data-bs-theme="light">
                             <?php if (!empty($button['icon'])) : ?>
                                 <i class="<?php echo htmlspecialchars($button['icon']); ?>"></i>
