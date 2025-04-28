@@ -1,6 +1,5 @@
 import gulp from "gulp";
 import rename from "gulp-rename";
-import rtlcss from "gulp-rtlcss";
 import sass from "gulp-dart-sass";
 import _ from "lodash";
 import {build as buildMaster} from "./build.js";
@@ -18,7 +17,6 @@ const args = Object.assign(
     {
         prod: false,
         sourcemap: false,
-        rtl: "",
         exclude: "",
         theme: "",
         path: "",
@@ -107,56 +105,6 @@ if (args.sourcemap !== false) {
     // build.config.compile.cssSourcemaps = true;
 }
 
-if (args.rtl) {
-    build.config.compile.rtl.enabled = true;
-}
-
-const rtlTask = (cb) => {
-    const streams = [];
-    let stream = null;
-    objectWalkRecursive(
-        build.build,
-        (val, key, userdata) => {
-            if (val.hasOwnProperty("src") && val.hasOwnProperty("dist")) {
-                if (["custom", "media", "api", "misc"].indexOf(key) !== -1) {
-                    if (userdata.indexOf(key) === -1 && typeof val.styles !== "undefined") {
-                        // rtl conversion in each plugins
-                        for (let i in val.styles) {
-                            if (!val.styles.hasOwnProperty(i)) {
-                                continue;
-                            }
-
-                            const toRtlFile = dotPath(val.styles[i]);
-                            // exclude scss file for now
-                            if (toRtlFile.indexOf(".scss") === -1 && !/\*/.test(toRtlFile)) {
-                                stream = gulp.src(toRtlFile, {allowEmpty: true})
-                                    .pipe(rtlcss())
-                                    .pipe(rename({suffix: ".rtl"}))
-                                    .pipe(gulp.dest(pathOnly(toRtlFile)));
-                                streams.push(stream);
-
-                                // convert rtl for minified
-                                if (!/\.min\./i.test(toRtlFile)) {
-                                    stream = gulp.src(toRtlFile, {allowEmpty: true})
-                                        .pipe(
-                                            sass({outputStyle: "compressed"}).on("error", sass.logError)
-                                        )
-                                        .pipe(rename({suffix: args.suffix ? ".min.rtl" : ".rtl"}))
-                                        .pipe(gulp.dest(pathOnly(toRtlFile)));
-                                    streams.push(stream);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        build.config.compile.rtl.skip
-    );
-    cb();
-    return streams;
-};
-
 // task to bundle js/css
 let buildBundleTask = (cb) => {
     var streams = [];
@@ -178,9 +126,6 @@ if (!args.sass && !args.js && !args.media) {
     tasks.push(cleanTask);
 }
 
-if (typeof build.config.compile.rtl !== "undefined" && build.config.compile.rtl.enabled) {
-    tasks.push(rtlTask);
-}
 tasks.push(buildBundleTask);
 
 if (args.presets && fs.existsSync(build.config.path.src + '/sass/presets')) {

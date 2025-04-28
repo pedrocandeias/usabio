@@ -48270,11 +48270,11 @@ body.page-bg-image-lg {
 }
 
 [data-bs-theme=light] body:not(.app-blank) {
-  background-image: url("../media/patterns/header-bg.jpg");
+  background-image: url("../media/patterns/header-bg.png");
 }
 
 [data-bs-theme=dark] body:not(.app-blank) {
-  background-image: url("../media/patterns/header-bg-dark.jpg");
+  background-image: url("../media/patterns/header-bg-dark.png");
 }
 
 .text-page-bg {

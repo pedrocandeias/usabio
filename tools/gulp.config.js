@@ -4,19 +4,8 @@ const gulpConfig = {
 	version: "8.2.9",
 	config: {
 		debug: false,
+		encoding: false,
 		compile: {
-			rtl: {
-				enabled: false,
-				skip: [
-					"select2",
-					"keenicons",
-					"line-awesome",
-					"fontawesome5",
-					"nouislider",
-					"tinymce",
-					"sweetalert2",
-				],
-			},
 			jsMinify: false,
 			cssMinify: false,
 			jsSourcemaps: false,
@@ -26,8 +15,10 @@ const gulpConfig = {
 			src: "../resources/src",
 			common_src: "../resources/src",
 			node_modules: "node_modules",
+	
 		},
 		dist: ["../assets"],
+
 	},
 	build: {
 		base: {
@@ -603,6 +594,7 @@ const gulpConfig = {
 			},
 		},
 		custom: {
+			
 			src: {
 				styles: [
 					"{$config.path.common_src}/sass/custom/**/*.scss",
@@ -619,10 +611,12 @@ const gulpConfig = {
 			},
 		},
 		media: {
+			encopding: false,
 			src: {
 				media: [
 					"{$config.path.common_src}/media/**/*.*",
 					"{$config.path.src}/media/**/*.*",
+					"encoding: false",
 				],
 			},
 			dist: {

@@ -9,7 +9,6 @@ import terser from "gulp-terser";
 import sourcemaps from "gulp-sourcemaps";
 import path, * as pathDir from "path";
 import fs from "fs";
-import rtlcss from "gulp-rtlcss";
 import cleancss from "gulp-clean-css";
 import yargs from "yargs";
 import {hideBin} from 'yargs/helpers'
@@ -123,7 +122,7 @@ const jsChannel = () => {
 /**
  * Add CSS compilation options to gulp pipe
  */
-const cssChannel = (rtl, includePaths) => {
+const cssChannel = (includePaths) => {
   const { compile } = config;
   const { cssSourcemaps, cssMinify } = compile;
   return lazypipe()
@@ -141,10 +140,6 @@ const cssChannel = (rtl, includePaths) => {
         ),
         // outputStyle: config.cssMinify ? 'compressed' : '',
       }).on("error", sass.logError);
-    })
-    .pipe(() => {
-      // convert rtl for style.bundle.css only here, others already converted before
-      return gulpif(rtl, rtlcss());
     })
     .pipe(() => {
       return gulpif(cssMinify, cleancss());
@@ -428,7 +423,7 @@ const bundle = (bundle) => {
 
           switch (type) {
             case "fonts":
-              stream = gulp.src(vendorObj[type], { allowEmpty: true });
+              stream = gulp.src(vendorObj[type], { allowEmpty: true }, {encoding: false});
               const outputFonts = outputChannel(bundle.dist[type] + "/" + vendor, undefined, type)();
               if (outputFonts) {
                 stream.pipe(outputFonts);
@@ -436,7 +431,7 @@ const bundle = (bundle) => {
               bundleStreams.push(stream);
               break;
             case "images":
-              stream = gulp.src(vendorObj[type], { allowEmpty: true });
+              stream = gulp.src(vendorObj[type], { allowEmpty: true }, {encoding: false});
               const outputImages = outputChannel(bundle.dist[type] + "/" + vendor, undefined, type)();
               if (outputImages) {
                 stream.pipe(outputImages);
@@ -489,48 +484,6 @@ const bundle = (bundle) => {
       switch (type) {
         case "styles":
           if (bundle.dist.hasOwnProperty(type)) {
-
-            // rtl css bundle
-            if (
-              typeof build.config.compile.rtl !== "undefined" &&
-              build.config.compile.rtl.enabled
-            ) {
-              let toRtlFiles = [];
-              let rtlFiles = [];
-              bundle.src[type].forEach((path) => {
-                // get rtl css file path
-                let cssFile =
-                  pathOnly(path) + "/" + baseName(path) + ".rtl.css";
-                // check if rtl file is exist
-                if (
-                  fs.existsSync(cssFile) &&
-                  build.config.compile.rtl.skip.indexOf(baseName(path)) === -1
-                ) {
-                  rtlFiles = rtlFiles.concat(cssFile);
-                } else {
-                  // rtl css file not exist, use default css file
-                  cssFile = path;
-                }
-                toRtlFiles = toRtlFiles.concat(cssFile);
-              });
-
-              let shouldRtl = false;
-              if (baseName(bundle.dist[type]) === "style.bundle") {
-                shouldRtl = true;
-              }
-
-              const rtlOutput = pathOnly(bundle.dist[type]) + "/" + baseName(bundle.dist[type]) + ".rtl.css";
-              stream = gulp
-                .src(toRtlFiles, { allowEmpty: true })
-                .pipe(cssRewriter(bundle.dist)())
-                .pipe(concat(baseName(bundle.dist[type]) + ".rtl.css"))
-                .pipe(cssChannel(shouldRtl)());
-              const outputRTLCSS = outputChannel(rtlOutput, baseName(bundle.dist[type]) + ".rtl.css", type)();
-              if (outputRTLCSS) {
-                stream.pipe(outputRTLCSS);
-              }
-              bundleStreams.push(stream);
-            }
 
             // default css bundle
             stream = gulp
@@ -610,28 +563,7 @@ const outputFunc = (bundle) => {
               stream.pipe(outputStyles);
             }
             outputFuncStreams.push(stream);
-
-            // rtl styles for scss
-            let shouldRtl = false;
-            if (
-              typeof build.config.compile.rtl !== "undefined" &&
-              build.config.compile.rtl.enabled
-            ) {
-              bundle.src[type].forEach((output) => {
-                if (output.indexOf(".scss") !== -1) {
-                  shouldRtl = true;
-                }
-              });
-              stream = gulp
-                .src(bundle.src[type], { allowEmpty: true })
-                .pipe(cssChannel(shouldRtl)())
-                .pipe(rename({ suffix: ".rtl" }));
-              const rtlOutput = outputChannel(bundle.dist[type], undefined, type)();
-              if (rtlOutput) {
-                stream.pipe(rtlOutput);
-              }
-              outputFuncStreams.push(stream);
-            }
+           
             break;
           case "scripts":
             /**
