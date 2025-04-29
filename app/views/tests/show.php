@@ -76,7 +76,7 @@ require __DIR__ . '/../layouts/header.php';
                                     <div class="card mb-4 shadow-sm task-group" id="taskgroup<?php echo $group['id']; ?>" data-id="<?php echo $group['id']; ?>">
                                         <div class="card-header d-flex justify-content-between align-items-center p-4">
                                             <div class="d-flex align-items-center">
-                                                <div> 
+                                                <div style="cursor: grab;"> 
                                                     <i class="ki-duotone ki-abstract-14 fs-2x">
                                                         <span class="path1"></span>
                                                         <span class="path2"></span>
@@ -132,7 +132,7 @@ require __DIR__ . '/../layouts/header.php';
                                                 <?php foreach ($group['tasks'] as $task): ?>
                                                     <li class="list-group-item d-flex justify-content-between task-item draggable" data-id="<?php echo $task['id']; ?>">
                                                         <div class="d-flex align-items-center">
-                                                            <div> 
+                                                            <div style="cursor: grab;"> 
                                                                 <i class="ki-duotone ki-abstract-14 fs-2x">
                                                                     <span class="path1"></span>
                                                                     <span class="path2"></span>
@@ -544,7 +544,7 @@ require __DIR__ . '/../layouts/header.php';
                                      <div class="card mb-4 shadow-sm task-group" id="questionnairegroup<?php echo $qgroup['id']; ?>" data-id="<?php echo $qGroup['id']; ?>">
                                         <div class="card-header d-flex justify-content-between align-items-center p-4">
                                             <div class="d-flex align-items-center">
-                                                <div> 
+                                                <div style="cursor: grab;"> 
                                                     <i class="ki-duotone ki-abstract-14 fs-2x">
                                                         <span class="path1"></span>
                                                         <span class="path2"></span>
@@ -555,7 +555,14 @@ require __DIR__ . '/../layouts/header.php';
                                                 </div>
                                             </div>   
                                             <div class="d-flex text-end">
+                                            <a href="/index.php?controller=Question&action=generateSUS&group_id=<?php echo $qGroup['id']; ?>&test_id=<?php echo $test['id']; ?>" 
+                                                class="btn btn-outline-secondary btn-sm"
+                                                onclick="return confirm('Generate SUS questions in this group? This will add 10 questions.')">
+                                                    🧠 Add SUS Questions
+                                                </a>
                                                 <a href="/index.php?controller=Question&action=create&group_id=<?php echo $qGroup['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_question<?php echo $qGroup['id']; ?>">+ Add New Question</a>
+                                                
+                                                
                                                 <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                     <i class="ki-duotone ki-element-plus fs-2">
                                                         <span class="path1"></span>
@@ -600,7 +607,7 @@ require __DIR__ . '/../layouts/header.php';
                                                 <?php foreach ($qGroup['questions'] as $question): ?>
                                                     <li class="list-group-item d-flex justify-content-between task-item draggable" data-id="<?php echo $question['id']; ?>">
                                                         <div class="d-flex align-items-center">
-                                                            <div> 
+                                                            <div style="cursor: grab;"> 
                                                                 <i class="ki-duotone ki-abstract-14 fs-2x">
                                                                     <span class="path1"></span>
                                                                     <span class="path2"></span>
@@ -723,8 +730,7 @@ require __DIR__ . '/../layouts/header.php';
 
         <div class="d-flex gap-2 mt-4">
             <button type="submit" class="btn btn-primary">Save Question</button>
-           
-<a href="#" class="btn btn-secondary">Cancel</a>
+            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
         </div>
     </form>
 
@@ -764,41 +770,34 @@ require __DIR__ . '/../layouts/header.php';
                                                                 <!--end::Modal header-->
                                                                 <!--begin::Modal body-->
                                                                 <div class="modal-body py-lg-10 px-lg-10 fs-3">
-                                                                    
-                                                                    <div class="row mb-3 gx-5">
-                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Task Text</p>
-                                                                            <p><?php echo htmlspecialchars($task['task_text']); ?></p>
+    
+
+
+
+
+                                                                    <div class="row mb-3">
+                                                                        <div class="col-md-12 border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Question Text</p>
+                                                                            <p><?php echo htmlspecialchars($question['text']); ?></p>
                                                                         </div>
-                                                                        <div class="col-md-6  border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Scenario</p>
-                                                                            <p><?php echo htmlspecialchars($task['scenario']); ?></p>
+                                                                        <div class="col-md-12  border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Type of response</p>
+                                                                            <p><?php echo $question['question_type']; ?></p>
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="row mb-3">
-                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3 ">
-                                                                            <p class="fw-bold">Script (what moderator should say)</p>
-                                                                            <p><?php echo htmlspecialchars($task['script']); ?></p>
-                                                                        </div>
-                                                                        <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Metrics (what to observe)</p>
-                                                                            <p><?php echo htmlspecialchars($task['metrics']); ?></p>
+                                                                        <div class="col-md-12  border border-1 border-gray-300 rounded p-3">
+                                                                            <p class="fw-bold">Type of response</p>
+                                                                            <p><?php echo $question['question_type']; ?></p>
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="row mb-3  border border-1 border-gray-300 rounded p-3">
-                                                                        <div class="col-md-6">
-                                                                            <p class="fw-bold">Type of Evaluation:</p>
-                                                                            <p><?php echo $task['task_type']; ?></p>
+                                                                    <div class="row mb-3">
+                                                                        <div class="col-md-12 border border-1 border-gray-300 rounded p-3 ">
+                                                                            <p class="fw-bold">Response options</p>
+                                                                            <p><?php echo htmlspecialchars($question['question_options']); ?></p>
                                                                         </div>
-
-                
-                                                                    </div>
-
-                                                                    <div class="mb-3 border border-1 border-gray-300 rounded p-3">
-                                                                        <p class="fw-bold">Evaluation Options</p>
-                                                                        <p><?php echo htmlspecialchars($task['task_options']); ?></p>
                                                                     </div>
 
                                                                 
@@ -967,6 +966,7 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
 
                                 <?php endforeach; ?>
                             <div class="my-3 text-end">
+                                
                                 <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ Add Questionnaire Group</a>
                             </div>
                       
@@ -976,62 +976,7 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
                             </div>
                         <?php endif; ?>
 
-                            <!------ acaba aqui a cena -->
-                              <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-                                <h2 class="mb-0">Questionnaire Groups</h2>
-                                <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-success btn-sm">+ Add Questionnaire Group</a>
-                            </div>
-
-                            <div id="questionnaire-group-list">
-                            
-                                <?php if (!empty($questionnaireGroups)) : ?>
-                                    <?php foreach ($questionnaireGroups as $qGroup): ?>
-                                        <div class="card mb-3 shadow-sm questionnaire-group" id="questionnaire-group<?php echo $qGroup['id']; ?>" data-id="<?php echo $qGroup['id']; ?>">
-                                            <div class="card-header d-flex justify-content-between align-items-center">
-                                                <h5 class="mb-0"><span class="me-2" style="cursor: grab;">☰</span><?php echo htmlspecialchars($qGroup['title']); ?></h5>
-                                                <div>
-                                                    <a href="/index.php?controller=Response&action=exportCsvByQuestionnaireGroup&group_id=<?php echo $qGroup['id']; ?>" class="btn btn-outline-secondary btn-sm">📥 Export answers</a>
-                                                    <a href="/index.php?controller=QuestionnaireGroup&action=edit&id=<?php echo $qGroup['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
-                                                    <a href="/index.php?controller=QuestionnaireGroup&action=destroy&id=<?php echo $qGroup['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this group?');">Delete</a>
-                                                </div>
-                                            </div>
-
-                                            <div class="card-body p-0">
-                                                <?php if (!empty($qGroup['questions'])) : ?>
-                                                    <ul class="list-group list-group-flush question-list" data-group-id="<?php echo $qGroup['id']; ?>">
-                                                        <?php foreach ($qGroup['questions'] as $question): ?>
-                                                            <li class="list-group-item d-flex justify-content-between question-item" data-id="<?php echo $question['id']; ?>">
-                                                                <div>
-                                                                    <span class="me-2" style="cursor: grab;">☰</span>
-                                                                    <strong><?php echo htmlspecialchars($question['text']); ?></strong>
-                                                                    <small class="text-muted">[<?php echo $question['question_type']; ?>]</small>
-                                                                </div>
-                                                                <div>
-                                                                    <a href="/index.php?controller=Question&action=edit&id=<?php echo $question['id']; ?>&test_id=<?php echo $test['id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                                                    <a href="/index.php?controller=Question&action=destroy&id=<?php echo $question['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this question?');">Delete</a>
-                                                                </div>
-                                                            </li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                <?php else: ?>
-                                                    <p class="p-3 text-muted">No questions yet.</p>
-                                                <?php endif; ?>
-                                            </div>
-
-                                            <div class="card-footer text-end">
-                                                <a href="/index.php?controller=Question&action=generateSUS&group_id=<?php echo $qGroup['id']; ?>&test_id=<?php echo $test['id']; ?>" 
-                                                class="btn btn-outline-secondary btn-sm"
-                                                onclick="return confirm('Generate SUS questions in this group? This will add 10 questions.')">
-                                                    🧠 Add SUS Questions
-                                                </a>
-                                                <a href="/index.php?controller=Question&action=create&group_id=<?php echo $qGroup['id']; ?>&test_id=<?php echo $test['id']; ?>" class="btn btn-sm btn-success">+ Add Question</a>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <p class="text-muted">No questionnaire groups yet. <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>">Add one</a>.</p>
-                                <?php endif; ?>
-                            </div>
+                      
                         </div>
                     </div>
                 </div>

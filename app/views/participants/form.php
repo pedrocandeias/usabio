@@ -49,7 +49,7 @@ require __DIR__ . '/../layouts/header.php';
                     $selected = $participant['participant_academic_level'] ?? '';
                     foreach ($levels as $level): ?>
                         <option value="<?php echo htmlspecialchars($level); ?>" <?php echo ($selected === $level) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($level); ?>
+                            <?php echo htmlspecialchars($level); ?>$customFields
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -100,9 +100,9 @@ require __DIR__ . '/../layouts/header.php';
             <label class="form-label">Assigned Tests</label>
             <select name="test_ids[]" class="form-select" multiple>
                 <?php foreach ($tests as $test): ?>
-                    <option value="<?= $test['id'] ?>"
-                        <?= in_array($test['id'], $assignedTestIds ?? []) ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($test['title']) ?>
+                    <option value="<?php echo $test['id'] ?>"
+                        <?php echo in_array($test['id'], $assignedTestIds ?? []) ? 'selected' : '' ?>>
+                        <?php echo htmlspecialchars($test['title']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>

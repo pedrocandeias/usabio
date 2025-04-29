@@ -7,7 +7,7 @@
    viewBox="0 0 67.992874 43.037777"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4.1 (1:1.4.1+202503302257+93de688d07)"
+   inkscape:version="1.4.1-rc (06eac75fbf, 2025-03-29)"
    sodipodi:docname="logo-white-small-login.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -23,13 +23,13 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.69308361"
-     inkscape:cx="134.90436"
-     inkscape:cy="181.79625"
+     inkscape:zoom="3.920673"
+     inkscape:cx="106.86941"
+     inkscape:cy="65.167384"
      inkscape:window-width="1920"
-     inkscape:window-height="961"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-height="1085"
+     inkscape:window-x="1920"
+     inkscape:window-y="32"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
@@ -49,7 +49,7 @@
        id="path2"
        sodipodi:nodetypes="ccc" />
     <path
-       style="fill:none;stroke:#999999;stroke-width:1.74415;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
+       style="fill:none;stroke:#ffffff;stroke-width:1.74415;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
        d="m 76.513255,142.45129 3.668197,-3.55908 z"
        id="path3"
        sodipodi:nodetypes="ccc" />
@@ -58,7 +58,7 @@
        style="fill:none;stroke:#ffffff;stroke-width:1.8465;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
        d="m 80.114372,138.89221 h -5.087357 a 4.5791897,4.5791897 0 0 1 -4.579187,-4.5792 v -9.10907 a 7.3073042,7.3073042 0 0 1 7.307297,-7.30731 v 0 h 12.245281 a 6.8696986,6.8696986 0 0 1 6.869697,6.86971 v 0.10424" />
     <path
-       style="fill:none;stroke:#999999;stroke-width:1.74415;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
+       style="fill:none;stroke:#ffffff;stroke-width:1.74415;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
        d="m 96.888383,130.12141 -4.061037,-3.77336 z"
        id="path2-6"
        sodipodi:nodetypes="ccc" />

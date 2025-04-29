@@ -1,25 +1,25 @@
 <?php
-
+require_once __DIR__ . '/BaseController.php'; // carrega o base
 require_once __DIR__ . '/../models/Participant.php';
 
-class ParticipantController
+class ParticipantController extends BaseController
 {
-    private $pdo;
-    private $participantModel;
+
+    protected $participantModel;
 
     public function __construct($pdo)
     {
-        $this->pdo = $pdo;
-        $this->participantModel = new Participant($pdo);
-
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: /?controller=Auth&action=login');
+    
+        if (!isset($_SESSION['username'])) {
+            header('Location: /index.php?controller=Auth&action=login&error=Please+login+first');
             exit;
         }
+        parent::__construct($pdo); // Inicializa $this->pdo antes de usá-lo
+        $this->participantModel = new Participant($this->pdo);
+    
     }
 
     public function index()
@@ -50,6 +50,41 @@ class ParticipantController
         $stmt->execute([$project_id]);
         $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+
+        // Buscar os testes atribuídos por participante
+        $stmt = $this->pdo->prepare("
+        SELECT pt.participant_id, t.title AS test_title, t.id AS test_id
+        FROM participant_test pt
+        JOIN tests t ON pt.test_id = t.id
+        WHERE pt.participant_id IN (
+            SELECT id FROM participants WHERE project_id = ?
+        )
+        ");
+        $stmt->execute([$project_id]);
+        $testAssignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Agrupar por participant_id
+        $testsByParticipant = [];
+        foreach ($testAssignments as $row) {
+        $testsByParticipant[$row['participant_id']][] = [
+            'test_title' => $row['test_title'],
+            'participant_test_id' => $row['test_id'],
+        ];
+        }
+
+        // Fetch tests linked to this project
+$stmt = $this->pdo->prepare("SELECT id, title FROM tests WHERE project_id = ?");
+$stmt->execute([$project_id]);
+$tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+                $customFields = [];
+        if ($project_id) {
+            $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
+            $stmt->execute([$project_id]);
+            $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $project['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $project_id, 'active' => false],
@@ -76,6 +111,8 @@ class ParticipantController
     
         $project_id = $participant['project_id'];
     
+
+
         // Get project name for breadcrumb
         $stmt = $this->pdo->prepare("SELECT title AS project_name FROM projects WHERE id = ?");
         $stmt->execute([$project_id]);
@@ -207,7 +244,7 @@ class ParticipantController
                 $stmt->execute([$participant_id, $field_id, $value]);
             }
         }
-
+        $_SESSION['toast_success'] = "Participant added successfully!";
         header("Location: /index.php?controller=Participant&action=index&project_id=$project_id");
         exit;
     }
@@ -262,9 +299,7 @@ class ParticipantController
         $customFieldValues[$row['field_id']] = $row['value'];
         }
 
-    
 
-        
         // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
@@ -360,8 +395,8 @@ class ParticipantController
                 $stmt->execute([$participant_id, $field_id, $value]);
             }
         }
-
-        header("Location: /index.php?controller=Participant&action=edit&id=$participant_id&saved=1");
+        $_SESSION['toast_success'] = "Participant updated successfully!";
+        header("Location: /index.php?controller=Participant&action=index&project_id=$project_id");
         exit;
         
     }
@@ -378,7 +413,7 @@ class ParticipantController
 
         $stmt = $this->pdo->prepare("DELETE FROM participants WHERE id = ?");
         $stmt->execute([$participant_id]);
-
+        $_SESSION['toast_success'] = "Participant removed successfully!";
         header("Location: /index.php?controller=Participant&action=index&project_id=$project_id");
         exit;
     }

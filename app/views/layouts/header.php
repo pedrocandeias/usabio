@@ -48,8 +48,8 @@ if (!empty($_SESSION['fullname']) ) {
                         <!--begin::Header Logo-->
                         <div class="header-logo me-5 me-md-10 flex-grow-1 flex-lg-grow-0">
                             <a href="/?controller=Project&action=index">
-                                <img alt="Logo" src="assets/media/logos/demo2.png" class="logo-default h-25px" />
-                                <img alt="Logo" src="assets/media/logos/demo2-sticky.png" class="logo-sticky h-25px" />
+                                <img alt="Logo" src="assets/media/logos/logo-white.svg" class="logo-default h-55px" />
+                                <img alt="Logo" src="assets/media/logos/logo-primary.svg" class="logo-sticky h-55px" />
                             </a>
                         </div>
                         <!--end::Header Logo-->
@@ -62,86 +62,26 @@ if (!empty($_SESSION['fullname']) ) {
                                 <div class="header-menu align-items-stretch" data-kt-drawer="true" data-kt-drawer-name="header-menu" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_header_menu_mobile_toggle" data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_body', lg: '#kt_header_nav'}">
                                     <!--begin::Menu-->
                                     <div class="menu menu-rounded menu-column menu-lg-row menu-active-bg menu-title-gray-700 menu-state-primary menu-arrow-gray-500 fw-semibold my-5 my-lg-0 align-items-stretch px-2 px-lg-0" id="#kt_header_menu" data-kt-menu="true">
-                                        <!--begin:Menu item-->
+                                        
                                         <div class="menu-item  here menu-here-bg me-0 me-lg-2">
-                                            <!--begin:Menu link-->
+                                           
                                             <a class="menu-link py-3" href="/?controller=Project&action=index">
                                                 <span class="menu-title">Projects</span>
                                                 <span class="menu-arrow d-lg-none"></span>
                                             </a>
-                                            <!--end:Menu link-->
+                                           
                                         </div>
-                                        <!--end:Menu item-->
-                                        <!--begin:Menu item-->
+                                        
+                                        
                                         <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-0 me-lg-2">
-                                            <!--begin:Menu link-->
+                                           
                                             <a class="menu-link py-3" href="/?controller=Project&action=index">
                                                 <span class="menu-title">Team</span>
                                                 <span class="menu-arrow d-lg-none"></span>
                                             </a>
-                                            <!--end:Menu link-->
+                                           
                                         </div>
-                                        <!--end:Menu item-->
-                                        <!--begin:Menu item-->
-                                        <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion menu-sub-lg-down-indention me-0 me-lg-2">
-                                            <!--begin:Menu link-->
-                                            <span class="menu-link py-3">
-                                                <span class="menu-title">Help</span>
-                                                <span class="menu-arrow d-lg-none"></span>
-                                            </span>
-                                            <!--end:Menu link-->
-                                            <!--begin:Menu sub-->
-                                            <div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown px-lg-2 py-lg-4 w-lg-200px">
-                                                <!--begin:Menu item-->
-                                                <div class="menu-item">
-                                                    <!--begin:Menu link-->
-                                                    <a class="menu-link py-3" href="https://preview.keenthemes.com/html/metronic/docs/base/utilities" target="_blank" title="Check out over 200 in-house components, plugins and ready for use solutions" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-dismiss="click" data-bs-placement="right">
-                                                        <span class="menu-icon">
-                                                            <i class="ki-duotone ki-rocket fs-2">
-                                                                <span class="path1"></span>
-                                                                <span class="path2"></span>
-                                                            </i>
-                                                        </span>
-                                                        <span class="menu-title">Components</span>
-                                                    </a>
-                                                    <!--end:Menu link-->
-                                                </div>
-                                                <!--end:Menu item-->
-                                                <!--begin:Menu item-->
-                                                <div class="menu-item">
-                                                    <!--begin:Menu link-->
-                                                    <a class="menu-link py-3" href="https://preview.keenthemes.com/html/metronic/docs" target="_blank" title="Check out the complete documentation" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-dismiss="click" data-bs-placement="right">
-                                                        <span class="menu-icon">
-                                                            <i class="ki-duotone ki-abstract-26 fs-2">
-                                                                <span class="path1"></span>
-                                                                <span class="path2"></span>
-                                                            </i>
-                                                        </span>
-                                                        <span class="menu-title">Documentation</span>
-                                                    </a>
-                                                    <!--end:Menu link-->
-                                                </div>
-                                                <!--end:Menu item-->
-                                                <!--begin:Menu item-->
-                                                <div class="menu-item">
-                                                    <!--begin:Menu link-->
-                                                    <a class="menu-link py-3" href="https://preview.keenthemes.com/metronic8/demo2/layout-builder.html" title="Build your layout and export HTML for server side integration" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-dismiss="click" data-bs-placement="right">
-                                                        <span class="menu-icon">
-                                                            <i class="ki-duotone ki-switch fs-2">
-                                                                <span class="path1"></span>
-                                                                <span class="path2"></span>
-                                                            </i>
-                                                        </span>
-                                                        <span class="menu-title">Layout Builder</span>
-                                                    </a>
-                                                    <!--end:Menu link-->
-                                                </div>
-                                                <!--end:Menu item-->
-                                            
-                                            </div>
-                                            <!--end:Menu sub-->
-                                        </div>
-                                        <!--end:Menu item-->
+                                        
                                     </div>
                                     <!--end::Menu-->
                                 </div>
@@ -441,16 +381,20 @@ if (!empty($_SESSION['fullname']) ) {
             <div class="d-flex align-items-center py-3 py-md-1">
             <!--begin::Actions-->
             <div class="d-flex align-items-center py-3 py-md-1">
-                <?php if (!empty($headerNavbuttons)) : ?>
+             
+            
+            <?php if (!empty($headerNavbuttons)) : ?>
                     <?php foreach ($headerNavbuttons as $label => $button) : ?>
                         <!--begin::Button-->
                         <a href="<?php echo htmlspecialchars($button['url']); ?>" 
-                                class="<?php if (!empty($button['class'])) :  echo htmlspecialchars($button['class']); endif; ?>" 
+                                class="<?php if (!empty($button['class'])) :  echo htmlspecialchars($button['class']); 
+                               endif; ?>" 
                                 id="<?php echo !empty($button['id']) ? htmlspecialchars($button['id']) : ''; ?>"
                                 <?php if (!empty($button['data'])) :
-                                foreach ($button['data'] as $key => $value) : 
-                                   echo 'data-'.htmlspecialchars($key).'"'.htmlspecialchars($value).'"';
-                                endforeach; endif; ?>
+                                    foreach ($button['data'] as $key => $value) : 
+                                        echo 'data-'.htmlspecialchars($key).'="'.htmlspecialchars($value).'" ';
+                                    endforeach; 
+                                endif; ?>
                             data-bs-theme="light">
                             <?php if (!empty($button['icon'])) : ?>
                                 <i class="<?php echo htmlspecialchars($button['icon']); ?>"></i>
@@ -459,7 +403,7 @@ if (!empty($_SESSION['fullname']) ) {
                         </a>
                         <!--end::Button-->
                     <?php endforeach; ?>
-                <?php endif; ?>
+            <?php endif; ?>
             </div>
             <!--end::Actions-->            
             </div>
@@ -468,25 +412,7 @@ if (!empty($_SESSION['fullname']) ) {
         <!--end::Container-->
     </div>
     <!--end::Toolbar-->
-    
 
-<a href="/index.php?controller=Duplicate&action=selectProject"class="dropdown-item" >
-Duplicate a Project
-</a>
-<a href="index.php?controller=Session&action=dashboard&project_id=<?php echo $project['id']; ?>" >
-                            Start testing
-                        </a>
-        
-                    
-            <a href="/index.php?controller=Project&action=destroy&id=<?php echo $project['id']; ?>" 
-                
-                onclick="return confirm('Are you sure you want to delete this project?');">
-                    Delete Project
-            </a>
-
-            <a href="/index.php?controller=Response&action=exportCsv&test_id=<?php echo $test['id']; ?>" class="btn btn-outline-secondary btn-sm">
-                📤 Download All Responses (CSV)
-            </a>
 
 <?php else: ?>
 <header class="py-3 text-center">

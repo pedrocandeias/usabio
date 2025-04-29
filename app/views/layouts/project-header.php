@@ -59,16 +59,26 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                                         </i>
                                         Project Analysis
                                     </a>
-                                    <a class="btn btn-lg btn-secondary" href="/index.php?controller=Import&action=uploadForm&project_id=<?php echo $projectBase['id']; ?>">
+                                    <a class="btn btn-lg btn-secondary  mb-3" href="/index.php?controller=Export&action=printProject&project_id=<?php echo $projectBase['id']; ?>">
                                     <i class="ki-duotone ki-printer fs-1">
- <span class="path1"></span>
- <span class="path2"></span>
- <span class="path3"></span>
- <span class="path4"></span>
- <span class="path5"></span>
-</i>   
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                    </i>   
                                     Print Project
                                     </a>
+
+
+                                    <a class="btn btn-lg btn-info  mb-3" href="index.php?controller=Session&action=dashboard&project_id=<?php echo $projectBase['id']; ?>" >
+                                    <i class="ki-duotone ki-questionnaire-tablet fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                </i>
+                                    Start testing
+                        </a>
+        
                                 </div>
                             </div>
                         </div>
@@ -144,10 +154,10 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                 <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'tests') { echo 'active'; } ?>"  href="/index.php?controller=Test&action=index&project_id=<?php echo $projectBase['id']; ?>">Tests</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'participants') { echo 'active'; } ?>" href="apps/projects/budget.html">Participants</a>
+                <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'participants') { echo 'active'; } ?>" href="/index.php?controller=Participant&action=index&project_id=<?php echo $projectBase['id']; ?>">Participants</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'moderators') { echo 'active'; } ?>" href="apps/projects/users.html">Moderators</a>
+                <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'moderators') { echo 'active'; } ?>" href="/index.php?controller=ProjectUser&action=index&project_id=<?php echo $projectBase['id']; ?>">Moderators</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'import') { echo 'active'; } ?>" href="/index.php?controller=Import&action=uploadForm&project_id=<?php echo $projectBase['id']; ?>">Import</a>

@@ -1,21 +1,26 @@
 <?php
+require_once __DIR__ . '/BaseController.php'; // carrega o base
 
-class ExportController {
+class ExportController extends BaseController {
 
-    private $pdo;
+    
+    protected $exportModel;
 
     public function __construct($pdo)
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-
+    
         if (!isset($_SESSION['username'])) {
-            header('Location: /index.php?controller=Auth&action=login');
+            header('Location: /index.php?controller=Auth&action=login&error=Please+login+first');
             exit;
         }
-
-        $this->pdo = $pdo;
+        parent::__construct($pdo); // Inicializa $this->pdo antes de usá-lo
+        $this->pdo;
+    
     }
+
 
     public function index()
     {

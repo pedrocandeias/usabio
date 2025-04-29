@@ -203,7 +203,7 @@ class QuestionController
         $stmt->execute([$groupId]);
         $testId = $stmt->fetchColumn();
 
-        header("Location: /index.php?controller=Test&action=show&id=" . $testId);
+        header("Location: /index.php?controller=Test&action=show&id=" . $testId. "#questionnairegroup" . $groupId);
         exit;
     }
 
@@ -272,9 +272,66 @@ class QuestionController
             $stmt->execute([$groupId, $text, $preset, $i + 1]);
         }
 
-            header("Location: /index.php?controller=Test&action=show&id=" . ($_GET['test_id'] ?? ''));
+            header("Location: /index.php?controller=Test&action=show&id=" . ($_GET['test_id'] ?? '')."#questionnairegroup" . $groupId);
             exit;
     }
+
+    public function duplicate()
+{
+    $id = $_GET['id'] ?? 0;
+
+    // 1. Buscar a pergunta original
+    $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE id = ?");
+    $stmt->execute([$id]);
+    $original = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$original) {
+        echo "Original question not found.";
+        exit;
+    }
+
+    // Verificar permissões
+    if (!$this->userCanAccessGroup($original['questionnaire_group_id'])) {
+        echo "Access denied.";
+        exit;
+    }
+
+    // 2. Inserir uma cópia
+    $stmt = $this->pdo->prepare(
+        "
+        INSERT INTO questions (questionnaire_group_id, text, question_type, question_options, position, preset_type)
+        VALUES (?, ?, ?, ?, ?, ?)
+        "
+    );
+    $stmt->execute([
+        $original['questionnaire_group_id'],
+        $original['text'] . ' (Copy)',
+        $original['question_type'],
+        $original['question_options'],
+        $original['position'] + 1, // Opcional: podes querer duplicar na posição +1
+        $original['preset_type']
+    ]);
+
+    // 3. Buscar o ID do teste (para o redirect)
+    $stmt = $this->pdo->prepare(
+        "
+        SELECT t.id
+        FROM tests t
+        JOIN questionnaire_groups qg ON qg.test_id = t.id
+        WHERE qg.id = ?
+        "
+    );
+    $stmt->execute([$original['questionnaire_group_id']]);
+    $testId = $stmt->fetchColumn();
+
+    // Mensagem de sucesso opcional
+    $_SESSION['toast_success'] = "Question duplicated successfully!";
+
+    // 4. Redirecionar para o teste, na aba certa
+    header("Location: /index.php?controller=Test&action=show&id=" . $testId . "#questionnairegroup" . $original['questionnaire_group_id']);
+    exit;
+}
+
 
     
 }

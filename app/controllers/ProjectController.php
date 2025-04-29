@@ -65,13 +65,11 @@ class ProjectController extends BaseController
         
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
-            ['label' => $test['project_name'], 'url' => '/index.php?controller=Project&action=show&id=' . $test['project_id'], 'active' => false],
-            ['label' => $test['title'], 'url' => '/index.php?controller=Test&action=show&id=' . $test['id'], 'active' => false],
-            ['label' => 'Start Questionnaire', 'url' => '', 'active' => true],
+
         ];
 
 
-        include __DIR__ . '/../views/projects/form.php';
+        include __DIR__ . '/../views/projects/add_project.php';
 
     }
 
@@ -287,8 +285,12 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
         $stmt->execute([$project_id]);
         $assignedUsers = $stmt->fetchAll(PDO::FETCH_COLUMN);
     
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $project['title'], 'url' => '', 'active' => true],
+        ];
         
-        include __DIR__ . '/../views/projects/form.php';
+        include __DIR__ . '/../views/projects/edit_project.php';
     }
     
 
