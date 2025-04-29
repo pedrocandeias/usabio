@@ -48,46 +48,9 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                                 <div class="d-flex flex-wrap fw-semibold mb-4 fs-5 text-gray-500">
                                     <?php echo nl2br(htmlspecialchars($projectBase['description'])); ?>
                                 </div>
-                            </div>
-                            <div class="col-md-3 ">
-                                <div class="d-flex  flex-column mb-4">
-                                    <a href="/index.php?controller=Project&action=analysis&id=<?php echo $projectBase['id']; ?>" class="btn btn-lg btn-primary mb-3">
-                                        <i class="ki-duotone ki-chart-simple-2 fs-1">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                        </i>
-                                        Project Analysis
-                                    </a>
-                                    <a class="btn btn-lg btn-secondary  mb-3" href="/index.php?controller=Export&action=printProject&project_id=<?php echo $projectBase['id']; ?>">
-                                    <i class="ki-duotone ki-printer fs-1">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                    <span class="path3"></span>
-                                    <span class="path4"></span>
-                                    <span class="path5"></span>
-                                    </i>   
-                                    Print Project
-                                    </a>
 
-
-                                    <a class="btn btn-lg btn-info  mb-3" href="index.php?controller=Session&action=dashboard&project_id=<?php echo $projectBase['id']; ?>" >
-                                    <i class="ki-duotone ki-questionnaire-tablet fs-1">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                </i>
-                                    Start testing
-                        </a>
-        
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Details-->
-                </div>
-                <!--end::Head-->
-                <!--begin::Info-->
-                <div class="d-flex flex-wrap justify-content-start">
+  <!--begin::Info-->
+  <div class="d-flex flex-wrap justify-content-start">
                     <!--begin::Stats-->
                     <div class="d-flex flex-wrap">
                         <!--begin::Stat-->
@@ -140,6 +103,44 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                     <!--end::Stats-->
                 </div>
                 <!--end::Info-->
+
+                            </div>
+                            <div class="col-md-3 ">
+                                <div class="d-flex  flex-column mb-4">
+                                    <a href="/index.php?controller=Project&action=analysis&id=<?php echo $projectBase['id']; ?>" class="btn btn-lg btn-primary mb-3">
+                                        <i class="ki-duotone ki-chart-simple-2 fs-1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Project Analysis
+                                    </a>
+                                    <a class="btn btn-lg btn-secondary  mb-3" href="/index.php?controller=Export&action=printProject&project_id=<?php echo $projectBase['id']; ?>">
+                                        <i class="ki-duotone ki-printer fs-1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                            <span class="path5"></span>
+                                        </i>   
+                                    Print Project
+                                    </a>
+                                    <a class="btn btn-lg btn-info  mb-3" href="/index.php?controller=Test&action=index&project_id=<?php echo $projectBase['id']; ?>" >
+                                        <i class="ki-duotone ki-questionnaire-tablet fs-1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    Start testing
+                                    </a>
+        
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Details-->
+                </div>
+                <!--end::Head-->
+              
             </div>
             <!--end::Wrapper-->
         </div>

@@ -40,6 +40,17 @@ class ProjectUserController extends BaseController
         $stmt->execute();
         $allModerators = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $stmt = $this->pdo->prepare(
+            "
+            SELECT m.id, m.username 
+            FROM project_user pu 
+            JOIN moderators m ON pu.moderator_id = m.id 
+            WHERE pu.project_id = ?
+        "
+        );
+        $stmt->execute([$project_id]);
+        $assignedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         // Moderadores já atribuídos
         $stmt = $this->pdo->prepare("SELECT moderator_id FROM project_user WHERE project_id = ?");
         $stmt->execute([$project_id]);

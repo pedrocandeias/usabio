@@ -1058,9 +1058,8 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
                     <!--end::Modal header-->
                     <!--begin::Modal body-->
                     <div class="modal-body py-lg-10 px-lg-10">
-                        
                     <form method="POST" action="/index.php?controller=QuestionnaireGroup&action=store">
-                        <input type="hidden" name="test_id" value="<?php echo $qGroup['test_id']; ?>">
+                        <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
                         <div class="mb-3">
                             <label class="form-label">Title</label>

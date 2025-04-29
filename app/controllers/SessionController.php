@@ -1,21 +1,21 @@
 <?php
+require_once __DIR__ . '/BaseController.php';
 
-class SessionController
+class SessionController extends BaseController
 {
-    private $pdo;
-
     public function __construct($pdo)
     {
-        if (session_status() === PHP_SESSION_NONE) { 
+        if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-
+    
         if (!isset($_SESSION['username'])) {
-            header('Location: /index.php?controller=Auth&action=login');
+            header('Location: /index.php?controller=Auth&action=login&error=Please+login+first');
             exit;
         }
-
-        $this->pdo = $pdo;
+        parent::__construct($pdo); // Inicializa $this->pdo antes de usá-lo
+        $this->pdo; // usa $this->pdo já inicializado
+    
     }
 
     public function dashboard()
@@ -144,15 +144,15 @@ class SessionController
         $assignedParticipants[] = $p;
         }
 
-// Who already did tasks
-$stmt = $this->pdo->prepare("SELECT DISTINCT participant_name FROM evaluations WHERE test_id = ? AND did_tasks = 1");
-$stmt->execute([$test['id']]);
-$taskCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
+        // Who already did tasks
+        $stmt = $this->pdo->prepare("SELECT DISTINCT participant_name FROM evaluations WHERE test_id = ? AND did_tasks = 1");
+        $stmt->execute([$test['id']]);
+        $taskCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
 
-// Who already did questionnaire
-$stmt = $this->pdo->prepare("SELECT DISTINCT participant_name FROM evaluations WHERE test_id = ? AND did_questionnaire = 1");
-$stmt->execute([$test['id']]);
-$questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
+        // Who already did questionnaire
+        $stmt = $this->pdo->prepare("SELECT DISTINCT participant_name FROM evaluations WHERE test_id = ? AND did_questionnaire = 1");
+        $stmt->execute([$test['id']]);
+        $questionnaireCompletedNames = array_map('strtolower', array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'participant_name'));
 
 
 

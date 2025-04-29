@@ -260,16 +260,17 @@ class ImportController extends BaseController
         $stmt = $this->pdo->prepare(
             "
         INSERT INTO projects (
-            title, description, product_under_test, business_case,
+            title, description, image, product_under_test, business_case,
             test_objectives, participants, equipment, responsibilities,
             location_dates, test_procedure, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
     "
         );
         $stmt->execute(
             [
             $project['title'] ?? 'Imported Project',
             $project['description'] ?? '',
+            $project['image'] ?? '',
             $project['product_under_test'] ?? '',
             $project['business_case'] ?? '',
             $project['test_objectives'] ?? '',

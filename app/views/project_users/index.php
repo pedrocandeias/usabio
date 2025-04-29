@@ -4,7 +4,7 @@ $title = 'Moderators Management';
 $pageTitle = 'Moderators Management';
 $pageDescription = 'Manage the moderators for your projects.';
 $headerNavbuttons = [
-    'Back to projects list' => [
+    'Back to project' => [
         'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
@@ -35,6 +35,11 @@ require __DIR__ . '/../layouts/header.php';
                     <div class="col-md-3">
                         <div class="card mb-4">
                             <div class="card-body">
+                                <?php echo $projectAssignedUsers; ?>
+                                <?php echo $project['id']; ?>
+                                <?php print_r($assignedModeratorIds); ?>
+                                <?php print_r($allModerators); ?>
+                               
                                 <h5 class="card-title">Assigned moderators</h5>
                                 <?php if (!empty($assignedUsers)) : ?>
                                     <ul class="list-group mb-4">

@@ -28,11 +28,9 @@ require __DIR__ . '/../layouts/header.php';
         </div>
     </div>
     <div class="card-body">
-       
-        <div class="row">
-            <div class="col-md-12">
-                <table class="table table-bordered table-striped table-hover">
-                    <thead class="table-dark">
+    
+                <table class="table table-striped table-row-bordered table-row-dashed gy-4 align-middle fw-bold">
+                    <thead class="fs-7 text-gray-500 text-uppercase">
                         <tr>
                             <th>ID</th>
                             <th>Username</th>
@@ -50,7 +48,7 @@ require __DIR__ . '/../layouts/header.php';
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="fs-6">
                         <?php foreach ($users as $user): ?>
                             <tr>
                                 <td><?php echo $user['id']; ?></td>
@@ -91,9 +89,7 @@ require __DIR__ . '/../layouts/header.php';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            </div>
-                                
-        </div>
+       
     </div>
     <!--end::Post-->
 </div>

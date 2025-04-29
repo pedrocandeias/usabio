@@ -5,9 +5,9 @@ $title = 'Moderators Management';
 $pageTitle = 'Moderators Management';
 $pageDescription = 'Manage the moderators for your project.';
 $headerNavbuttons = [
-    'Back to project' => [
+    'Back to project list' => [
         'url' => '/index.php?controller=Project&action=show&id=' . $project_id ,
-        'icon' => 'ki-duotone ki-black-left fs-2',
+        'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
     ],
 ];

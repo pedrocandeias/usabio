@@ -417,7 +417,8 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
         SELECT id FROM evaluations WHERE test_id IN ($testIdList)
     )"
         );
-        $avgTime = round($stmt->fetchColumn());
+        $avgRaw = $stmt->fetchColumn();
+        $avgTime = $avgRaw !== null ? round($avgRaw) : 0;
 
         $stmt = $this->pdo->query(
             "
@@ -564,6 +565,12 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
             }
 
         }
+        
+        $breadcrumbs = [
+            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=edit&id='.$project_id, 'active' => false],
+            ['label' => 'Analysis', 'url' => '', 'active' => true],
+        ];
 
 
         include __DIR__ . '/../views/projects/analysis.php';

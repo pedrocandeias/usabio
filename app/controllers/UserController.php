@@ -48,7 +48,7 @@ class UserController
 
     public function create()
     {
-        $user = ['id' => 0, 'username' => '', 'is_admin' => 0];
+        $user = ['id' => 0, 'username' => '', 'company' => '', 'is_admin' => 0];
         require __DIR__ . '/../views/users/form.php';
     }
 
@@ -62,7 +62,7 @@ class UserController
         $email = $_POST['email'];
         $fullname = $_POST['fullname'] ?? null;
         $company = $_POST['company'] ?? null;
-        $isAdmin = !empty($_POST['is_admin']);
+        $isAdmin = !empty($_POST['is_admin']) ? 1 : 0;
         $password = $_POST['password'] ?? null;
 
         if (!$email || !$password) {
@@ -116,7 +116,7 @@ class UserController
         $email = $_POST['email'];
         $fullname = $_POST['fullname'] ?? null;
         $company = $_POST['company'] ?? null;
-        $isAdmin = !empty($_POST['is_admin']);
+        $isAdmin = !empty($_POST['is_admin']) ? 1 : 0;
 
         $stmt = $this->pdo->prepare("
             UPDATE moderators
