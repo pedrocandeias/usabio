@@ -556,10 +556,10 @@ require __DIR__ . '/../layouts/header.php';
                                             </div>   
                                             <div class="d-flex text-end">
                                             <a href="/index.php?controller=Question&action=generateSUS&group_id=<?php echo $qGroup['id']; ?>&test_id=<?php echo $test['id']; ?>" 
-                                                class="btn btn-outline-secondary btn-sm"
+                                                class="btn btn-warning"
                                                 onclick="return confirm('Generate SUS questions in this group? This will add 10 questions.')">
                                                     🧠 Add SUS Questions
-                                                </a>
+                                                </a> 
                                                 <a href="/index.php?controller=Question&action=create&group_id=<?php echo $qGroup['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_question<?php echo $qGroup['id']; ?>">+ Add New Question</a>
                                                 
                                                 

@@ -20,6 +20,11 @@ require __DIR__ . '/../layouts/header.php';
     <!--begin::Post-->
     <div class="content flex-row-fluid" id="kt_content">
 
+<?php require_once __DIR__ . '/../layouts/admin-header.php'; ?>
+
+        <!--begin::Row-->
+        <div class="row g-5 g-xl-8">
+
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">User Management</h3>
@@ -29,7 +34,7 @@ require __DIR__ . '/../layouts/header.php';
     </div>
     <div class="card-body">
     
-                <table class="table table-striped table-row-bordered table-row-dashed gy-4 align-middle fw-bold">
+                <table class="table-striped table-row-bordered table-row-dashed gy-4 align-middle fw-bold">
                     <thead class="fs-7 text-gray-500 text-uppercase">
                         <tr>
                             <th>ID</th>
@@ -89,7 +94,7 @@ require __DIR__ . '/../layouts/header.php';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-       
+                                    </div> 
     </div>
     <!--end::Post-->
 </div>

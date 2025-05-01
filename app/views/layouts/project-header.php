@@ -152,6 +152,9 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                 <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'overview') { echo 'active'; } ?>" href="/index.php?controller=Project&action=show&id=<?php echo $projectBase['id']; ?>">Overview</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'analysis') { echo 'active'; } ?>" href="index.php?controller=Project&action=analysis&id=<?php echo $projectBase['id']; ?>">Analysis</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link text-active-primary py-5 me-6 <?php if( $menuActive == 'tests') { echo 'active'; } ?>"  href="/index.php?controller=Test&action=index&project_id=<?php echo $projectBase['id']; ?>">Tests</a>
             </li>
             <li class="nav-item">

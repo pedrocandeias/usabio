@@ -441,11 +441,11 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
         // Get all questionnaire groups for this project
         $stmt = $this->pdo->prepare(
             "
-    SELECT qg.id AS group_id
-    FROM questionnaire_groups qg
-    JOIN tests t ON t.id = qg.test_id
-    WHERE t.project_id = ?
-"
+                SELECT qg.id AS group_id
+                FROM questionnaire_groups qg
+                JOIN tests t ON t.id = qg.test_id
+                WHERE t.project_id = ?
+            "
         );
         $stmt->execute([$project_id]);
         $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -459,11 +459,11 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
             // Get all questionnaire groups in this project
             $stmt = $this->pdo->prepare(
                 "
-    SELECT qg.id AS group_id
-    FROM questionnaire_groups qg
-    JOIN tests t ON t.id = qg.test_id
-    WHERE t.project_id = ?
-"
+                    SELECT qg.id AS group_id
+                    FROM questionnaire_groups qg
+                    JOIN tests t ON t.id = qg.test_id
+                    WHERE t.project_id = ?
+                "
             );
             $stmt->execute([$project_id]);
             $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -474,9 +474,9 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
                 // Fetch SUS questions
                 $stmt = $this->pdo->prepare(
                     "
-        SELECT id, text FROM questions
-        WHERE questionnaire_group_id = ? AND preset_type = 'SUS'
-        ORDER BY position ASC
+                SELECT id, text FROM questions
+                WHERE questionnaire_group_id = ? AND preset_type = 'SUS'
+                ORDER BY position ASC
     "
                 );
                 $stmt->execute([$groupId]);
@@ -488,10 +488,10 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
                 // Fetch all evaluations and responses for this project
                 $stmt = $this->pdo->prepare(
                     "
-        SELECT e.id AS evaluation_id, e.participant_name, r.question, r.answer
-        FROM evaluations e
-        JOIN responses r ON r.evaluation_id = e.id
-        WHERE e.test_id IN (SELECT id FROM tests WHERE project_id = ?)
+                SELECT e.id AS evaluation_id, e.participant_name, r.question, r.answer
+                FROM evaluations e
+                JOIN responses r ON r.evaluation_id = e.id
+                WHERE e.test_id IN (SELECT id FROM tests WHERE project_id = ?)
     "
                 );
                 $stmt->execute([$project_id]);
@@ -563,6 +563,27 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
                     'variation' => $variation
                 ];
             }
+            // TASK ANALYSIS
+            $stmt = $this->pdo->prepare("
+                SELECT r.question AS task_text, COUNT(*) AS total_responses,
+                    AVG(r.time_spent) AS avg_time,
+                    SUM(CASE WHEN r.evaluation_errors IS NOT NULL AND r.evaluation_errors != '' THEN 1 ELSE 0 END) AS error_count
+                FROM responses r
+                JOIN evaluations e ON e.id = r.evaluation_id
+                WHERE r.type = 'task' AND e.test_id IN ($testIdList)
+                GROUP BY r.question
+                ORDER BY total_responses DESC
+            ");
+            $stmt->execute();
+            $taskStats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($taskStats as &$t) {
+                $errors = $t['error_count'] ?? 0;
+                $total = $t['total_responses'] ?? 1; // evitar divisão por zero
+                $t['success_rate'] = round((($total - $errors) / $total) * 100, 1);
+            }
+            unset($t);
+            
+
 
         }
         
