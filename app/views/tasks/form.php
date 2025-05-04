@@ -56,6 +56,7 @@ require __DIR__ . '/../layouts/header.php';
                 <label class="form-label">Predefined Evaluation Type (optional)</label>
                 <select class="form-select" id="preset-options">
                     <option value="">— Select a common type —</option>
+                    <option value="Completed:completed;Incompleted:incomplete">Completed/Incompleted</option>
                     <option value="Yes:yes;No:no">Yes / No</option>
                     <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
                     <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
@@ -71,11 +72,9 @@ require __DIR__ . '/../layouts/header.php';
             <small class="form-text text-muted">Use the format: <code>Label:Value;Label:Value;</code></small>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Position</label>
-            <input type="number" name="position" class="form-control" value="<?php echo $task['position']; ?>">
-        </div>
-
+      
+        <input type="hidden" name="position" class="form-control" value="<?php echo $task['position']; ?>">
+      
         <div class="d-flex gap-2 mt-4">
             <input type="hidden" name="preset_type" id="preset_type" value="">
             <button type="submit" class="btn btn-primary">Save Task</button>
@@ -86,6 +85,10 @@ require __DIR__ . '/../layouts/header.php';
 
 <script>
     const presets = {
+        "Completed/Incompleted": {
+        type: "radio",
+        options: "Completed:completed;Incompleted:incomplete"
+    },
     "Yes / No": {
         type: "radio",
         options: "Yes:yes;No:no"

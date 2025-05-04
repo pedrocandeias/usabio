@@ -47,7 +47,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                         
                                             <!--begin::Heading-->
                                             <div class="fs-2hx fw-bold"><?php echo count($projects); ?></div>
-                                            <div class="fs-4 fw-semibold text-gray-500 mb-7">Current Projects</div>
+                                            <div class="fs-4 fw-semibold text-gray-500 mb-7"><?php echo __('current_projects'); ?></div>
                                             <!--end::Heading-->
                                             <!--begin::Wrapper-->
                                             <div class="d-flex flex-wrap">
@@ -74,14 +74,14 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                                     <!--begin::Label-->
                                                     <div class="d-flex fs-6 fw-semibold align-items-center mb-3">
                                                         <div class="bullet bg-success me-3"></div>
-                                                        <div class="text-gray-500">Completed</div>
+                                                        <div class="text-gray-500"><?php echo __('completed'); ?></div>
                                                         <div class="ms-auto fw-bold text-gray-700"><?php echo $statusCounts['Completed']; ?></div>
                                                     </div>
                                                     <!--end::Label-->
                                                     <!--begin::Label-->
                                                     <div class="d-flex fs-6 fw-semibold align-items-center mb-3">
                                                         <div class="bullet bg-warning me-3"></div>
-                                                        <div class="text-gray-500">In Progress</div>
+                                                        <div class="text-gray-500"><?php echo __('in_progress'); ?></div>
                                                         <div class="ms-auto fw-bold text-gray-700"><?php echo $statusCounts['In Progress']; ?></div>
                                                     </div>
                                                     <!--end::Label-->
@@ -102,7 +102,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                         <div class="card-body p-9">
                                             <!--begin::Heading-->
                                             <div class="fs-2hx fw-bold">49</div>
-                                            <div class="fs-4 fw-semibold text-gray-500 mb-7">Teammates</div>
+                                            <div class="fs-4 fw-semibold text-gray-500 mb-7"><?php echo __('teammates'); ?></div>
                                             <!--end::Heading-->
                                             <!--begin::Users group-->
                                             <div class="symbol-group symbol-hover mb-9">
@@ -150,8 +150,8 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <!--begin::Toolbar-->
                             <div class="d-flex flex-wrap flex-stack my-5">
                                 <!--begin::Heading-->
-                                <h2 class="fs-2 fw-semibold my-2">Projects 
-                                <span class="fs-6 text-gray-500 ms-1">by Status</span></h2>
+                                <h2 class="fs-2 fw-semibold my-2"><?php echo __('projects'); ?>
+                                <span class="fs-6 text-gray-500 ms-1"><?php echo __('by_status'); ?></span></h2>
                                 <!--end::Heading-->
                                 <!--begin::Controls-->
                                 <div class="d-flex flex-wrap my-1">
@@ -159,9 +159,9 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                     <div class="m-0">
                                         <!--begin::Select-->
                                         <select name="status" data-control="select2" data-hide-search="true" class="form-select form-select-sm bg-body border-body fw-bold w-125px">
-                                            <option value="all" selected="selected">All</option>
-                                            <option value="In Progress">In Progress</option>
-                                            <option value="Completed">Completed</option>
+                                            <option value="all" selected="selected"><?php echo __('all'); ?></option>
+                                            <option value="In Progress"><?php echo __('in_progress'); ?></option>
+                                            <option value="Completed"><?php echo __('completed'); ?></option>
                                         </select>
                                         <!--end::Select-->
                                     </div>
@@ -198,14 +198,14 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                             <div class="card-toolbar">
                                             <?php if(!empty($project['status'])) : ?>
                                                 <?php if ($project['status'] == 'completed') : ?>
-                                                <span class="badge badge-light-success fw-bold me-auto px-4 py-3">Completed</span>
+                                                <span class="badge badge-light-success fw-bold me-auto px-4 py-3"><?php echo __('completed'); ?></span>
                                             <?php elseif ($project['status'] == 'in_progress') : ?>
-                                                <span class="badge badge-light-warning fw-bold me-auto px-4 py-3">In Progress</span>
+                                                <span class="badge badge-light-warning fw-bold me-auto px-4 py-3"><?php echo __('in_progress'); ?></span>
                                             <?php else : ?>
                                                 <span class="badge fw-bold me-auto px-4 py-3"></span>
                                             <?php endif; ?>
                                             <?php else: ?>
-                                                <span class="badge badge-light-secondary fw-bold me-auto px-4 py-3">No Status</span>
+                                                <span class="badge badge-light-secondary fw-bold me-auto px-4 py-3"><?php echo __('no_status'); ?></span>
                                             <?php endif; ?>
                                             
                                             </div>
@@ -218,13 +218,13 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                             <p class="text-gray-500 fw-semibold fs-5 mt-1 mb-7"><?php echo htmlspecialchars($project['description']); ?></p>
                                             <div class="d-flex flex-wrap mb-5">
                                                 <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-7 mb-3">
-                                                    <div class="fw-semibold text-gray-500">Created</div>
+                                                    <div class="fw-semibold text-gray-500"><?php echo __('created'); ?></div>
                                                     <div class="fs-6 text-gray-800 fw-bold">
                                                         <?php echo date('F j, Y', strtotime($project['created_at'])); ?>
                                                     </div>
                                                 </div>
                                                 <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 mb-3">
-                                                    <div class="fs-6 text-gray-800 fw-bold">Update</div>
+                                                    <div class="fw-semibold text-gray-500"><?php echo __('updated'); ?></div>
                                                     <div class="fs-6 text-gray-800 fw-bold">
                                                     <?php echo date('F j, Y', strtotime($project['updated_at'])); ?>
                                                     </div>

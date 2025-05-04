@@ -24,7 +24,7 @@ require __DIR__ . '/../layouts/header.php';
        
         <div class="d-flex flex-wrap flex-stack">
             <!--begin::Heading-->
-            <h3 class="fw-bold mx-4">Tasks & Questions for <?php echo $test['title'];?></h3>
+            <h3 class="fw-bold mx-4"><?php echo __('tasks_questions_for'); ?> <?php echo $test['title'];?></h3>
             <!--end::Heading-->
         </div>
        
@@ -35,13 +35,13 @@ require __DIR__ . '/../layouts/header.php';
                     <div class="card-toolbar">
                         <ul class="nav nav-tabs nav-line-tabs nav-line-tabs-2x nav-stretch  border-0">
                             <li class="nav-item">
-                                <a class="nav-link active fw-bold fs-3" data-bs-toggle="tab" href="#testdescription">Test description</a>
+                                <a class="nav-link active fw-bold fs-3" data-bs-toggle="tab" href="#testdescription"><?php echo __('test_description'); ?></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fw-bold fs-3" data-bs-toggle="tab" href="#taskgroup">Task Groups & Tasks</a>
+                                <a class="nav-link fw-bold fs-3" data-bs-toggle="tab" href="#taskgroup"><?php echo __('task_groups_tasks'); ?></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fw-bold fs-3" data-bs-toggle="tab" href="#questionnairegroup">Questionnaire Groups & Questions</a>
+                                <a class="nav-link fw-bold fs-3" data-bs-toggle="tab" href="#questionnairegroup"><?php echo __('questionnaire_groups_questions'); ?></a>
                             </li>
                         </ul>
                     </div>
@@ -87,7 +87,7 @@ require __DIR__ . '/../layouts/header.php';
                                                 </div>
                                             </div>   
                                             <div class="d-flex text-end">
-                                                <a href="/index.php?controller=Task&action=create&group_id=<?php echo $group['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_task<?php echo $group['id']; ?>">+ Add New Task</a>
+                                                <a href="/index.php?controller=Task&action=create&group_id=<?php echo $group['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_task<?php echo $group['id']; ?>">+ <?php echo __('add_new_task'); ?></a>
                                                 <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                     <i class="ki-duotone ki-element-plus fs-2">
                                                         <span class="path1"></span>
@@ -101,7 +101,7 @@ require __DIR__ . '/../layouts/header.php';
                                                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
                                                     <!--begin::Heading-->
                                                     <div class="menu-item px-3">
-                                                        <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">Settings</div>
+                                                        <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase"><?php echo __('settings'); ?></div>
                                                     </div>
                                                     <!--end::Heading-->
                                                     <div class="separator my-2"></div>
@@ -110,16 +110,16 @@ require __DIR__ . '/../layouts/header.php';
                                                     
                                                     
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=Response&action=exportCsvByTaskGroup&group_id=<?php echo $group['id']; ?>" class="menu-link bg-outline-warning px-3">📥 Export answers</a>
+                                                        <a href="/index.php?controller=Response&action=exportCsvByTaskGroup&group_id=<?php echo $group['id']; ?>" class="menu-link bg-outline-warning px-3">📥 <?php echo __('export_answers'); ?></a>
                                                     </div>
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=TaskGroup&action=edit&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task_group<?php echo $group['id']; ?>">Edit Task Group</a>
+                                                        <a href="/index.php?controller=TaskGroup&action=edit&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task_group<?php echo $group['id']; ?>"><?php echo __('edit_task_group'); ?></a>
                                                     </div>
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=TaskGroup&action=duplicate&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate Task Group</a>
+                                                        <a href="/index.php?controller=TaskGroup&action=duplicate&id=<?php echo $group['id']; ?>" class="menu-link bg-outline-info px-3"><?php echo __('duplicate_task_group'); ?></a>
                                                     </div>
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=TaskGroup&action=destroy&id=<?php echo $group['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this test?');">Delete test</a>
+                                                        <a href="/index.php?controller=TaskGroup&action=destroy&id=<?php echo $group['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('<?php echo __('are_you_sure_you_want_to_delete_this_task_group?'); ?>"><?php echo __('delete_task_group'); ?></a>
                                                     </div>
                                                     <!--end::Menu item-->
                                                 </div>
@@ -144,7 +144,7 @@ require __DIR__ . '/../layouts/header.php';
                                                         </div>   
                                                        
                                                         <div class="text-end">
-                                                            <a href="#" class="btn btn-sm btn-secondary"  data-bs-toggle="modal" data-bs-target="#kt_modal_view_task<?php echo $task['id']; ?>">View Task</a>
+                                                            <a href="#" class="btn btn-sm btn-secondary"  data-bs-toggle="modal" data-bs-target="#kt_modal_view_task<?php echo $task['id']; ?>"><?php echo __('view_task'); ?></a>
                                                             <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                                 <i class="ki-duotone ki-element-plus fs-2">
                                                                     <span class="path1"></span>
@@ -158,23 +158,21 @@ require __DIR__ . '/../layouts/header.php';
                                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
                                                                 <!--begin::Heading-->
                                                                 <div class="menu-item px-3">
-                                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase text-start">Settings</div>
+                                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase text-start"><?php echo __('settings'); ?></div>
                                                                 </div>
                                                                 <!--end::Heading-->
                                                                 <div class="separator my-2"></div>
                                                                 <!--end:Menu item-->
                                                                 <!--begin::Menu item-->
-                                                                
-                                                                
                                                             
                                                                 <div class="menu-item px-3">
-                                                                    <a href="/index.php?controller=Task&action=edit&id=<?php echo $task['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task<?php echo $task['id']; ?>">Edit task</a>
+                                                                    <a href="/index.php?controller=Task&action=edit&id=<?php echo $task['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_task<?php echo $task['id']; ?>"><?php echo __('edit_task'); ?></a>
                                                                 </div>
                                                                 <div class="menu-item px-3">
-                                                                    <a href="/index.php?controller=Task&action=duplicate&id=<?php echo $task['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate task</a>
+                                                                    <a href="/index.php?controller=Task&action=duplicate&id=<?php echo $task['id']; ?>" class="menu-link bg-outline-info px-3"><?php echo __('duplicate_task'); ?></a>
                                                                 </div>
                                                                 <div class="menu-item px-3">
-                                                                    <a href="/index.php?controller=Task&action=destroy&id=<?php echo $task['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this test?');">Delete task</a>
+                                                                    <a href="/index.php?controller=Task&action=destroy&id=<?php echo $task['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this test?');"><?php echo __('delete_task'); ?></a>
                                                                 </div>
                                                                 <!--end::Menu item-->
                                                             
@@ -192,7 +190,7 @@ require __DIR__ . '/../layouts/header.php';
                                                                     <!--begin::Modal header-->
                                                                     <div class="modal-header">
                                                                         <!--begin::Modal title-->
-                                                                        <h2>Edit Task</h2>
+                                                                        <h2><?php echo __('edit_task'); ?></h2>
                                                                         <!--end::Modal title-->
                                                                         <!--begin::Close-->
                                                                         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -250,6 +248,7 @@ require __DIR__ . '/../layouts/header.php';
                                                                                 <label class="form-label">Predefined Evaluation Type (optional)</label>
                                                                                 <select class="form-select" id="preset-options">
                                                                                     <option value="">— Select a common type —</option>
+                                                                                    <option value="Completed:completed;Incompleted:incomplete">Completed/Incompleted</option>
                                                                                     <option value="Yes:yes;No:no">Yes / No</option>
                                                                                     <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
                                                                                     <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
@@ -265,15 +264,13 @@ require __DIR__ . '/../layouts/header.php';
                                                                             <small class="form-text text-muted">Use the format: <code>Label:Value;Label:Value;</code></small>
                                                                         </div>
 
-                                                                        <div class="mb-3">
-                                                                            <label class="form-label">Position</label>
-                                                                            <input type="number" name="position" class="form-control" value="<?php echo $task['position']; ?>">
-                                                                        </div>
-
+                                                                        
+                                                                            <input type="hidden" name="position" class="form-control" value="<?php echo $task['position']; ?>">
+                                                                        
                                                                         <div class="d-flex gap-2 mt-4">
                                                                             <input type="hidden" name="preset_type" id="preset_type" value="">
-                                                                            <button type="submit" class="btn btn-primary">Save Task</button>
-                                                                            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                                                                            <button type="submit" class="btn btn-primary"><?php echo __('save_task'); ?></button>
+                                                                            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
                                                                         </div>
                                                                     </form>
                                                                 </div>
@@ -295,7 +292,7 @@ require __DIR__ . '/../layouts/header.php';
                                                                 <!--begin::Modal header-->
                                                                 <div class="modal-header">
                                                                     <!--begin::Modal title-->
-                                                                    <h2>View Task</h2>
+                                                                    <h2><?php echo __('view_task'); ?></h2>
                                                                     <!--end::Modal title-->
                                                                     <!--begin::Close-->
                                                                     <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -312,29 +309,29 @@ require __DIR__ . '/../layouts/header.php';
                                                                     
                                                                     <div class="row mb-3 gx-5">
                                                                         <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Task Text</p>
+                                                                            <p class="fw-bold"><?php echo __('task_text'); ?></p>
                                                                             <p><?php echo htmlspecialchars($task['task_text']); ?></p>
                                                                         </div>
                                                                         <div class="col-md-6  border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Scenario</p>
+                                                                            <p class="fw-bold"><?php echo __('scenario'); ?></p>
                                                                             <p><?php echo htmlspecialchars($task['scenario']); ?></p>
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="row mb-3">
                                                                         <div class="col-md-6 border border-1 border-gray-300 rounded p-3 ">
-                                                                            <p class="fw-bold">Script (what moderator should say)</p>
+                                                                            <p class="fw-bold"><?php echo __('script_what_moderator_should_say'); ?></p>
                                                                             <p><?php echo htmlspecialchars($task['script']); ?></p>
                                                                         </div>
                                                                         <div class="col-md-6 border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Metrics (what to observe)</p>
+                                                                            <p class="fw-bold"><?php echo __('metrics_what_to_observe'); ?></p>
                                                                             <p><?php echo htmlspecialchars($task['metrics']); ?></p>
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="row mb-3  border border-1 border-gray-300 rounded p-3">
                                                                         <div class="col-md-6">
-                                                                            <p class="fw-bold">Type of Evaluation:</p>
+                                                                            <p class="fw-bold"><?php echo __('type_of_evaluation'); ?>:</p>
                                                                             <p><?php echo $task['task_type']; ?></p>
                                                                         </div>
 
@@ -342,7 +339,7 @@ require __DIR__ . '/../layouts/header.php';
                                                                     </div>
 
                                                                     <div class="mb-3 border border-1 border-gray-300 rounded p-3">
-                                                                        <p class="fw-bold">Evaluation Options</p>
+                                                                        <p class="fw-bold"><?php echo __('evaluation_options'); ?></p>
                                                                         <p><?php echo htmlspecialchars($task['task_options']); ?></p>
                                                                     </div>
 
@@ -358,7 +355,7 @@ require __DIR__ . '/../layouts/header.php';
 
                                             <?php endforeach; ?>
                                             <?php else: ?>
-                                                <li class="list-group-item text-muted">No tasks in this group yet.</li>
+                                                <li class="list-group-item text-muted"><?php echo __('no_tasks_in_this_group_yet'); ?>.</li>
                                             <?php endif; ?>
                                         </ul>
 
@@ -375,7 +372,7 @@ require __DIR__ . '/../layouts/header.php';
                                         <!--begin::Modal header-->
                                         <div class="modal-header">
                                             <!--begin::Modal title-->
-                                            <h2>Edit Task Group</h2>
+                                            <h2><?php echo __('edit_task_group'); ?></h2>
                                             <!--end::Modal title-->
                                             <!--begin::Close-->
                                             <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -398,7 +395,7 @@ require __DIR__ . '/../layouts/header.php';
                                                     <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
                                                     <div class="mb-3">
-                                                        <label class="form-label">Title</label>
+                                                        <label class="form-label"><?php echo __('title'); ?></label>
                                                         <input type="text" name="title" class="form-control" required value="<?php echo htmlspecialchars($group['title']); ?>">
                                                     </div>
 
@@ -406,9 +403,9 @@ require __DIR__ . '/../layouts/header.php';
                                                         <input type="hidden" name="position" class="form-control" value="<?php echo htmlspecialchars($group['position']); ?>">
                                                   
 
-                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                    <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
                                                    
-                                                    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                                                    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
 
                                                 </form>
 
@@ -433,7 +430,7 @@ require __DIR__ . '/../layouts/header.php';
                                         <!--begin::Modal header-->
                                         <div class="modal-header">
                                             <!--begin::Modal title-->
-                                            <h2>Edit Task Group</h2>
+                                            <h2><?php echo __('create_task_group'); ?></h2>
                                             <!--end::Modal title-->
                                             <!--begin::Close-->
                                             <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -452,29 +449,29 @@ require __DIR__ . '/../layouts/header.php';
 
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Task Text</label>
+                                                        <label class="form-label"><?php echo __('task_text'); ?></label>
                                                         <textarea name="task_text" class="form-control" required rows="4"></textarea>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Scenario</label>
+                                                        <label class="form-label"><?php echo __('scenario'); ?></label>
                                                         <textarea name="scenario" class="form-control" rows="4"></textarea>
                                                     </div>
                                                 </div>
 
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Script (what moderator should say)</label>
+                                                        <label class="form-label"><?php echo __('script_what_moderator_should_say'); ?></label>
                                                         <textarea name="script" class="form-control" rows="3"></textarea>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Metrics (what to observe)</label>
+                                                        <label class="form-label"><?php echo __('metrics_what_to_observe'); ?></label>
                                                         <textarea name="metrics" class="form-control" rows="3"></textarea>
                                                     </div>
                                                 </div>
 
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Type of Evaluation</label>
+                                                        <label class="form-label"><?php echo __('type_of_evaluation'); ?></label>
                                                         <select name="task_type" id="task_type" class="form-select">
                                                             <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
                                                                 <option value="<?php echo $type; ?>">
@@ -485,9 +482,10 @@ require __DIR__ . '/../layouts/header.php';
                                                     </div>
 
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Predefined Evaluation Type (optional)</label>
+                                                        <label class="form-label"><?php echo __('predefined_evaluation_type_optional'); ?></label>
                                                         <select class="form-select" id="preset-options">
                                                             <option value="">— Select a common type —</option>
+                                                            <option value="Completed:completed;Incompleted:incomplete">Completed/Incompleted</option>
                                                             <option value="Yes:yes;No:no">Yes / No</option>
                                                             <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
                                                             <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
@@ -498,7 +496,7 @@ require __DIR__ . '/../layouts/header.php';
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Evaluation Options</label>
+                                                    <label class="form-label"><?php echo __('evaluation_options'); ?></label>
                                                     <textarea name="task_options" id="task_options" class="form-control" rows="3"></textarea>
                                                     <small class="form-text text-muted">Use the format: <code>Label:Value;Label:Value;</code></small>
                                                 </div>
@@ -508,8 +506,8 @@ require __DIR__ . '/../layouts/header.php';
                                             
                                                 <div class="d-flex gap-2 mt-4">
                                                     <input type="hidden" name="preset_type" id="preset_type" value="">
-                                                    <button type="submit" class="btn btn-primary">Save Task</button>
-                                                    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                                                    <button type="submit" class="btn btn-primary"><?php echo __('save_task_group'); ?></button>
+                                                    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
                                                 </div>
                                             </form>
                                         </div>
@@ -529,7 +527,7 @@ require __DIR__ . '/../layouts/header.php';
                       
                             </div>
                         <?php else: ?>
-                            <div class="alert alert-warning text-center py-3">No task groups yet. <a href="/index.php?controller=TaskGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_task_group">+ Add Task Group</a>
+                            <div class="alert alert-warning text-center py-3"><?php echo __('no_task_groups_yet'); ?>. <a href="/index.php?controller=TaskGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_task_group">+ Add Task Group</a>
                             </div>
                         <?php endif; ?>
                         </div>
@@ -556,11 +554,11 @@ require __DIR__ . '/../layouts/header.php';
                                             </div>   
                                             <div class="d-flex text-end">
                                             <a href="/index.php?controller=Question&action=generateSUS&group_id=<?php echo $qGroup['id']; ?>&test_id=<?php echo $test['id']; ?>" 
-                                                class="btn btn-warning"
+                                                class="btn btn-warning me-2"
                                                 onclick="return confirm('Generate SUS questions in this group? This will add 10 questions.')">
-                                                    🧠 Add SUS Questions
+                                                    🧠 <?php echo __('add_sus_questions'); ?>
                                                 </a> 
-                                                <a href="/index.php?controller=Question&action=create&group_id=<?php echo $qGroup['id']; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_question<?php echo $qGroup['id']; ?>">+ Add New Question</a>
+                                                <a href="/index.php?controller=Question&action=create&group_id=<?php echo $qGroup['id']; ?>" class="btn btn-primary me-2"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_question<?php echo $qGroup['id']; ?>">+ <?php echo __('add_new_question'); ?></a>
                                                 
                                                 
                                                 <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
@@ -576,7 +574,7 @@ require __DIR__ . '/../layouts/header.php';
                                                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
                                                     <!--begin::Heading-->
                                                     <div class="menu-item px-3">
-                                                        <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">Settings</div>
+                                                        <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase"><?php echo __('settings'); ?></div>
                                                     </div>
                                                     <!--end::Heading-->
                                                     <div class="separator my-2"></div>
@@ -585,16 +583,16 @@ require __DIR__ . '/../layouts/header.php';
                                                     
                                                     
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=Response&action=exportCsvByQuestionnaireGroup&group_id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-warning px-3">📥 Export answers</a>
+                                                        <a href="/index.php?controller=Response&action=exportCsvByQuestionnaireGroup&group_id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-warning px-3">📥 <?php echo __('export_answers'); ?></a>
                                                     </div>
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=QuestionnaireGroup&action=edit&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_questionnaire_group<?php echo $qGroup['id']; ?>">Edit Questionnaire</a>
+                                                        <a href="/index.php?controller=QuestionnaireGroup&action=edit&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_questionnaire_group<?php echo $qGroup['id']; ?>"><?php echo __('edit_questionnaire'); ?></a>
                                                     </div>
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=QuestionnaireGroup&action=duplicate&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-info text-start px-3">Duplicate Questionnaire</a>
+                                                        <a href="/index.php?controller=QuestionnaireGroup&action=duplicate&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-outline-info text-start px-3"><?php echo __('duplicate_questionnaire'); ?></a>
                                                     </div>
                                                     <div class="menu-item px-3">
-                                                        <a href="/index.php?controller=QuestionnaireGroup&action=destroy&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this Questionnaire?');">Delete Questionnaire</a>
+                                                        <a href="/index.php?controller=QuestionnaireGroup&action=destroy&id=<?php echo $qGroup['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('<?php echo __('are_you_sure_you_want_to_delete_this_questionnaire'); ?>');"><?php echo __('delete_questionnaire'); ?></a>
                                                     </div>
                                                     <!--end::Menu item-->
                                                 </div>
@@ -619,7 +617,7 @@ require __DIR__ . '/../layouts/header.php';
                                                         </div>   
                                                        
                                                         <div class="text-end">
-                                                            <a href="#" class="btn btn-sm btn-secondary"  data-bs-toggle="modal" data-bs-target="#kt_modal_view_question<?php echo $question['id']; ?>">View Question</a>
+                                                            <a href="#" class="btn btn-sm btn-secondary"  data-bs-toggle="modal" data-bs-target="#kt_modal_view_question<?php echo $question['id']; ?>"><?php echo __('view_question'); ?></a>
                                                             <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                                 <i class="ki-duotone ki-element-plus fs-2">
                                                                     <span class="path1"></span>
@@ -633,7 +631,7 @@ require __DIR__ . '/../layouts/header.php';
                                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
                                                                 <!--begin::Heading-->
                                                                 <div class="menu-item px-3">
-                                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase text-start">Settings</div>
+                                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase text-start"><?php echo __('settings'); ?></div>
                                                                 </div>
                                                                 <!--end::Heading-->
                                                                 <div class="separator my-2"></div>
@@ -643,13 +641,13 @@ require __DIR__ . '/../layouts/header.php';
                                                                 
                                                             
                                                                 <div class="menu-item px-3">
-                                                                    <a href="/index.php?controller=Question&action=edit&id=<?php echo $question['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_question<?php echo $question['id']; ?>">Edit question</a>
+                                                                    <a href="/index.php?controller=Question&action=edit&id=<?php echo $question['id']; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_question<?php echo $question['id']; ?>"><?php echo __('edit_question'); ?></a>
                                                                 </div>
                                                                 <div class="menu-item px-3">
-                                                                    <a href="/index.php?controller=Question&action=duplicate&id=<?php echo $question['id']; ?>" class="menu-link bg-outline-info px-3">Duplicate question</a>
+                                                                    <a href="/index.php?controller=Question&action=duplicate&id=<?php echo $question['id']; ?>" class="menu-link bg-outline-info px-3"><?php echo __('duplicate_question'); ?></a>
                                                                 </div>
                                                                 <div class="menu-item px-3">
-                                                                    <a href="/index.php?controller=Question&action=destroy&id=<?php echo $question['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this questionnaire group?');">Delete question</a>
+                                                                    <a href="/index.php?controller=Question&action=destroy&id=<?php echo $question['id']; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('<?php echo __('Are you sure you want to delete this questionnaire group'); ?>"><?php echo __('delete_question'); ?></a>
                                                                 </div>
                                                                 <!--end::Menu item-->
                                                             
@@ -667,7 +665,7 @@ require __DIR__ . '/../layouts/header.php';
                                                                     <!--begin::Modal header-->
                                                                     <div class="modal-header">
                                                                         <!--begin::Modal title-->
-                                                                        <h2>Edit Question</h2>
+                                                                        <h2><?php echo __('edit_question'); ?></h2>
                                                                         <!--end::Modal title-->
                                                                         <!--begin::Close-->
                                                                         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -692,11 +690,11 @@ require __DIR__ . '/../layouts/header.php';
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label class="form-label">Question Text</label>
+                <label class="form-label"><?php echo __('question_text'); ?></label>
                 <textarea name="text" class="form-control" required rows="4"><?php echo htmlspecialchars($question['text']); ?></textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Type of Response</label>
+                <label class="form-label"><?php echo __('type_of_response') ?></label>
                 <select name="question_type" id="question_type" class="form-select">
                     <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
                         <option value="<?php echo $type; ?>" <?php echo $question['question_type'] === $type ? 'selected' : ''; ?>>
@@ -705,9 +703,10 @@ require __DIR__ . '/../layouts/header.php';
                     <?php endforeach; ?>
                 </select>
 
-                <label class="form-label mt-4">Predefined Evaluation Type (optional)</label>
+                <label class="form-label mt-4"><?php echo __('predefined_evaluation_type'); ?> (<?php echo __('optional'); ?>)</label>
                 <select class="form-select" id="preset-options">
                     <option value="">— Select a common type —</option>
+                    <option value="Completed:completed;Incompleted:incomplete">Completed/Incompleted</option>
                     <option value="Yes:yes;No:no">Yes / No</option>
                     <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
                     <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
@@ -718,19 +717,17 @@ require __DIR__ . '/../layouts/header.php';
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Response Options</label>
+            <label class="form-label"><?php echo __('response_options'); ?></label>
             <textarea name="question_options" id="question_options" class="form-control" rows="3"><?php echo htmlspecialchars($question['question_options']); ?></textarea>
             <small class="form-text text-muted">Use <code>Label:Value;Label:Value</code> format for choice-based questions.</small>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Position</label>
-            <input type="number" name="position" class="form-control" value="<?php echo $question['position']; ?>">
-        </div>
+            <input type="hidden" name="position" class="form-control" value="<?php echo $question['position']; ?>">
+
 
         <div class="d-flex gap-2 mt-4">
-            <button type="submit" class="btn btn-primary">Save Question</button>
-            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+            <button type="submit" class="btn btn-primary"><?php echo __('save_question'); ?></button>
+            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
         </div>
     </form>
 
@@ -756,7 +753,7 @@ require __DIR__ . '/../layouts/header.php';
                                                                 <!--begin::Modal header-->
                                                                 <div class="modal-header">
                                                                     <!--begin::Modal title-->
-                                                                    <h2>View Question</h2>
+                                                                    <h2><?php echo __('view_question'); ?></h2>
                                                                     <!--end::Modal title-->
                                                                     <!--begin::Close-->
                                                                     <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -777,25 +774,25 @@ require __DIR__ . '/../layouts/header.php';
 
                                                                     <div class="row mb-3">
                                                                         <div class="col-md-12 border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Question Text</p>
+                                                                            <p class="fw-bold"><?php echo __('question_text'); ?></p>
                                                                             <p><?php echo htmlspecialchars($question['text']); ?></p>
                                                                         </div>
                                                                         <div class="col-md-12  border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Type of response</p>
+                                                                            <p class="fw-bold"><?php echo __('question_type'); ?></p>
                                                                             <p><?php echo $question['question_type']; ?></p>
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="row mb-3">
                                                                         <div class="col-md-12  border border-1 border-gray-300 rounded p-3">
-                                                                            <p class="fw-bold">Type of response</p>
+                                                                            <p class="fw-bold"><?php echo __('type_of_response'); ?></p>
                                                                             <p><?php echo $question['question_type']; ?></p>
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="row mb-3">
                                                                         <div class="col-md-12 border border-1 border-gray-300 rounded p-3 ">
-                                                                            <p class="fw-bold">Response options</p>
+                                                                            <p class="fw-bold"><?php echo __('response_options'); ?></p>
                                                                             <p><?php echo htmlspecialchars($question['question_options']); ?></p>
                                                                         </div>
                                                                     </div>
@@ -812,7 +809,7 @@ require __DIR__ . '/../layouts/header.php';
 
                                             <?php endforeach; ?>
                                             <?php else: ?>
-                                                <li class="list-group-item text-muted">No tasks in this group yet.</li>
+                                                <li class="list-group-item text-muted"><?php echo __('no_tasks_in_this_group_yet'); ?>.</li>
                                             <?php endif; ?>
                                         </ul>
 
@@ -829,7 +826,7 @@ require __DIR__ . '/../layouts/header.php';
                                         <!--begin::Modal header-->
                                         <div class="modal-header">
                                             <!--begin::Modal title-->
-                                            <h2>Edit Questionnaire Group</h2>
+                                            <h2><?php echo __('edit_questionnaire_group'); ?></h2>
                                             <!--end::Modal title-->
                                             <!--begin::Close-->
                                             <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -852,7 +849,7 @@ require __DIR__ . '/../layouts/header.php';
                                                     <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
                                                     <div class="mb-3">
-                                                        <label class="form-label">Title</label>
+                                                        <label class="form-label"><?php echo __('title'); ?></label>
                                                         <input type="text" name="title" class="form-control" required value="<?php echo htmlspecialchars($qGroup['title']); ?>">
                                                     </div>
 
@@ -860,9 +857,9 @@ require __DIR__ . '/../layouts/header.php';
                                                         <input type="hidden" name="position" class="form-control" value="<?php echo htmlspecialchars($qGroup['position']); ?>">
                                                   
 
-                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                    <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
                                                    
-                                                    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                                                    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
 
                                                 </form>
 
@@ -887,7 +884,7 @@ require __DIR__ . '/../layouts/header.php';
                                         <!--begin::Modal header-->
                                         <div class="modal-header">
                                             <!--begin::Modal title-->
-                                            <h2>Add Question</h2>
+                                            <h2><?php echo __('add_question'); ?></h2>
                                             <!--end::Modal title-->
                                             <!--begin::Close-->
                                             <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -908,11 +905,11 @@ require __DIR__ . '/../layouts/header.php';
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label class="form-label">Question Text</label>
+                <label class="form-label"><?php echo __('question_text') ?></label>
                 <textarea name="text" class="form-control" required rows="4"><?php echo htmlspecialchars($question['text']); ?></textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Type of Response</label>
+                <label class="form-label"><?php echo __('type_of_response') ?></label>
                 <select name="question_type" id="question_type" class="form-select">
                     <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
                         <option value="<?php echo $type; ?>" <?php echo $question['question_type'] === $type ? 'selected' : ''; ?>>
@@ -921,36 +918,34 @@ require __DIR__ . '/../layouts/header.php';
                     <?php endforeach; ?>
                 </select>
 
-                <label class="form-label mt-4">Predefined Evaluation Type (optional)</label>
+                <label class="form-label mt-4"><?php echo __('predefined_evaluation_type'); ?> (<?php echo __('optional'); ?>)</label>
                 <select class="form-select" id="preset-options">
                     <option value="">— Select a common type —</option>
+                    <option value="Completed:completed;Incompleted:incomplete">Completed/Incompleted</option>
                     <option value="Yes:yes;No:no">Yes / No</option>
                     <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
                     <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
                     <option value="Very Poor:1;Poor:2;Average:3;Good:4;Excellent:5">Satisfaction Scale (1-5)</option>
                 </select>
-                <small class="form-text text-muted">This will auto-fill the response type and options below.</small>
+                <small class="form-text text-muted"><?php echo __('this_will_auto_fill_the_response_type_and_options_below'); ?>.</small>
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Response Options</label>
+            <label class="form-label"><?php echo __('response_options'); ?></label>
             <textarea name="question_options" id="question_options" class="form-control" rows="3"><?php echo htmlspecialchars($question['question_options']); ?></textarea>
             <small class="form-text text-muted">Use <code>Label:Value;Label:Value</code> format for choice-based questions.</small>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Position</label>
-            <input type="number" name="position" class="form-control" value="<?php echo $question['position']; ?>">
-        </div>
+        <input type="hidden" name="position" class="form-control" value="<?php echo $question['position']; ?>">
 
         <div class="d-flex gap-2 mt-4">
-            <button type="submit" class="btn btn-primary">Save Question</button>
+            <button type="submit" class="btn btn-primary"><?php echo __('save_question'); ?></button>
             <?php
 $anchor = $question['id'] ? '#questionnaire-group' . $question['questionnaire_group_id'] : '#questionnaire-group-list';
 $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] . $anchor;
 ?>
-<a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary">Cancel</a>
+<a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary"><?php echo __('cancel'); ?></a>
         </div>
     </form>
 
@@ -967,7 +962,7 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
                                 <?php endforeach; ?>
                             <div class="my-3 text-end">
                                 
-                                <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ Add Questionnaire Group</a>
+                                <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ <?php echo __('add_questionnaire_group'); ?></a>
                             </div>
                       
                             </div>
@@ -993,7 +988,7 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
                     <!--begin::Modal header-->
                     <div class="modal-header">
                         <!--begin::Modal title-->
-                        <h2>Create a new task group</h2>
+                        <h2><?php echo __('create_a_new_task_group'); ?></h2>
                         <!--end::Modal title-->
                         <!--begin::Close-->
                         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -1012,16 +1007,16 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
                             <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
                             <div class="mb-3">
-                                <label class="form-label">Title</label>
+                                <label class="form-label"><?php echo __('title'); ?></label>
                                 <input type="text" name="title" class="form-control" required value="">
                             </div>
 
                                 <input type="hidden" name="position" class="form-control" value="0">
                      
 
-                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
                             
-                            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
 
                         </form>
                     
@@ -1044,7 +1039,7 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
                     <!--begin::Modal header-->
                     <div class="modal-header">
                         <!--begin::Modal title-->
-                        <h2>Create a new questionnaire group</h2>
+                        <h2><?php echo __('create_a_new_questionnaire_group'); ?></h2>
                         <!--end::Modal title-->
                         <!--begin::Close-->
                         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -1062,12 +1057,12 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
                         <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
                         <div class="mb-3">
-                            <label class="form-label">Title</label>
+                            <label class="form-label"><?php echo __('title'); ?></label>
                             <input type="text" name="title" class="form-control" required value="">
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                        <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
+                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
 
                     </form>
                     
@@ -1161,6 +1156,10 @@ window.addEventListener('DOMContentLoaded', () => {
     <?php endif; ?>
 
     const presets = {
+    "Completed/Incompleted": {
+        type: "radio",
+        options: "Completed:completed;Incompleted:incomplete"
+    },
     "Yes / No": {
         type: "radio",
         options: "Yes:yes;No:no"

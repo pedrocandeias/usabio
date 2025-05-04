@@ -23,11 +23,11 @@ require __DIR__ . '/../layouts/header.php';
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label class="form-label">Question Text</label>
+                <label class="form-label"><?php echo __('question_text') ?></label>
                 <textarea name="text" class="form-control" required rows="4"><?php echo htmlspecialchars($question['text']); ?></textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Type of Response</label>
+                <label class="form-label"><?php echo __('type_of_response') ?></label>
                 <select name="question_type" id="question_type" class="form-select">
                     <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
                         <option value="<?php echo $type; ?>" <?php echo $question['question_type'] === $type ? 'selected' : ''; ?>>
@@ -39,6 +39,7 @@ require __DIR__ . '/../layouts/header.php';
                 <label class="form-label mt-4">Predefined Evaluation Type (optional)</label>
                 <select class="form-select" id="preset-options">
                     <option value="">— Select a common type —</option>
+                    <option value="Completed:completed;Incompleted:incomplete">Completed/Incompleted</option>
                     <option value="Yes:yes;No:no">Yes / No</option>
                     <option value="Strongly Disagree:1;Disagree:2;Neutral:3;Agree:4;Strongly Agree:5">Agreement Scale (1-5)</option>
                     <option value="Very Easy:1;Easy:2;Neutral:3;Hard:4;Very Hard:5">Difficulty Scale (1-5)</option>
@@ -49,16 +50,14 @@ require __DIR__ . '/../layouts/header.php';
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Response Options</label>
+            <label class="form-label"><?php echo __('response_options'); ?></label>
             <textarea name="question_options" id="question_options" class="form-control" rows="3"><?php echo htmlspecialchars($question['question_options']); ?></textarea>
             <small class="form-text text-muted">Use <code>Label:Value;Label:Value</code> format for choice-based questions.</small>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Position</label>
-            <input type="number" name="position" class="form-control" value="<?php echo $question['position']; ?>">
-        </div>
-
+        
+            <input type="hidden" name="position" class="form-control" value="<?php echo $question['position']; ?>">
+        
         <div class="d-flex gap-2 mt-4">
             <button type="submit" class="btn btn-primary">Save Question</button>
             <?php
@@ -72,6 +71,10 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
 
 <script>
 const presets = {
+    "Completed/Incompleted": {
+        type: "radio",
+        options: "Completed:completed;Incompleted:incomplete"
+    },
     "Yes / No": {
         type: "radio",
         options: "Yes:yes;No:no"

@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/../helpers/translation.php';
 class BaseController
 {
     protected $pdo;
@@ -9,11 +9,12 @@ class BaseController
     protected $projectTests = [];
     protected $projectParticipants = [];
     protected $projectAssignedUsers = [];
+    public $lang = [];
 
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
-
+        $this->loadLanguage();
         // Detecta project_id
         if (isset($_GET['controller']) && $_GET['controller'] === 'Project') {
             $projectId = $_GET['id'] ?? null;
@@ -76,5 +77,24 @@ class BaseController
         $stmt = $this->pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
         $stmt->execute([$key]);
         return $stmt->fetchColumn();
+    }
+
+    protected function loadLanguage()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+    
+        $language = $_GET['lang'] ?? $_SESSION['lang'] ?? 'en';
+        $_SESSION['lang'] = $language;
+     
+        $langFile = __DIR__ . '/../lang/' . $language . '.php';
+
+        $this->lang = file_exists($langFile)
+            ? include $langFile
+            : include __DIR__ . '/../lang/en.php';
+    
+        $GLOBALS['lang'] = $this->lang; // Make it available to views and __()
     }
 }

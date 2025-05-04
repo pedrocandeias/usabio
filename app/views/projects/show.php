@@ -4,7 +4,7 @@ $title = 'Project details - Overview';
 $pageTitle = 'Project details - Overview';
 $pageDescription = 'Manage your project and test sessions.';
 $headerNavbuttons = [
-    'Back to projects list' => [
+    __('back_to_projects_list') => [
         'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
@@ -27,10 +27,10 @@ require __DIR__ . '/../layouts/header.php';
 
             <!--begin::Col (Product under test)-->
             <div class="col-xl-4">
-                <div class="card card-xl-stretch mb-xl-3 shadow-sm">
+                <div class="card  mb-xl-8 shadow-sm">
                     <div class="card-header py-5 bg-primary">
                         <h3 class="card-title">
-                            <span class="card-label fw-bold fs-3 mb-1 text-white">Product under test</span>
+                            <span class="card-label fw-bold fs-3 mb-1 text-white"><?php echo __('product_under_test'); ?></span>
                         </h3>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -39,6 +39,25 @@ require __DIR__ . '/../layouts/header.php';
                         </div>
                     </div>
                 </div>
+                <div class="card mb-xl-8 shadow-sm">
+                    <div class="card-header bg-primary">
+                        <h3 class="card-title">
+                            <span class="card-label fw-bold fs-3 text-white"><?php echo __('assigned_moderators'); ?></span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($assignedUsers)) : ?>
+                            <ul class="list-group mb-4">
+                                <?php foreach ($assignedUsers as $user): ?>
+                                    <li class="list-group-item"><?php echo htmlspecialchars($user['username']); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="text-muted"><?php echo __('no_moderators_assigned_to_this_project'); ?>.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
             </div>
             <!--end::Col-->
 
@@ -50,7 +69,7 @@ require __DIR__ . '/../layouts/header.php';
                         <div class="card card-xl-stretch mb-xl-3 shadow-sm">
                             <div class="card-header bg-primary">
                                 <h3 class="card-title">
-                                    <span class="card-label fw-bold fs-3 text-white">Test Objectives</span>
+                                    <span class="card-label fw-bold fs-3 text-white"><?php echo __('test_objectives'); ?></span>
                                 </h3>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -65,7 +84,7 @@ require __DIR__ . '/../layouts/header.php';
                         <div class="card card-xl-stretch shadow-sm">
                             <div class="card-header bg-primary">
                                 <h3 class="card-title">
-                                    <span class="card-label fw-bold fs-3 text-white">Business case</span>
+                                    <span class="card-label fw-bold fs-3 text-white"><?php echo __('business_case'); ?></span>
                                 </h3>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -84,7 +103,7 @@ require __DIR__ . '/../layouts/header.php';
                         <div class="card card-xl-stretch mb-xl-8 shadow-sm">
                             <div class="card-header bg-primary">
                                 <h3 class="card-title">
-                                    <span class="card-label fw-bold fs-3 text-white">Participants</span>
+                                    <span class="card-label fw-bold fs-3 text-white"><?php echo __('participants'); ?></span>
                                 </h3>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -97,7 +116,7 @@ require __DIR__ . '/../layouts/header.php';
                         <div class="card card-xl-stretch mb-1 shadow-sm">
                             <div class="card-header bg-primary">
                                 <h3 class="card-title">
-                                    <span class="card-label fw-bold fs-3 text-white">Location & Dates</span>
+                                    <span class="card-label fw-bold fs-3 text-white"><?php echo __('location_dates'); ?></span>
                                 </h3>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -113,7 +132,7 @@ require __DIR__ . '/../layouts/header.php';
                         <div class="card card-xl-stretch mb-xl-8 shadow-sm">
                             <div class="card-header bg-primary">
                                 <h3 class="card-title">
-                                    <span class="card-label fw-bold fs-3 text-white">Responsibilities</span>
+                                    <span class="card-label fw-bold fs-3 text-white"><?php echo __('responsabilities'); ?></span>
                                 </h3>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -126,7 +145,7 @@ require __DIR__ . '/../layouts/header.php';
                         <div class="card card-xl-stretch mb-1 shadow-sm">
                             <div class="card-header bg-primary">
                                 <h3 class="card-title">
-                                    <span class="card-label fw-bold fs-3 text-white">Equipment</span>
+                                    <span class="card-label fw-bold fs-3 text-white"><?php echo __('equipment'); ?></span>
                                 </h3>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -149,31 +168,15 @@ require __DIR__ . '/../layouts/header.php';
 
             <div class="col-xl-12">
                 <div class="card card-xl-stretch mb-xl-8 shadow-sm">
+
                     <div class="card-header bg-primary">
                         <h3 class="card-title">
-                            <span class="card-label fw-bold fs-3 text-white">Assigned Users</span>
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <?php if (!empty($assignedUsers)) : ?>
-                            <ul class="list-group mb-4">
-                                <?php foreach ($assignedUsers as $user): ?>
-                                    <li class="list-group-item"><?php echo htmlspecialchars($user['username']); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php else: ?>
-                            <p class="text-muted">No moderators assigned to this project.</p>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="card-header bg-primary mt-5">
-                        <h3 class="card-title">
-                            <span class="card-label fw-bold fs-3 text-white">Test Procedures</span>
+                            <span class="card-label fw-bold fs-3 text-white"><?php echo __('test_procedures'); ?></span>
                         </h3>
                     </div>
                     <div class="card-body">
                         <div class="fw-semibold fs-6">
-                            <?php echo nl2br(htmlspecialchars($project['test_procedure'] ?? 'No additional information available.')); ?>
+                            <?php echo nl2br(htmlspecialchars($project['test_procedure'] ?? __('no_additional_information_available.'))); ?>
                         </div>
                     </div>
 

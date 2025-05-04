@@ -23,12 +23,9 @@ require __DIR__ . '/../layouts/header.php';
             <input type="text" name="title" class="form-control" required value="<?php echo htmlspecialchars($group['title']); ?>">
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Position</label>
-            <input type="number" name="position" class="form-control" value="<?php echo htmlspecialchars($group['position']); ?>">
-        </div>
+            <input type="hidden" name="position" class="form-control" value="<?php echo htmlspecialchars($group['position']); ?>">
 
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
         <?php
         $anchor = $group['id'] ? '#questionnaire-group' . $group['id'] : '#questionnaire-group-list';
         $cancelUrl = '/index.php?controller=Test&action=show&id=' . $group['test_id'] . $anchor;

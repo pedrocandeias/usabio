@@ -1,6 +1,9 @@
 <?php /**
        * head 
-       */ ?>
+       */       
+      
+      echo $_SESSION['lang'];
+      ?>
 <!DOCTYPE html>
 <html lang="en">
     <!--begin::Head-->

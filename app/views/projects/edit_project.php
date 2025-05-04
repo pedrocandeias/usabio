@@ -7,7 +7,7 @@ $pageTitle = 'Projects';
 $pageDescription = 'Manage your projects and test sessions.';
 $title = 'Projects settings';
 $headerNavbuttons = [
-    'Back to projects list' => [
+    __('back_to_projects_list') => [
         'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',

@@ -22,12 +22,10 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <input type="text" name="title" class="form-control" required value="<?php echo htmlspecialchars($taskGroup['title']); ?>">
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Position</label>
-            <input type="number" name="position" class="form-control" value="<?php echo htmlspecialchars($taskGroup['position']); ?>">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Save</button>
+       
+        <input type="hidden" name="position" class="form-control" value="<?php echo htmlspecialchars($taskGroup['position']); ?>">
+       
+        <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
         <?php
         $anchor = $taskGroup['id'] ? '#taskgroup' . $taskGroup['id'] : '#task-group-list';
         $cancelUrl = '/index.php?controller=Test&action=show&id=' . $taskGroup['test_id'] . $anchor;

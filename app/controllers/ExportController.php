@@ -703,67 +703,72 @@ public function exportProjectJSON()
     exit;
 }
 
-public function printProject()
-{
-    $project_id = $_GET['project_id'] ?? 0;
+    public function printProject()
+    {
+        $project_id = $_GET['project_id'] ?? 0;
 
-    // Load project
-    $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
-    $stmt->execute([$project_id]);
-    $project = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$project) {
-        echo "Project not found.";
-        exit;
-    }
-
-    // Load tasks
-    $stmt = $this->pdo->prepare("SELECT * FROM task_groups WHERE test_id IN (SELECT id FROM tests WHERE project_id = ?) ORDER BY position ASC");
-    $stmt->execute([$project_id]);
-    $taskGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $tasksByGroup = [];
-    foreach ($taskGroups as $group) {
-        $stmt = $this->pdo->prepare("SELECT * FROM tasks WHERE task_group_id = ? ORDER BY position ASC");
-        $stmt->execute([$group['id']]);
-        $tasksByGroup[$group['id']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Load questionnaire groups
-    $stmt = $this->pdo->prepare("SELECT * FROM questionnaire_groups WHERE test_id IN (SELECT id FROM tests WHERE project_id = ?) ORDER BY position ASC");
-    $stmt->execute([$project_id]);
-    $questionnaireGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $questionsByGroup = [];
-    foreach ($questionnaireGroups as $group) {
-        $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE questionnaire_group_id = ? ORDER BY position ASC");
-        $stmt->execute([$group['id']]);
-        $questionsByGroup[$group['id']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Load participants
-    $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE project_id = ? ORDER BY participant_name ASC");
-    $stmt->execute([$project_id]);
-    $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Load custom field labels
-    $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
-    $stmt->execute([$project_id]);
-    $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Load participant custom data
-    $participantIds = array_column($participants, 'id');
-    $customData = [];
-    if (!empty($participantIds)) {
-        $in = implode(',', array_fill(0, count($participantIds), '?'));
-        $stmt = $this->pdo->prepare("SELECT * FROM participant_custom_data WHERE participant_id IN ($in)");
-        $stmt->execute($participantIds);
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $customData[$row['participant_id']][$row['field_id']] = $row['value'];
+        // Load project
+        $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
+        $stmt->execute([$project_id]);
+        $project = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$project) {
+            echo "Project not found.";
+            exit;
         }
-    }
 
-    include __DIR__ . '/../views/export/print_project.php';
-}
+        // Load tests
+        $stmt = $this->pdo->prepare("SELECT * FROM tests WHERE project_id = ?");
+        $stmt->execute([$project_id]);
+        $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Load tasks
+        $stmt = $this->pdo->prepare("SELECT * FROM task_groups WHERE test_id IN (SELECT id FROM tests WHERE project_id = ?) ORDER BY position ASC");
+        $stmt->execute([$project_id]);
+        $taskGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $tasksByGroup = [];
+        foreach ($taskGroups as $group) {
+            $stmt = $this->pdo->prepare("SELECT * FROM tasks WHERE task_group_id = ? ORDER BY position ASC");
+            $stmt->execute([$group['id']]);
+            $tasksByGroup[$group['id']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Load questionnaire groups
+        $stmt = $this->pdo->prepare("SELECT * FROM questionnaire_groups WHERE test_id IN (SELECT id FROM tests WHERE project_id = ?) ORDER BY position ASC");
+        $stmt->execute([$project_id]);
+        $questionnaireGroups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $questionsByGroup = [];
+        foreach ($questionnaireGroups as $group) {
+            $stmt = $this->pdo->prepare("SELECT * FROM questions WHERE questionnaire_group_id = ? ORDER BY position ASC");
+            $stmt->execute([$group['id']]);
+            $questionsByGroup[$group['id']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Load participants
+        $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE project_id = ? ORDER BY participant_name ASC");
+        $stmt->execute([$project_id]);
+        $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Load custom field labels
+        $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
+        $stmt->execute([$project_id]);
+        $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Load participant custom data
+        $participantIds = array_column($participants, 'id');
+        $customData = [];
+        if (!empty($participantIds)) {
+            $in = implode(',', array_fill(0, count($participantIds), '?'));
+            $stmt = $this->pdo->prepare("SELECT * FROM participant_custom_data WHERE participant_id IN ($in)");
+            $stmt->execute($participantIds);
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $customData[$row['participant_id']][$row['field_id']] = $row['value'];
+            }
+        }
+
+        include __DIR__ . '/../views/export/print_project.php';
+    }
 
 }
 

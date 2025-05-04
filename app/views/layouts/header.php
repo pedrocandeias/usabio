@@ -16,22 +16,38 @@ if (!empty($_SESSION['fullname']) ) {
 }
 ?>
 
+
+
 <?php require __DIR__ . '/../layouts/head.php';  ?>
 
 <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled">
-
 <?php if (empty($minimalLayout)) : ?>
+<script>
+    var defaultThemeMode = "light";
+    var themeMode; 
+    if ( document.documentElement ) { 
+        if ( document.documentElement.hasAttribute("data-bs-theme-mode")) { 
+            themeMode = document.documentElement.getAttribute("data-bs-theme-mode"); 
+        } else { 
+            if ( localStorage.getItem("data-bs-theme") !== null ) { 
+                themeMode = localStorage.getItem("data-bs-theme"); 
+            } else { 
+                themeMode = defaultThemeMode; 
+            } 
+        } if ( themeMode === "system" ) { 
+            themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; 
+        } 
+        document.documentElement.setAttribute("data-bs-theme", themeMode); 
+    }
+</script>
 
-<script>var defaultThemeMode = "light"; var themeMode; if ( document.documentElement ) { if ( document.documentElement.hasAttribute("data-bs-theme-mode")) { themeMode = document.documentElement.getAttribute("data-bs-theme-mode"); } else { if ( localStorage.getItem("data-bs-theme") !== null ) { themeMode = localStorage.getItem("data-bs-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-bs-theme", themeMode); }</script>
-    <!--begin::Main-->
-    <!--begin::Root-->
-    <div class="d-flex flex-column flex-root">
+    <div class="d-flex flex-column flex-root ">
         <!--begin::Page-->
         <div class="page d-flex flex-row flex-column-fluid">
             <!--begin::Wrapper-->
             <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
                 <!--begin::Header-->
-                <div id="kt_header" class="header align-items-stretch mb-5 mb-lg-10" data-kt-sticky="true" data-kt-sticky-name="header" data-kt-sticky-offset="{default: '200px', lg: '300px'}">
+                <div id="kt_header" class=" d-print-none header align-items-stretch mb-5 mb-lg-10" data-kt-sticky="true" data-kt-sticky-name="header" data-kt-sticky-offset="{default: '200px', lg: '300px'}">
                     <!--begin::Container-->
                     <div class="container-xxl d-flex align-items-center">
                         <!--begin::Heaeder menu toggle-->
@@ -66,7 +82,7 @@ if (!empty($_SESSION['fullname']) ) {
                                         <div class="menu-item  here menu-here-bg me-0 me-lg-2">
                                            
                                             <a class="menu-link py-3" href="/?controller=Project&action=index">
-                                                <span class="menu-title">Projects</span>
+                                                <span class="menu-title"><?php echo __('projects'); ?></span>
                                                 <span class="menu-arrow d-lg-none"></span>
                                             </a>
                                            
@@ -76,7 +92,7 @@ if (!empty($_SESSION['fullname']) ) {
                                         <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-0 me-lg-2">
                                            
                                             <a class="menu-link py-3" href="/?controller=Project&action=index">
-                                                <span class="menu-title">Team</span>
+                                                <span class="menu-title"><?php echo __('team'); ?></span>
                                                 <span class="menu-arrow d-lg-none"></span>
                                             </a>
                                            
@@ -90,7 +106,7 @@ if (!empty($_SESSION['fullname']) ) {
                             <!--end::Navbar-->
                             <!--begin::Toolbar wrapper-->
                             <div class="topbar d-flex align-items-stretch flex-shrink-0">
-                
+
                             <?php if (!empty($_SESSION['is_superadmin'])) : ?>
                                 <!--begin::Admin links-->
                                 <div class="d-flex align-items-center ms-1 ms-lg-3">
@@ -105,7 +121,11 @@ if (!empty($_SESSION['fullname']) ) {
                                     </div>      
                                 <!--begin::Menu-->
 
+
+                                
                         <div class="menu menu-sub menu-sub-dropdown menu-column w-250px w-lg-325px" data-kt-menu="true">
+
+
                             <!--begin::Heading-->
                             <div class="d-flex flex-column flex-center bgi-no-repeat rounded-top px-9 py-10" style="background-image:url('assets/media/misc/menu-header-bg.jpg')">
                                 <!--begin::Title-->
@@ -226,7 +246,7 @@ if (!empty($_SESSION['fullname']) ) {
                                             <span class="path10"></span>
                                         </i>
                                     </span>
-                                    <span class="menu-title">Light</span>
+                                    <span class="menu-title"><?php echo __('light'); ?></span>
                                 </a>
                             </div>
                             <!--end::Menu item-->
@@ -239,7 +259,7 @@ if (!empty($_SESSION['fullname']) ) {
                                             <span class="path2"></span>
                                         </i>
                                     </span>
-                                    <span class="menu-title">Dark</span>
+                                    <span class="menu-title"><?php echo __('dark'); ?></span>
                                 </a>
                             </div>
                             <!--end::Menu item-->
@@ -254,7 +274,7 @@ if (!empty($_SESSION['fullname']) ) {
                                             <span class="path4"></span>
                                         </i>
                                     </span>
-                                    <span class="menu-title">System</span>
+                                    <span class="menu-title"><?php echo __('system'); ?></span>
                                 </a>
                             </div>
                             <!--end::Menu item-->
@@ -266,10 +286,10 @@ if (!empty($_SESSION['fullname']) ) {
                     <div class="d-flex align-items-center me-lg-n2 ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
                     <!--begin::Menu wrapper-->
                     <?php if (isset($displayName)) : ?>
-                        <span class="fw-bold text-white">Hi, <?php echo htmlspecialchars($displayName); ?>!</span>    
+                        <span class="fw-bold text-white"><?php echo __('hi,');?> <?php echo htmlspecialchars($displayName); ?>!</span>    
                         <?php else: ?>
                             <div class="d-flex align-items-center ms-1 ms-lg-3">
-                            <button type="button" class="btn btn-info">Sign-up</button>
+                            <button type="button" class="btn btn-info"><?php echo __('sign_up');?></button>
                             </div>
                         <?php endif; ?>
                         <div class="btn btn-icon btn-active-light-primary btn-custom w-30px h-30px w-md-40px h-md-40px" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
@@ -303,15 +323,24 @@ if (!empty($_SESSION['fullname']) ) {
                                     <!--end::Username-->
                                 </div>
                             </div>
-                            <!--end::Menu item--    
-                            <!--begin::Menu item-->
+                    
+                            <div class="menu-item px-5 my-1">                            
+                            <?php if($_SESSION['lang'] == 'en') : ?>
+                                <a href="?lang=pt" class="menu-link px-5">🇵🇹 Português</a>
+                            <?php else: ?>
+                                <a href="?lang=en" class="menu-link px-5">🇬🇧 English</a>
+                            <?php endif; ?>
+                            </div>
+
+
+
                             <div class="menu-item px-5 my-1">
-                                <a href="/index.php?controller=User&action=profile" class="menu-link px-5">Account Settings</a>
+                                <a href="/index.php?controller=User&action=profile" class="menu-link px-5"><?php echo __('account_settings'); ?></a>
                             </div>
                             <!--end::Menu item-->
                             <!--begin::Menu item-->
                             <div class="menu-item px-5">
-                                <a href="/index.php?controller=Auth&action=logout" class="menu-link px-5">Sign Out</a>
+                                <a href="/index.php?controller=Auth&action=logout" class="menu-link px-5"><?php echo __('sign_out'); ?></a>
                             </div>
                             <!--end::Menu item-->
                         </div>
@@ -330,7 +359,7 @@ if (!empty($_SESSION['fullname']) ) {
     </div>
     <!--end::Header-->
     <!--begin::Toolbar-->
-    <div class="toolbar py-5 pb-lg-15" id="kt_toolbar">
+    <div class="toolbar py-5 pb-lg-15 d-print-none" id="kt_toolbar">
         <!--begin::Container-->
         <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
             <!--begin::Page title-->
@@ -343,7 +372,7 @@ if (!empty($_SESSION['fullname']) ) {
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-1">
                     <!--begin::Item-->
                     <li class="breadcrumb-item text-white opacity-75">
-                        <a href="/?controller=Project&action=index" class="text-white text-hover-primary">Home</a>
+                        <a href="/?controller=Project&action=index" class="text-white text-hover-primary"><?php echo __('home'); ?></a>
                     </li>
                     <!--end::Item-->
                     <!--begin::Item-->
@@ -415,7 +444,7 @@ if (!empty($_SESSION['fullname']) ) {
 
 
 <?php else: ?>
-<header class="py-3 text-center">
+<header class="py-3 text-center  d-print-none">
     <a href="/" class="logo">
         <img src="dist/img/testflow-logo.png"
         alt="Logo">

@@ -94,10 +94,10 @@ require __DIR__ . '/../layouts/header.php';
         <div class="col-md-12">
         <?php if(!empty($tests)): ?>
             <hr class="my-4">
-            <h5>Tests</h5>
-            <p class="text-muted">Select the tests that this participant will be assigned to.</p>
+            <h5><?php echo __('tests'); ?></h5>
+            <p class="text-muted"><?php echo __('select_the_tests_that_this_participant_will_be_assigned_to'); ?></p>
         <div class="mb-3">
-            <label class="form-label">Assigned Tests</label>
+            <label class="form-label"><?php echo __('assigned_tests'); ?></label>
             <select name="test_ids[]" class="form-select" multiple>
                 <?php foreach ($tests as $test): ?>
                     <option value="<?php echo $test['id'] ?>"
@@ -123,20 +123,6 @@ require __DIR__ . '/../layouts/header.php';
     <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary mt-4 mb-4">← Back to Projects</a>
  
 </div>
-
-<?php if (!empty($_GET['saved'])): ?>
-    <!-- Toast -->
-    <div class="toast-container position-fixed bottom-0 end-0 mb-5 p-3">
-        <div id="savedToast" class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    ✅ Participant updated successfully!
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
 
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

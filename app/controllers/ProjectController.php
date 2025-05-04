@@ -29,7 +29,7 @@ class ProjectController extends BaseController
     public function index()
     {
         $breadcrumbs = [
-            ['label' => 'My Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+            ['label' => __('my_projects'), 'url' => '/index.php?controller=Project&action=index', 'active' => false],
         ];
 
         $projects = $this->projectModel->all();

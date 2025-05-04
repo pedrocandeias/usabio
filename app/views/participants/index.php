@@ -4,7 +4,7 @@ $title = 'Project details - Participants';
 $pageTitle = 'Participants in '. $project['project_name'];
 $menuActive = 'participants';
 $headerNavbuttons = [
-    'Back to projects list' => [
+    __('back_to_projects_list') => [
         'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
@@ -27,10 +27,10 @@ require __DIR__ . '/../layouts/header.php';
         <div class="card-header mt-5">
             <!--begin::Card title-->
             <div class="card-title flex-column">
-                <h3 class="fw-bold mb-1">Participants in project</h3>
+                <h3 class="fw-bold mb-1"><?php echo __('participants_in_project'); ?></h3>
 
                 <?php if (!empty($participants)): ?>
-                <div class="fs-6 text-gray-500"><?php echo count($participants); ?> added to the project</div>
+                <div class="fs-6 text-gray-500"><?php echo count($participants); ?> <?php echo __('added_to_the_project'); ?></div>
                 <?php endif; ?>
             </div>
             <!--begin::Card title-->
@@ -38,7 +38,7 @@ require __DIR__ . '/../layouts/header.php';
             <div class="card-toolbar my-1">
                 <!--begin::Select-->
                 <div class="me-6 my-1">
-                <a href="/index.php?controller=Participant&action=create&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_participant<?php echo $project_id; ?>">+ Add New Participant</a>
+                <a href="/index.php?controller=Participant&action=create&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_participant<?php echo $project_id; ?>">+ <?php echo __('add_new_participant'); ?></a>
                         
                 </div>
                 <!--end::Select-->
@@ -70,13 +70,13 @@ require __DIR__ . '/../layouts/header.php';
                 <thead class="fs-7 text-gray-500 text-uppercase">
                     <tr>
                         <th class="text-center">ID</th>
-                        <th>Name</th>
-                        <th class="text-center">Age</th>
-                        <th class="text-center">Gender</th>
-                        <th class="text-center">Academic Level</th>
-                        <th class="text-center">Assigned to</th>
-                        <th class="text-center">Sessions</th>
-                        <th class="text-center">Last Evaluation</th>
+                        <th><?php echo __('name'); ?></th>
+                        <th class="text-center"><?php echo __('age'); ?></th>
+                        <th class="text-center"><?php echo __('gender'); ?></th>
+                        <th class="text-center"><?php echo __('academic_qualification'); ?></th>
+                        <th class="text-center"><?php echo __('assigned_to'); ?></th>
+                        <th class="text-center"><?php echo __('sessions'); ?></th>
+                        <th class="text-center"><?php echo __('last_evaluation'); ?></th>
                         <th class="text-center"></th>
                     </tr>
                 </thead>
@@ -117,7 +117,7 @@ require __DIR__ . '/../layouts/header.php';
                                         <?php endforeach; ?>
 
                             <?php } else {
-                                        echo '<span class="text-muted">No tests assigned</span>';
+                                        echo '<span class="text-muted">'. __('No tests assigned') . '</span>';
                             }
                             ?></td>
                                 <td>  <?php
@@ -143,7 +143,7 @@ require __DIR__ . '/../layouts/header.php';
                                 : '<span  class="badge badge-warning text-white fst-italic">N/A</span>'; ?>
                             </td>
                             <td>
-                                <a class="btn btn-light btn-sm" href="/index.php?controller=Participant&action=show&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" data-bs-toggle="modal" data-bs-target="#kt_modal_view_participant<?php echo $participant['id']; ?>">View full profile</a>
+                                <a class="btn btn-light btn-sm" href="/index.php?controller=Participant&action=show&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" data-bs-toggle="modal" data-bs-target="#kt_modal_view_participant<?php echo $participant['id']; ?>"><?php echo __('view_full_profile'); ?></a>
                                 <button type="button" class="btn btn-sm btn-icon btn-color-light-dark btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                     <i class="ki-duotone ki-element-plus fs-2">
                                         <span class="path1"></span>
@@ -157,7 +157,7 @@ require __DIR__ . '/../layouts/header.php';
                         <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
                             <!--begin::Heading-->
                             <div class="menu-item px-3">
-                                <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">Settings</div>
+                                <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase"><?php echo __('settings'); ?></div>
                             </div>
                             <!--end::Heading-->
                             <div class="separator my-2"></div>
@@ -166,10 +166,10 @@ require __DIR__ . '/../layouts/header.php';
              
                            
                             <div class="menu-item px-3">
-                                <a href="/index.php?controller=Participant&action=edit&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_participant<?php echo $participant['id']; ?>">Edit Participant</a>
+                                <a href="/index.php?controller=Participant&action=edit&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" class="menu-link bg-outline-info px-3" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_participant<?php echo $participant['id']; ?>"><?php echo __('edit_participant'); ?></a>
                             </div>
                             <div class="menu-item px-3">
-                                <a href="/index.php?controller=Participant&action=destroy&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this participant?');">Delete participant</a>
+                                <a href="/index.php?controller=Participant&action=destroy&id=<?php echo $participant['id']; ?>&project_id=<?php echo $project_id; ?>" class="menu-link bg-danger text-white px-3" onclick="return confirm('Are you sure you want to delete this participant?');"><?php echo __('delete_participant'); ?></a>
                             </div>
                             <!--end::Menu item-->
                         </div>
@@ -187,7 +187,7 @@ require __DIR__ . '/../layouts/header.php';
                 <!--begin::Modal header-->
                 <div class="modal-header">
                     <!--begin::Modal title-->
-                    <h2>Edit Participant</h2>
+                    <h2><?php echo __('edit_participant');?></h2>
                     <!--end::Modal title-->
                     <!--begin::Close-->
                     <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -213,19 +213,19 @@ require __DIR__ . '/../layouts/header.php';
                     <?php endif; ?>
 
                     <div class="mb-3">
-                        <label class="form-label">Participant Name</label>
+                        <label class="form-label"><?php echo __('participant_name'); ?></label>
                         <input type="text" name="participant_name" class="form-control" value="<?php echo htmlspecialchars($participant['participant_name'] ?? ''); ?>" required>
                     </div>
 
                     <div class="row">
                         <div class="col-md-4">
-                            <label class="form-label">Age</label>
+                            <label class="form-label"><?php echo __('age'); ?></label>
                             <input type="number" name="participant_age" class="form-control" value="<?php echo htmlspecialchars($participant['participant_age'] ?? ''); ?>">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Gender</label>
+                            <label class="form-label"><?php echo __('gender'); ?></label>
                             <select name="participant_gender" class="form-select">
-                                <option value="">Select</option>
+                                <option value=""><?php echo __('select'); ?></option>
                                 <option value="female" <?php echo ($participant['participant_gender'] ?? '') === 'female' ? 'selected' : ''; ?>>Female</option>
                                 <option value="male" <?php echo ($participant['participant_gender'] ?? '') === 'male' ? 'selected' : ''; ?>>Male</option>
                                 <option value="nonbinary" <?php echo ($participant['participant_gender'] ?? '') === 'nonbinary' ? 'selected' : ''; ?>>Non-Binary</option>
@@ -233,9 +233,9 @@ require __DIR__ . '/../layouts/header.php';
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Academic Qualification</label>
+                            <label class="form-label"><?php echo __('academic_qualification'); ?></label>
                             <select name="participant_academic_level" class="form-select">
-                                <option value="">Select...</option>
+                                <option value=""><?php echo __('select...'); ?></option>
                                 <?php
                                 $levels = [
                                     'Primary education', 'Secondary education', 'High school diploma',
@@ -256,7 +256,7 @@ require __DIR__ . '/../layouts/header.php';
 
                     if (!empty($customFields)) { ?>
                         <hr class="my-4">
-                        <h5>Custom Fields</h5>
+                        <h5><?php echo __('custom_fields'); ?></h5>
                         <?php foreach ($customFields as $field): ?>
                             <div class="mb-3">
                                 <label class="form-label"><?php echo htmlspecialchars($field['label']); ?></label>
@@ -282,7 +282,7 @@ require __DIR__ . '/../layouts/header.php';
                         
                     <?php } else { ?>
                         <div class="alert alert-warning mt-3 mb-3" role="alert">
-                            ⚠️ No custom fields for participants found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list">Create custom fields</a> to collect additional information about participants.
+                            ⚠️ <?php echo __('no_custom_fields_for_participants_found_for_this_project.'); ?> <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list">Create custom fields</a> to collect additional information about participants.
                         </div>
                     <?php } ?>
 
@@ -340,7 +340,7 @@ require __DIR__ . '/../layouts/header.php';
             </table>
         </div>
     <?php else: ?>
-        <p class="text-muted">No participants found for this project. <a href="/index.php?controller=Participant&action=create&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_participant<?php echo $project_id; ?>">Add a New Participant</a></p>
+        <p class="text-muted"><?php echo __('no_participants_found_for_this_project'); ?>. <a href="/index.php?controller=Participant&action=create&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_participant<?php echo $project_id; ?>"><?php echo __('add_a_new_participant'); ?></a></p>
     <?php endif; ?>    
             </div>
             <!--end::Card body-->
@@ -350,9 +350,9 @@ require __DIR__ . '/../layouts/header.php';
 
 <div class="card mt-5">
     <div class="card-header">
-        <h3 class="card-title">Custom fields for participants</h3>
+        <h3 class="card-title"><?php echo __('custom_fields_for_participants'); ?></h3>
         <div class="card-toolbar">
-            <a href="/index.php?controller=CustomField&action=create&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_custom_field<?php echo $project_id; ?>">+ Add New Custom Field</a>
+            <a href="/index.php?controller=CustomField&action=create&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_custom_field<?php echo $project_id; ?>">+ <?php echo __('add_new_custom_field'); ?></a>
         </div>
     </div>
     <div class="card-body">
@@ -379,11 +379,11 @@ require __DIR__ . '/../layouts/header.php';
                 </div>
 
                 <div class="col-md-1">
-                    <button type="submit" class="btn btn-success w-100">Add</button>
+                    <button type="submit" class="btn btn-success w-100"><?php echo __('add'); ?></button>
                 </div>
             </form>
 
-            <?php if (!empty($customFields)) : ?>https://usabio.ddev.site:8443/index.php?controller=Participant&action=index&project_id=20
+            <?php if (!empty($customFields)) : ?>
                 <table class="table table-bordered table-sm">
                     <thead>
                         <tr>
@@ -400,8 +400,8 @@ require __DIR__ . '/../layouts/header.php';
                             <td><?php echo $field['field_type']; ?></td>
                             <td><?php echo htmlspecialchars($field['options']); ?></td>
                             <td class="text-end">
-                                <a href="/index.php?controller=ParticipantCustomField&action=edit&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="/index.php?controller=ParticipantCustomField&action=destroy&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this field?')">Delete</a>
+                                <a href="/index.php?controller=ParticipantCustomField&action=edit&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-primary"><?php echo __('edit'); ?></a>
+                                <a href="/index.php?controller=ParticipantCustomField&action=destroy&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('<?php echo __('are_you_sure_you_want_to_delete_this_field?'); ?>')"><?php echo __('delete'); ?></a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -409,7 +409,7 @@ require __DIR__ . '/../layouts/header.php';
                 </table>
             <?php else: ?>
                 <div class="alert alert-warning" role="alert">
-                    ⚠️ No custom fields for participants found for this project.
+                    ⚠️ <?php echo __('no_custom_fields_for_participants_found_for_this_project'); ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -428,7 +428,7 @@ require __DIR__ . '/../layouts/header.php';
                 <!--begin::Modal header-->
                 <div class="modal-header">
                     <!--begin::Modal title-->
-                    <h2>Add Participant</h2>
+                    <h2><?php echo __('add_participant'); ?></h2>
                     <!--end::Modal title-->
                     <!--begin::Close-->
                     <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -452,25 +452,27 @@ require __DIR__ . '/../layouts/header.php';
                     <?php endif; ?>
 
                     <div class="mb-3">
-                        <label class="form-label">Participant Name</label>
+                        <label class="form-label"><?php echo __('participant_name'); ?></label>
                         <input type="text" name="participant_name" class="form-control" value="" required>
                     </div>
 
                     <div class="row">
                         <div class="col-md-4">
-                            <label class="form-label">Age</label>
+                            <label class="form-label"><?php echo __('age'); ?></label>
                             <input type="number" name="participant_age" class="form-control" value="">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Gender</label>
+                            <label class="form-label"><?php echo __('Gender'); ?></label>
                             <select name="participant_gender" class="form-select">
                                 <option value="">Select</option>
                                 <option value="female">Female</option>
-                                <option value="male">Male</option>https://usabio.ddev.site:8443/index.php?controller=Participant&action=index&project_id=20
+                                <option value="male">Male</option>
+                                <option value="nonbinary">Non-Binary</option>
+                                <option value="other">other</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Academic Qualification</label>
+                            <label class="form-label"><?php echo __('academic_qualification'); ?></label>
                             <select name="participant_academic_level" class="form-select">
                                 <option value="">Select...</option>
                                 <?php
@@ -492,7 +494,7 @@ require __DIR__ . '/../layouts/header.php';
 
                     if (!empty($customFields)) { ?>
                         <hr class="my-4">
-                        <h5>Custom Fields</h5>
+                        <h5><?php echo __('custom_fields'); ?></h5>
                         <?php foreach ($customFields as $field): ?>
                             <div class="mb-3">
                                 <label class="form-label"><?php echo htmlspecialchars($field['label']); ?></label>
@@ -526,10 +528,10 @@ require __DIR__ . '/../layouts/header.php';
                     <?php 
                     if(!empty($tests)): ?>
                         <hr class="my-4">
-                        <h5>Tests</h5>
-                        <p class="text-muted">Select the tests that this participant will be assigned to.</p>
+                        <h5><?php echo __('tests'); ?></h5>
+                        <p class="text-muted"><?php echo __('select_the_tests_that_this_participant_will_be_assigned_to'); ?></p>
                     <div class="mb-3">
-                        <label class="form-label">Assigned Tests</label>
+                        <label class="form-label"><?php echo __('assigned_tests'); ?></label>
                         <div class="form-check">
                             <?php foreach ($tests as $test): ?>
                                 <div class="mb-2">
@@ -547,13 +549,13 @@ require __DIR__ . '/../layouts/header.php';
                     </div>
                     <?php else : ?>
                         <div class="alert alert-warning mt-3 mb-3" role="alert">
-                            ⚠️ No tests found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list">Create tests</a> to assign to participants.
+                            ⚠️ <?php echo __('no_tests_found_for_this_project'); ?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list"><?php echo __('create_tests'); ?></a> <?php echo __('to_assign_to_participants') ;?>.
                         </div>
                     <?php endif; ?>
                     </div>
                     <div class="mt-2">
-                        <button type="submit" class="btn btn-primary">Save Participant</button>
-                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                        <button type="submit" class="btn btn-primary"><?php echo __('save_participant'); ?></button>
+                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
                     </div>
                 </form>
             </div>

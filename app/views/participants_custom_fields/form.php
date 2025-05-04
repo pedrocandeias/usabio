@@ -36,12 +36,11 @@
         <input type="text" name="options" class="form-control" value="<?= htmlspecialchars($field['options'] ?? '') ?>">
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Position</label>
-        <input type="number" name="position" class="form-control" value="<?= htmlspecialchars($field['position'] ?? 0) ?>">
-    </div>
+   
+        <input type="hidden" name="position" class="form-control" value="<?= htmlspecialchars($field['position'] ?? 0) ?>">
+ 
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
     <a href="/index.php?controller=ParticipantCustomField&action=index&project_id=<?= $_GET['project_id'] ?? $field['project_id'] ?>" class="btn btn-secondary">Cancel</a>
 </form>
 
