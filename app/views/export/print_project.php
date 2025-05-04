@@ -53,232 +53,251 @@ require __DIR__ . '/../layouts/header.php'; ?>
         </div>
 
         <?php foreach ($tests as $test): ?>
-            <div class="card my-4">
-                <div class="card-header ">
-                    <h4 class="mt-4"><?php echo htmlspecialchars($test['title']) ?></h4>
-                </div>
-                <div class="card-body">
-                    <div class="card-test fs-4">
-                        <p><?php echo nl2br(htmlspecialchars($test['description'])) ?></p>
+            <?php if($test['layout_image'] == '') { ?>
+                <div class="card my-4">
+                    <div class="card-header ">
+                        <h4 class="mt-4"><?php echo htmlspecialchars($test['title']) ?></h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-test fs-4">
+                            <p><?php echo nl2br(htmlspecialchars($test['description'])) ?></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        <?php endforeach; ?>
-           
+            <?php } else { ?>
+                <div class="card my-4">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img class="img-fluid rounded shadow-sm" src="/uploads/<?php echo $test['layout_image']; ?>" class="img-fluid rounded-start" alt="<?php echo htmlspecialchars($test['title']) ?>">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h4 class="mt-4"><?php echo htmlspecialchars($test['title']) ?></h4>
+                                    <p class="card-text"><?php echo nl2br(htmlspecialchars($test['description'])) ?></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
         
-            <?php foreach ($taskGroups as $group): ?>
-            <div class="card my-4">
-                <div class="card-header ">
-                    <h4 class="mt-4"><?php echo htmlspecialchars($group['title']) ?></h4>
-                </div>
-                <div class="card-body px-0">
-                    <div class="container">
-                       <?php 
-                       $i = 1;
-                       foreach ($tasksByGroup[$group['id']] as $task): ?>
-                        <div class="row g-5 mb-5">
-                            <div class="col-sm-12 col-md-8">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h3 class="card-title"><?php echo $i++; ?>: <?php echo htmlspecialchars($task['task_text']) ?></h3>
-                                        <div class="card-text"> <hr>
-                                            <?php if (!empty($task['script'])) : ?><p class="fs-4"><strong><?php echo __('script');?>:</strong> <?php echo nl2br(htmlspecialchars($task['script'])) ?></p><?php 
-                                            endif; ?>
-                                            <?php if (!empty($task['scenario'])) : ?><p class="fs-4"><strong><?php echo __('scenario'); ?>:</strong> <?php echo nl2br(htmlspecialchars($task['scenario'])) ?></p><?php 
-                                            endif; ?>
-                                            <?php if (!empty($task['metrics'])) : ?><p class="fs-4"><strong><?php echo __('metrics'); ?>:</strong> <?php echo nl2br(htmlspecialchars($task['metrics'])) ?></p><?php 
-                                            endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-12 col-md-4">
-                                <div class="card  bg-light">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><?php echo __('time'); ?></h5>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control">
-                                        </div>
-                                        <h5 class="card-title my-5"><?php echo __('status'); ?>:</h5>
-                                        <?php
-                                        $type = $task['task_type'] ?? 'text';
-                                        $options = [];
-
-                                            if (!empty($task['task_options'])) {
-                                                $pairs = explode(';', $task['task_options']);
-                                                foreach ($pairs as $pair) {
-                                                    if (strpos($pair, ':') !== false) {
-                                                        [$label, $value] = explode(':', $pair, 2);
-                                                    } else {
-                                                        $label = $value = trim($pair);
-                                                    }
-                                                    $options[] = ['label' => trim($label), 'value' => trim($value)];
-                                                }
-                                            }
-
-                                            switch ($type) {
-                                                case 'radio':
-                                                    foreach ($options as $opt): ?>
-                                                    <div class="form-group">
-                                                        <div class="form-check mb-2">
-                                                            <input class="form-check-input" type="checkbox" name="answer[<?php echo $task['id']; ?>]" value="" id="r-<?php echo $task['id'] . '-' . $opt['value']; ?>">
-                                                            <label class="form-check-label text-black" for="r-<?php echo $task['id'] . '-' . $opt['value']; ?>">
-                                                                <?php echo htmlspecialchars($opt['label']); ?>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <?php endforeach;
-                                                    break;
-
-                                                case 'checkbox':
-                                                    foreach ($options as $opt): ?>
-                                                    <div class="form-group">
-                                                        <div class="form-check mb-2">
-                                                            <input class="form-check-input" type="checkbox" name="answer[<?php echo $task['id']; ?>][]" value="" id="c-<?php echo $task['id'] . '-' . $opt['value']; ?>">
-                                                            <label class="form-check-label text-black" for="c-<?php echo $task['id'] . '-' . $opt['value']; ?>"><?php echo $opt['label']; ?></label>
-                                                        </div>
-                                                    </div>
-                                                    <?php endforeach;
-                                                    break;
-
-                                                case 'dropdown': ?>
-                                                <div class="form-group">
-                                                        <?php foreach ($options as $opt): ?>
-                                                            <input class="form-check-input" type="checkbox" name="answer[<?php echo $task['id']; ?>][]" value="" id="c-<?php echo $task['id'] . '-' . $opt['value']; ?>">
-                                                            <label class="form-check-label text-black" for="c-<?php echo $task['id'] . '-' . $opt['value']; ?>"><?php echo $opt['label']; ?></label>
-                                                        <?php endforeach; ?>
-                                                    
-                                                </div>
-                                                    <?php
-                                                    break;
-
-                                                default: ?>
-                                                <div class="form-group">
-                                                    <textarea name="answer[<?php echo $task['id']; ?>]" class="form-control" rows="3" placeholder="Participant response..."></textarea>
-                                                </div>
-                                                    <?php
-                                            }
-                                        ?>
-                                        
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-12 col-md-12">
-                                <div class="card  bg-light">
-                                    <div class="card-body">
-                                    <h5 class="card-title"><?php echo __('observations'); ?></h5>
-                                        <div class="form-group">
-                                            <textarea class="form-control" rows="4"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <?php foreach ($taskGroups as $group): ?>
+                    <?php if ($group['test_id'] == $test['id']): ?>
+                    <div class="card my-4">
+                        <div class="card-header ">
+                            <h4 class="mt-4"><?php echo htmlspecialchars($group['title']) ?></h4>
                         </div>
-                    <?php endforeach; ?>
-                    </div>
+                        <div class="card-body px-0">
+                            <div class="container">
+                            <?php 
+                            $i = 1;
+                            foreach ($tasksByGroup[$group['id']] as $task): ?>
+                                <div class="row g-5 mb-5">
+                                    <div class="col-sm-12 col-md-8">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h3 class="card-title"><?php echo $i++; ?>: <?php echo htmlspecialchars($task['task_text']) ?></h3>
+                                                <div class="card-text"> <hr>
+                                                    <?php if (!empty($task['script'])) : ?><p class="fs-4"><strong><?php echo __('script');?>:</strong> <?php echo nl2br(htmlspecialchars($task['script'])) ?></p><?php 
+                                                    endif; ?>
+                                                    <?php if (!empty($task['scenario'])) : ?><p class="fs-4"><strong><?php echo __('scenario'); ?>:</strong> <?php echo nl2br(htmlspecialchars($task['scenario'])) ?></p><?php 
+                                                    endif; ?>
+                                                    <?php if (!empty($task['metrics'])) : ?><p class="fs-4"><strong><?php echo __('metrics'); ?>:</strong> <?php echo nl2br(htmlspecialchars($task['metrics'])) ?></p><?php 
+                                                    endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="card  bg-light">
+                                            <div class="card-body">
+                                                <h5 class="card-title"><?php echo __('time'); ?></h5>
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <h5 class="card-title my-5"><?php echo __('status'); ?>:</h5>
+                                                <?php
+                                                $type = $task['task_type'] ?? 'text';
+                                                $options = [];
 
+                                                    if (!empty($task['task_options'])) {
+                                                        $pairs = explode(';', $task['task_options']);
+                                                        foreach ($pairs as $pair) {
+                                                            if (strpos($pair, ':') !== false) {
+                                                                [$label, $value] = explode(':', $pair, 2);
+                                                            } else {
+                                                                $label = $value = trim($pair);
+                                                            }
+                                                            $options[] = ['label' => trim($label), 'value' => trim($value)];
+                                                        }
+                                                    }
+
+                                                    switch ($type) {
+                                                        case 'radio':
+                                                            foreach ($options as $opt): ?>
+                                                            <div class="form-group">
+                                                                <div class="form-check mb-2">
+                                                                    <input class="form-check-input" type="checkbox" name="answer[<?php echo $task['id']; ?>]" value="" id="r-<?php echo $task['id'] . '-' . $opt['value']; ?>">
+                                                                    <label class="form-check-label text-black" for="r-<?php echo $task['id'] . '-' . $opt['value']; ?>">
+                                                                        <?php echo htmlspecialchars($opt['label']); ?>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <?php endforeach;
+                                                            break;
+
+                                                        case 'checkbox':
+                                                            foreach ($options as $opt): ?>
+                                                            <div class="form-group">
+                                                                <div class="form-check mb-2">
+                                                                    <input class="form-check-input" type="checkbox" name="answer[<?php echo $task['id']; ?>][]" value="" id="c-<?php echo $task['id'] . '-' . $opt['value']; ?>">
+                                                                    <label class="form-check-label text-black" for="c-<?php echo $task['id'] . '-' . $opt['value']; ?>"><?php echo $opt['label']; ?></label>
+                                                                </div>
+                                                            </div>
+                                                            <?php endforeach;
+                                                            break;
+
+                                                        case 'dropdown': ?>
+                                                        <div class="form-group">
+                                                                <?php foreach ($options as $opt): ?>
+                                                                    <input class="form-check-input" type="checkbox" name="answer[<?php echo $task['id']; ?>][]" value="" id="c-<?php echo $task['id'] . '-' . $opt['value']; ?>">
+                                                                    <label class="form-check-label text-black" for="c-<?php echo $task['id'] . '-' . $opt['value']; ?>"><?php echo $opt['label']; ?></label>
+                                                                <?php endforeach; ?>
+                                                            
+                                                        </div>
+                                                            <?php
+                                                            break;
+
+                                                        default: ?>
+                                                        <div class="form-group">
+                                                            <textarea name="answer[<?php echo $task['id']; ?>]" class="form-control" rows="3" placeholder="Participant response..."></textarea>
+                                                        </div>
+                                                            <?php
+                                                    }
+                                                ?>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="card  bg-light">
+                                            <div class="card-body">
+                                            <h5 class="card-title"><?php echo __('observations'); ?></h5>
+                                                <div class="form-group">
+                                                    <textarea class="form-control" rows="4"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            </div>
+
+                                    
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                <?php endforeach; ?> 
+
+    
+                <?php foreach ($questionnaireGroups as $group): ?>
+                    <?php if ($group['test_id'] == $test['id']): ?>
+                    <div class="card my-4">
+                        <div class="card-header ">
+                            <h4 class="mt-4"><?php echo htmlspecialchars($group['title']) ?></h4>
+                        </div>
+                        <div class="card-body px-0">
+                            <div class="container">
+                            <?php 
+                            $i = 1;
+                            foreach ($questionsByGroup[$group['id']] as $question): ?>
                             
-                </div>
-            </div>
-            <?php endforeach; ?> 
-
-   
-            <?php foreach ($questionnaireGroups as $group): ?>
-            <div class="card my-4">
-                <div class="card-header ">
-                    <h4 class="mt-4"><?php echo htmlspecialchars($group['title']) ?></h4>
-                </div>
-                <div class="card-body px-0">
-                    <div class="container">
-                    <?php 
-                    $i = 1;
-                    foreach ($questionsByGroup[$group['id']] as $question): ?>
-                    
-                    
-                        <div class="row g-5 mb-5">
-                            <div class="col-sm-12 col-md-12">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h3 class="card-title"><?php echo $i++; ?>: <?php echo htmlspecialchars($question['text']) ?></h3>
-                                        <div class="card-text"> 
-                                            <hr>
-                                            <?php
-                                            $type = $question['question_type'];
-                                            $options = [];
-                                            if (!empty($question['question_options'])) {
-                                                $pairs = explode(';', $question['question_options']);
-                                                foreach ($pairs as $pair) {
-                                                    $pair = trim($pair);
-                                                    if (strpos($pair, ':') !== false) {
-                                                        [$label, $value] = explode(':', $pair, 2);
-                                                    } else {
-                                                        $label = $value = $pair;
+                            
+                                <div class="row g-5 mb-5">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h3 class="card-title"><?php echo $i++; ?>: <?php echo htmlspecialchars($question['text']) ?></h3>
+                                                <div class="card-text"> 
+                                                    <hr>
+                                                    <?php
+                                                    $type = $question['question_type'];
+                                                    $options = [];
+                                                    if (!empty($question['question_options'])) {
+                                                        $pairs = explode(';', $question['question_options']);
+                                                        foreach ($pairs as $pair) {
+                                                            $pair = trim($pair);
+                                                            if (strpos($pair, ':') !== false) {
+                                                                [$label, $value] = explode(':', $pair, 2);
+                                                            } else {
+                                                                $label = $value = $pair;
+                                                            }
+                                                            $options[] = ['label' => trim($label), 'value' => trim($value)];
+                                                        }
                                                     }
-                                                    $options[] = ['label' => trim($label), 'value' => trim($value)];
-                                                }
-                                            }
-                                            switch ($type):
-                                                case 'radio':
-                                                    foreach ($options as $opt): ?>
-                                                        <div class="form-check mb-2  form-check-inline">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="answer[<?php echo $question['id']; ?>]"
-                                                                value="<?php echo $opt['value']; ?>"
-                                                                id="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
-                                                            <label class="form-check-label text-black fs-4"
-                                                                for="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
-                                                                <?php echo htmlspecialchars($opt['label']); ?>
-                                                            </label>
-                                                        </div>
-                                                    <?php endforeach;
-                                                    break;
+                                                    switch ($type):
+                                                        case 'radio':
+                                                            foreach ($options as $opt): ?>
+                                                                <div class="form-check mb-2  form-check-inline">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="answer[<?php echo $question['id']; ?>]"
+                                                                        value="<?php echo $opt['value']; ?>"
+                                                                        id="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
+                                                                    <label class="form-check-label text-black fs-4"
+                                                                        for="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
+                                                                        <?php echo htmlspecialchars($opt['label']); ?>
+                                                                    </label>
+                                                                </div>
+                                                            <?php endforeach;
+                                                            break;
 
-                                                case 'checkbox':
-                                                    foreach ($options as $opt): ?>
-                                                        <div class="form-check mb-2">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="answer[<?php echo $question['id']; ?>][]"
-                                                                value="<?php echo $opt['value']; ?>"
-                                                                id="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
-                                                            <label class="form-check-label text-black fs-4"
-                                                                for="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
-                                                                <?php echo htmlspecialchars($opt['label']); ?>
-                                                            </label>
-                                                        </div>
-                                                    <?php endforeach;
-                                                    break;
+                                                        case 'checkbox':
+                                                            foreach ($options as $opt): ?>
+                                                                <div class="form-check mb-2">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="answer[<?php echo $question['id']; ?>][]"
+                                                                        value="<?php echo $opt['value']; ?>"
+                                                                        id="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
+                                                                    <label class="form-check-label text-black fs-4"
+                                                                        for="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
+                                                                        <?php echo htmlspecialchars($opt['label']); ?>
+                                                                    </label>
+                                                                </div>
+                                                            <?php endforeach;
+                                                            break;
 
-                                                case 'dropdown': ?>
-                                                    <div class="form-check mb-2">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="answer[<?php echo $question['id']; ?>][]"
-                                                                value="<?php echo $opt['value']; ?>"
-                                                                id="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
-                                                            <label class="form-check-label text-black fs-4"
-                                                                for="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
-                                                                <?php echo htmlspecialchars($opt['label']); ?>
-                                                            </label>
-                                                        </div>
-                                                    <?php break;
+                                                        case 'dropdown': ?>
+                                                            <div class="form-check mb-2">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="answer[<?php echo $question['id']; ?>][]"
+                                                                        value="<?php echo $opt['value']; ?>"
+                                                                        id="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
+                                                                    <label class="form-check-label text-black fs-4"
+                                                                        for="q-<?php echo $question['id'] . '-' . $opt['value']; ?>">
+                                                                        <?php echo htmlspecialchars($opt['label']); ?>
+                                                                    </label>
+                                                                </div>
+                                                            <?php break;
 
-                                                default: ?>
-                                                    <textarea name="answer[<?php echo $question['id']; ?>]"
-                                                            class="form-control" rows="3"
-                                                            placeholder="Participant response..."></textarea>
-                                            <?php endswitch; ?>
+                                                        default: ?>
+                                                            <textarea name="answer[<?php echo $question['id']; ?>]"
+                                                                    class="form-control" rows="3"
+                                                                    placeholder="Participant response..."></textarea>
+                                                    <?php endswitch; ?>
 
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            <?php endforeach; ?>
                             </div>
                         </div>
-                    <?php endforeach; ?>
                     </div>
-                </div>
-            </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             <?php endforeach; ?>
-
+        
             <div class="card my-4">
                 <div class="card-header ">
                     <h3 class="card-title">👥 <?php echo __('participants'); ?></h3>

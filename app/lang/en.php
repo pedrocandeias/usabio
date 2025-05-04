@@ -235,5 +235,21 @@ return [
     'sessions' => 'Sessions',
     'name' => 'Name',
     'assigned_moderators' => 'Assigned Moderators',
+    'welcome_to_the_task_session_please_follow_the_instructions_below_to_complete_the_tasks' => 'Welcome to the task session. Please follow the instructions below to complete the tasks.',
+    'mark_as_complete' => 'Mark as Completed',
+    'start' => 'Start',
+    'finish_session' => 'Finish Session',
+    
+    'task_session' => 'Task Session',
+    'participant_info' => 'Participant Info',
+    'questionnaire_complete' => 'Questionnaire Complete',
+    'thank_you_for_your_participation' => 'Thank you for your participation!',
+    'back_to-home' => 'Back to Home',
+    'create_a_new_project' => 'Create a new project',
+    'duplicate_project' => 'Duplicate Project',
+    'delete_project' => 'Delete Project',
+    'edit_project' => 'Edit Project',
+    'are_you_sure_you_want_to_delete_this_project?' => 'Are you sure you want to delete this project?',
+
 ];
 ?>

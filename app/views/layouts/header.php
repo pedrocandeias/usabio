@@ -446,8 +446,7 @@ if (!empty($_SESSION['fullname']) ) {
 <?php else: ?>
 <header class="py-3 text-center  d-print-none">
     <a href="/" class="logo">
-        <img src="dist/img/testflow-logo.png"
-        alt="Logo">
+    <img alt="Logo" src="assets/media/logos/logo-white.svg" class="logo-default h-55px" />
     </a>
 </header>
 <?php endif; ?>

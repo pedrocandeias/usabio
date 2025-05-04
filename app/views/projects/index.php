@@ -13,9 +13,9 @@ if (!isset($assignedUsers) && isset($this) && property_exists($this, 'projecAssi
 $menuActive = 'overview';
 $pageTitle = 'Projects';
 $pageDescription = 'Manage your projects and test sessions.';
-$title = 'My Projects';
+$title = __('my_projects');
 $headerNavbuttons = [
-    'Create New Project' => [
+    __('create_a_new_project') => [
         'url' => '#',
         'icon' => 'ki-duotone ki-plus fs-2',
         'class' => 'btn bg-body btn-active-color-primary',
@@ -35,141 +35,8 @@ require __DIR__ . '/../layouts/header.php'; ?>
     <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
                         <!--begin::Post-->
                         <div class="content flex-row-fluid" id="kt_content">
-                            <!--begin::Stats-->
-                            <div class="row gx-6 gx-xl-9">
-                                <?php if (!empty($projects)) : ?>
-                                        
-                                <div class="col-lg-6 col-xxl-6">
-                                    <!--begin::Card-->
-                                    <div class="card h-100">
-                                        <!--begin::Card body-->
-                                        <div class="card-body p-9">
-                                        
-                                            <!--begin::Heading-->
-                                            <div class="fs-2hx fw-bold"><?php echo count($projects); ?></div>
-                                            <div class="fs-4 fw-semibold text-gray-500 mb-7"><?php echo __('current_projects'); ?></div>
-                                            <!--end::Heading-->
-                                            <!--begin::Wrapper-->
-                                            <div class="d-flex flex-wrap">
-                                                <!--begin::Chart-->
-                                                <div class="d-flex flex-center h-100px w-100px me-9 mb-5">
-                                                    <canvas id="kt_project_list_status_chart"></canvas>
-                                                </div>
-                                                <!--end::Chart-->
-                                                <!--begin::Labels-->
-                                                <div class="d-flex flex-column justify-content-center flex-row-fluid pe-11 mb-5">
-                                                    <?php
-                                                    $statusCounts = [
-                                                        'Completed' => 0,
-                                                        'In Progress' => 0,
-                                                    ];
-
-                                                    foreach ($projects as $project) {
-                                                        if (!empty($project['status']) && isset($statusCounts[$project['status']])) {
-                                                            $statusCounts[$project['status']]++;
-                                                        }
-                                                    }
-                                                    ?>
-
-                                                    <!--begin::Label-->
-                                                    <div class="d-flex fs-6 fw-semibold align-items-center mb-3">
-                                                        <div class="bullet bg-success me-3"></div>
-                                                        <div class="text-gray-500"><?php echo __('completed'); ?></div>
-                                                        <div class="ms-auto fw-bold text-gray-700"><?php echo $statusCounts['Completed']; ?></div>
-                                                    </div>
-                                                    <!--end::Label-->
-                                                    <!--begin::Label-->
-                                                    <div class="d-flex fs-6 fw-semibold align-items-center mb-3">
-                                                        <div class="bullet bg-warning me-3"></div>
-                                                        <div class="text-gray-500"><?php echo __('in_progress'); ?></div>
-                                                        <div class="ms-auto fw-bold text-gray-700"><?php echo $statusCounts['In Progress']; ?></div>
-                                                    </div>
-                                                    <!--end::Label-->
-                                                   
-                                                </div>
-                                                <!--end::Labels-->
-                                            </div>
-                                            <!--end::Wrapper-->
-                                        </div>
-                                        <!--end::Card body-->
-                                    </div>
-                                    <!--end::Card-->
-                                </div>
-                                <?php endif; ?>
-                                <div class="col-lg-6 col-xxl-6">
-                                    <!--begin::Clients-->
-                                    <div class="card h-100">
-                                        <div class="card-body p-9">
-                                            <!--begin::Heading-->
-                                            <div class="fs-2hx fw-bold">49</div>
-                                            <div class="fs-4 fw-semibold text-gray-500 mb-7"><?php echo __('teammates'); ?></div>
-                                            <!--end::Heading-->
-                                            <!--begin::Users group-->
-                                            <div class="symbol-group symbol-hover mb-9">
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Alan Warden">
-                                                    <span class="symbol-label bg-warning text-inverse-warning fw-bold">A</span>
-                                                </div>
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Michael Eberon">
-                                                    <img alt="Pic" src="assets/media/avatars/300-11.jpg" />
-                                                </div>
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Michelle Swanston">
-                                                    <img alt="Pic" src="assets/media/avatars/300-7.jpg" />
-                                                </div>
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Francis Mitcham">
-                                                    <img alt="Pic" src="assets/media/avatars/300-20.jpg" />
-                                                </div>
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Susan Redwood">
-                                                    <span class="symbol-label bg-primary text-inverse-primary fw-bold">S</span>
-                                                </div>
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Melody Macy">
-                                                    <img alt="Pic" src="assets/media/avatars/300-2.jpg" />
-                                                </div>
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Perry Matthew">
-                                                    <span class="symbol-label bg-info text-inverse-info fw-bold">P</span>
-                                                </div>
-                                                <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Barry Walter">
-                                                    <img alt="Pic" src="assets/media/avatars/300-12.jpg" />
-                                                </div>
-                                                <a href="#" class="symbol symbol-35px symbol-circle" data-bs-toggle="modal" data-bs-target="#kt_modal_view_users">
-                                                    <span class="symbol-label bg-dark text-gray-300 fs-8 fw-bold">+42</span>
-                                                </a>
-                                            </div>
-                                            <!--end::Users group-->
-                                            <!--begin::Actions-->
-                                            <div class="d-flex">
-                                                <a href="#" class="btn btn-primary btn-sm me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_view_users">View all</a>
-                                                <a href="#" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_users_search">Add New</a>
-                                            </div>
-                                            <!--end::Actions-->
-                                        </div>
-                                    </div>
-                                    <!--end::Clients-->
-                                </div>
-                            </div>
-                            <!--end::Stats-->
-                            <!--begin::Toolbar-->
-                            <div class="d-flex flex-wrap flex-stack my-5">
-                                <!--begin::Heading-->
-                                <h2 class="fs-2 fw-semibold my-2"><?php echo __('projects'); ?>
-                                <span class="fs-6 text-gray-500 ms-1"><?php echo __('by_status'); ?></span></h2>
-                                <!--end::Heading-->
-                                <!--begin::Controls-->
-                                <div class="d-flex flex-wrap my-1">
-                                    <!--begin::Select wrapper-->
-                                    <div class="m-0">
-                                        <!--begin::Select-->
-                                        <select name="status" data-control="select2" data-hide-search="true" class="form-select form-select-sm bg-body border-body fw-bold w-125px">
-                                            <option value="all" selected="selected"><?php echo __('all'); ?></option>
-                                            <option value="In Progress"><?php echo __('in_progress'); ?></option>
-                                            <option value="Completed"><?php echo __('completed'); ?></option>
-                                        </select>
-                                        <!--end::Select-->
-                                    </div>
-                                    <!--end::Select wrapper-->
-                                </div>
-                                <!--end::Controls-->
-                            </div>
-                            <!--end::Toolbar-->
+        
+                           
                             <!--begin::Row-->
                             <div class="row g-6 g-xl-9">
                                 
@@ -205,7 +72,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                                 <span class="badge fw-bold me-auto px-4 py-3"></span>
                                             <?php endif; ?>
                                             <?php else: ?>
-                                                <span class="badge badge-light-secondary fw-bold me-auto px-4 py-3"><?php echo __('no_status'); ?></span>
+                                                <span class="badge badge-light-danger fw-bold me-auto px-4 py-3"><?php echo __('no_status'); ?></span>
                                             <?php endif; ?>
                                             
                                             </div>
@@ -239,7 +106,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                 <!--end::Col-->                
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <p class="text-muted">No projects found.</p>
+                                <p class="text-muted"><?php echo __('no_projects_found'); ?>.</p>
                             <?php endif; ?>
                             </div>
                             <!--end::Row-->
@@ -260,7 +127,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <!--begin::Modal header-->
                     <div class="modal-header">
                         <!--begin::Modal title-->
-                        <h2>Create new project</h2>
+                        <h2><?php echo __('create_a_new_project'); ?></h2>
                         <!--end::Modal title-->
                         <!--begin::Close-->
                         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -280,7 +147,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <div class="col-md-6">
                                 <div class="card shadow-sm h-100">
                                     <div class="card-body">
-                                        <h4 class="card-title">🛠️ Custom Project</h4>
+                                        <h4 class="card-title">🛠️ <?php echo __('custom_project'); ?></h4>
                                         <p class="card-text">Start from scratch and define all project details manually.</p>
                                         <a href="/index.php?controller=Project&action=create" class="btn btn btn-light-primary w-100">Start Manual Setup</a>
                                     </div>
@@ -291,7 +158,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <div class="col-md-6">
                                 <div class="card shadow-sm h-100">
                                     <div class="card-body">
-                                        <h4 class="card-title">📦 Import Project</h4>
+                                        <h4 class="card-title">📦 <?php echo __('import_project'); ?></h4>
                                         <p class="card-text">Upload a JSON file exported from this platform containing a complete project.</p>
                                         <a href="/index.php?controller=Import&action=uploadJSONForm" class="btn btn btn-light-primary w-100">Import from File</a>
                                     </div>
@@ -302,7 +169,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <div class="col-md-6">
                                 <div class="card shadow-sm h-100">
                                     <div class="card-body">
-                                        <h4 class="card-title">🎯 Use a Template</h4>
+                                        <h4 class="card-title">🎯 <?php echo __('use_a_template'); ?></h4>
                                         <p class="card-text">Choose from predefined templates for quick setup (e.g. smart lamp test, onboarding, etc.).</p>
                                         <a href="/index.php?controller=Import&action=chooseTemplate" class="btn btn btn-light-primary w-100">Browse Templates</a>
                                     </div>
@@ -313,7 +180,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <div class="col-md-6">
                                 <div class="card card-flush shadow-sm h-100">
                                     <div class="card-body">
-                                        <h4 class="card-title">🤖 AI Generator</h4>
+                                        <h4 class="card-title">🤖 <?php echo __('ai_generator'); ?></h4>
                                         <p class="card-text">Let AI help you generate a project based on a few simple inputs.</p>
                                         <a href="/index.php?controller=Import&action=aiForm" class="btn btn btn-light-primary w-100">
                                             🧠 Generate with AI</a>
@@ -330,17 +197,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <!--end::Modal dialog-->
         </div>
         <!--end::Modal - Create project-->
-        <!--end::Modals-->
-<?php 
-        $totalProjects = count($projects);
-        $statusCounts = json_encode($statusCounts);
 
-        $percentages = [];
-foreach (json_decode($statusCounts, true) as $status => $count) {
-    $percentages[$status] = $totalProjects > 0 ? round(($count / $totalProjects) * 100, 2) : 0;
-}
-       
-?>
     <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
 

@@ -1,8 +1,8 @@
 <?php 
 $menuActive = 'overview';
-$title = 'Project details - Overview';
-$pageTitle = 'Project details - Overview';
-$pageDescription = 'Manage your project and test sessions.';
+$title = 'Project generation - AI FORM';
+$pageTitle = 'Project generation - AI FORM';
+$pageDescription = 'Create a project using AI.';
 $headerNavbuttons = [
     __('back_to_projects_list') => [
         'url' => '/index.php?controller=Project&action=index',

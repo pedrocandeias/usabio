@@ -685,7 +685,7 @@ $breadcrumbs = [
             echo "Missing evaluation ID.";
             exit;
         }
-    
+        $minimalLayout = true;
         // Fetch evaluation & test
         $stmt = $this->pdo->prepare(
             "
@@ -794,12 +794,17 @@ $breadcrumbs = [
         }
 
         // Redirect to confirmation page
-        header('Location: /index.php?controller=Session&action=questionnaireComplete');
+        $stmt = $this->pdo->prepare("SELECT t.project_id FROM evaluations e JOIN tests t ON e.test_id = t.id WHERE e.id = ?");
+        $stmt->execute([$evaluationId]);
+        $project_id = $stmt->fetchColumn();
+        header("Location: /index.php?controller=Session&action=questionnaireComplete&project_id=" . $project_id);
         exit;
     }
 
     public function questionnaireComplete()
     {
+        $project_id = $_GET['project_id'] ?? 0;
+        $minimalLayout = true;
         include __DIR__ . '/../views/session/questionnaire_complete.php';
     }
 
