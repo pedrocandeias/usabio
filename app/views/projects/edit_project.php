@@ -26,7 +26,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
         <div class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <h3 class="card-label"><?php echo __('project_details'); ?></h3>
+                    <h3 class="card-label"><?php echo __('edit_project'); ?></h3>
                 </div>
                 <div class="card-toolbar">
 
@@ -64,177 +64,168 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 </div>
             </div>
             <div class="card-body">
-                <h5 class="card-title"><?php echo __('edit_project'); ?></h5>
-                    <form method="POST" action="/index.php?controller=Project&action=<?php echo $project['id'] ? 'update' : 'store'; ?>">
+
+                    <form method="POST" action="/index.php?controller=Project&action=<?php echo $project['id'] ? 'update' : 'store'; ?>" enctype="multipart/form-data">
                         <?php if ($project['id']): ?>
                             <input type="hidden" name="id" value="<?php echo $project['id']; ?>">
                         <?php endif; ?>
-
 
                         <div class="row g-5 g-xl-8">
 
                             <div class="col-xl-12">
                                 <div class="card  mb-xl-8 shadow-sm">
-                                    <div class="card-header py-5 bg-primary">
-                                        <h3 class="card-title">
-                                            <span class="card-label fw-bold fs-3 mb-1 text-white"><?php echo __('project_title'); ?></span>
-                                        </h3>
-                                    </div>
                                     <div class="card-body d-flex flex-column">
                                         <div class="fw-semibold fs-6">
-                                            <label for="title" class="form-label"><?php echo __('project_title'); ?></label>
-                                            <textarea class="form-control" id="title" name="title" rows="3" required><?php echo htmlspecialchars($project['title']); ?></textarea>
+                                            <label for="title" class="form-label fw-bold"><?php echo __('project_title'); ?></label>
+                                            <input class="form-control" id="title" name="title" value="<?php echo htmlspecialchars($project['title']); ?>" required>
+                                        </div>
+                                        <div class="fw-semibold fs-6 my-5">
+                                            <label for="title" class="form-label fw-bold"><?php echo __('project_description'); ?></label>
+                                            <textarea class="form-control" id="description" name="description" rows="3" required><?php echo htmlspecialchars($project['description']); ?></textarea>
+                                        </div>
+                                        <div class="fw-semibold fs-6 my-5">
+                                            <label for="title" class="form-label fw-bold"><?php echo __('project_image'); ?></label>
+                                            <input type="file" class="form-control" id="project_image" name="project_image" accept=".jpg, .jpeg, .png">
+                                            <?php 
+                                            print_r($project);
+                                            if ($project['project_image']): 
+                                                
+                                                echo $project['project_image']
+                                                ?>
+                                                <img src="<?php echo htmlspecialchars($project['project_image']); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" class="img-thumbnail mt-2" style="max-width: 200px;">
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
                              </div>
+                             
                             <!--begin::Col (Product under test)-->
-                            <div class="col-xl-4">
+                            <div class="col-xl-3">
                                 <div class="card  mb-xl-8 shadow-sm">
-                                    <div class="card-header py-5 bg-primary">
+                                    <div class="card-header py-5 px-5">
                                         <h3 class="card-title">
-                                            <span class="card-label fw-bold fs-3 mb-1 text-white">Produto em Teste</span>
+                                            <?php echo __('product_under_test'); ?>
                                         </h3>
                                     </div>
-                                    <div class="card-body d-flex flex-column">
-                                        <div class="fw-semibold fs-6">
-                                            Guiador Adaptado para Bicicletas de Uso Público
-                                        </div>
+                                    <div class="card-body d-flex flex-column  px-5">
+                                        <p class="text-muted card-text">Whats being tested? What are the business and experience goals of the product?</p>
+                                        <textarea class="form-control" id="product_under_test" name="product_under_test" placeholder="<?php echo __('product_under_test'); ?>" required><?php echo htmlspecialchars($project['product_under_test']); ?></textarea>
                                     </div>
                                 </div>
-                                <div class="card mb-xl-8 shadow-sm">
-                                    <div class="card-header bg-primary">
+
+                                <div class="card  mb-xl-8 shadow-sm">
+                                    <div class="card-header py-5 px-5">
                                         <h3 class="card-title">
-                                            <span class="card-label fw-bold fs-3 text-white">Moderadores definidos</span>
+                                            <?php echo __('business_case'); ?>
                                         </h3>
                                     </div>
-                                    <div class="card-body">
-                                                                    <p class="text-muted">Nenhum moderador atribuído a este projecto.</p>
-                                                            </div>
-                                </div>
-                                
+                                    <div class="card-body d-flex flex-column  px-5">
+                                        <p class="text-muted card-text">Why are we doing this test? What are the benefits? What are the risks of not testing?</p>
+                                        <textarea class="form-control" id="business_case" name="business_case" placeholder="<?php echo __('business_case'); ?>" required><?php echo htmlspecialchars($project['business_case']); ?></textarea>
+                                    </div>
+                                </div> 
                             </div>
                             <!--end::Col-->
 
-                            <!--begin::Col (Business case + Test objectives)-->
-                            <div class="col-xl-8">
-                                <div class="row gx-5 gx-xl-8 mb-5">
-
-                                    <div class="col-xl-4 mb-5 mb-xl-0">
-                                        <div class="card card-xl-stretch mb-xl-3 shadow-sm">
-                                            <div class="card-header bg-primary">
-                                                <h3 class="card-title">
-                                                    <span class="card-label fw-bold fs-3 text-white">Objetivos do Teste</span>
-                                                </h3>
-                                            </div>
-                                            <div class="card-body d-flex flex-column">
-                                                <div class="fw-semibold fs-6">
-                                                    Avaliar a estabilidade, o nível de esforço necessário para manter o equilíbrio, a precisão no controlo direcional, bem como o conforto ergonómico do ponto de contacto com a mão ou braço ativo.                                </div>
-                                            </div>
-                                        </div>
+                            <!--begin::Col -->
+                            <div class="col-xl-3">
+                                <div class="card  mb-xl-8 shadow-sm h-100">
+                                    <div class="card-header py-5 px-5">
+                                        <h3 class="card-title">
+                                            <?php echo __('test_objectives'); ?>
+                                        </h3>
                                     </div>
-
-                                    <div class="col-xl-8">
-                                        <div class="card card-xl-stretch shadow-sm">
-                                            <div class="card-header bg-primary">
-                                                <h3 class="card-title">
-                                                    <span class="card-label fw-bold fs-3 text-white">Caso de Negócio</span>
-                                                </h3>
-                                            </div>
-                                            <div class="card-body d-flex flex-column">
-                                                <div class="fw-semibold fs-6">
-                                                    Garantir acessibilidade, segurança e conforto para todos os perfis de utilizadores.                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="card-body d-flex flex-column  px-5">
+                                        <p class="text-muted card-text">What are the goals of the usability test? What specific questions will be answered? What hypotheses will be tested?</p>
+                                        <textarea class="form-control h-100" id="test_objectives" rows="5" name="test_objectives" placeholder="<?php echo __('test_objectives'); ?>" required><?php echo htmlspecialchars($project['test_objectives']); ?></textarea>
                                     </div>
-
-                                </div>
-
-                                <div class="row gx-5 gx-xl-8 mb-5 mb-xl-8">
-                                    <!-- Participants and Location/Dates -->
-                                    <div class="col-xl-6 mb-xl-8">
-                                        <div class="card card-xl-stretch mb-xl-8 shadow-sm">
-                                            <div class="card-header bg-primary">
-                                                <h3 class="card-title">
-                                                    <span class="card-label fw-bold fs-3 text-white">Participantes</span>
-                                                </h3>
-                                            </div>
-                                            <div class="card-body d-flex flex-column">
-                                                <div class="fw-semibold fs-6">
-                                                    Utilizadores de bicicletas de uso público com mobilidade reduzida num dos membros superiores.                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card card-xl-stretch mb-1 shadow-sm">
-                                            <div class="card-header bg-primary">
-                                                <h3 class="card-title">
-                                                    <span class="card-label fw-bold fs-3 text-white">Local e Datas</span>
-                                                </h3>
-                                            </div>
-                                            <div class="card-body d-flex flex-column">
-                                                <div class="fw-semibold fs-6">
-                                                    O teste será realizado em um local seguro e controlado, em datas a serem definidas.                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Responsibilities and Equipment -->
-                                    <div class="col-xl-6">
-                                        <div class="card card-xl-stretch mb-xl-8 shadow-sm">
-                                            <div class="card-header bg-primary">
-                                                <h3 class="card-title">
-                                                    <span class="card-label fw-bold fs-3 text-white">Responsabilidades</span>
-                                                </h3>
-                                            </div>
-                                            <div class="card-body d-flex flex-column">
-                                                <div class="fw-semibold fs-6">
-                                                    Os participantes serão responsáveis por fornecer feedback honesto e preciso sobre a sua experiência ao utilizar o guiador adaptado.                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card card-xl-stretch mb-1 shadow-sm">
-                                            <div class="card-header bg-primary">
-                                                <h3 class="card-title">
-                                                    <span class="card-label fw-bold fs-3 text-white">Equipamento</span>
-                                                </h3>
-                                            </div>
-                                            <div class="card-body d-flex flex-column">
-                                                <div class="fw-semibold fs-6">
-                                                    Bicicleta equipada com o guiador adaptado, percurso definido com obstáculos leves.                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
-                            <!--end::Col-->
+
+
+                             <!--begin::Col -->
+                             <div class="col-xl-3">
+                                <!-- begin::Card participants -->
+                                <div class="card  mb-xl-8 shadow-sm">
+                                    <div class="card-header py-5 px-5">
+                                        <h3 class="card-title">
+                                            <?php echo __('participants'); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body d-flex flex-column  px-5">
+                                        <p class="text-muted card-text">Who are the participants? What are their characteristics? How many participants will be recruited?</p>
+                                        <textarea class="form-control h-100" id="participants" rows="5" name="participants" placeholder="<?php echo __('participants'); ?>" required><?php echo htmlspecialchars($project['participants']); ?></textarea>
+                                    </div>
+                                </div>
+                                <!-- end::Card participants -->
+                                <!-- begin::Card equipment -->
+                                <div class="card  mb-xl-8 shadow-sm">
+                                    <div class="card-header py-5 px-5">
+                                        <h3 class="card-title">
+                                            <?php echo __('equipment'); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body d-flex flex-column  px-5">
+                                        <p class="text-muted card-text">What equipment is needed for the test? What software or hardware will be used?</p>
+                                        <textarea class="form-control h-100" id="equipment" rows="5" name="equipment" placeholder="<?php echo __('equipment'); ?>" required><?php echo htmlspecialchars($project['equipment']); ?></textarea>
+                                    </div>
+                                </div>
+                                <!-- end::Card equipment -->     
+                            </div>
+                            <!--end::Col -->
+                            <!--begin::Col -->
+                            <div class="col-xl-3">
+                                <!-- begin::Card responsibilities -->
+                                <div class="card  mb-xl-8 shadow-sm">
+                                    <div class="card-header py-5 px-5">
+                                        <h3 class="card-title">
+                                            <?php echo __('responsibilities'); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body d-flex flex-column  px-5">
+                                        <p class="text-muted card-text">Who is responsible for what? What are the roles and responsibilities of the team members?</p>
+                                        <textarea class="form-control h-100" id="responsibilities" rows="5" name="responsibilities" placeholder="<?php echo __('responsibilities'); ?>" required><?php echo htmlspecialchars($project['responsibilities']); ?></textarea>
+                                    </div>
+                                </div>
+                                <!-- end::Card responsibilities -->
+                                <!-- begin::Card location_dates -->
+                                <div class="card  mb-xl-8 shadow-sm">
+                                    <div class="card-header py-5 px-5">
+                                        <h3 class="card-title">
+                                            <?php echo __('location_dates'); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body d-flex flex-column  px-5">
+                                        <p class="text-muted card-text">Where will the test take place? What are the dates and times of the test?</p>
+                                        <textarea class="form-control h-100" id="location_dates" rows="5" name="location_dates" placeholder="<?php echo __('location_dates'); ?>" required><?php echo htmlspecialchars($project['location_dates']); ?></textarea>
+                                    </div>
+                                </div>
+                                <!-- end::Card location_dates -->
+                            </div>
+                            <!--end::Col -->
                         </div>
+                        <!--end::Row-->
+                        <div class="row g-5 g-xl-8 my-5">
+                            <div class="col-xl-12">
+                                <div class="card  mb-xl-8 shadow-sm">
+                                    <div class="card-header py-5 px-5">
+                                        <h3 class="card-title">
+                                            <?php echo __('test_procedures'); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body d-flex flex-column  px-5">
+                                    <p class="text-muted card-text">What is the procedure for the test? What are the steps that will be followed? What are the tasks that will be performed?</p>
+
+                                    <textarea class="form-control h-100" id="test_procedure" rows="5" name="test_procedure" placeholder="<?php echo __('test_procedure'); ?>" required><?php echo htmlspecialchars($project['test_procedure']); ?></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::Row-->
 
 
 
                         
-                        <?php
-                        $fields = [
-                            'title' => 'Project Title',
-                            'description' => 'Project Description',
-                            'product_under_test' => 'Product Under Test',
-                            'business_case' => 'Business Case',
-                            'test_objectives' => 'Test Objectives',
-                            'participants' => 'Participants',
-                            'equipment' => 'Equipment',
-                            'responsibilities' => 'Responsibilities',
-                            'location_dates' => 'Location & Dates',
-                            'test_procedure' => 'Procedure',
-                        ];
-
-                        foreach ($fields as $name => $label): ?>
-                            <div class="mb-3">
-                                <label for="<?php echo $name; ?>" class="form-label"><?php echo $label; ?></label>
-                                <textarea class="form-control" id="<?php echo $name; ?>" name="<?php echo $name; ?>" rows="3" required><?php echo htmlspecialchars($project[$name]); ?></textarea>
-                            </div>
-                        <?php endforeach; ?>
-
-
                         <button type="submit" class="btn btn-primary">Update Project</button>
                         <a href="/index.php?controller=Project&action=index" class="btn btn-secondary">Cancel</a>
                     </form>

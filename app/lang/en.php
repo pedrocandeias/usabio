@@ -250,6 +250,7 @@ return [
     'delete_project' => 'Delete Project',
     'edit_project' => 'Edit Project',
     'are_you_sure_you_want_to_delete_this_project?' => 'Are you sure you want to delete this project?',
-
+    'project_title' => 'Project Title',
+    'responsibilities'    => 'Responsibilities',
 ];
 ?>

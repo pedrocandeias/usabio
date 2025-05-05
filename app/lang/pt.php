@@ -248,5 +248,7 @@ return [
     'delete_project' => 'Eliminar Projecto',
     'edit_project' => 'Editar Projecto',
     'are_you_sure_you_want_to_delete_this_project?' => 'Tem a certeza de que pretende eliminar este projecto?',
+    'project_title' => 'Título do Projecto',
+    'responsibilities' => 'Responsabilidades',
 ];
 ?>

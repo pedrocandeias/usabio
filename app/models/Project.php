@@ -38,6 +38,7 @@ class Project
                 responsibilities,
                 location_dates,
                 test_procedure,
+                project_image,
                 created_at,
                 updated_at
             ) VALUES (
@@ -51,6 +52,7 @@ class Project
                 :responsibilities,
                 :location_dates,
                 :test_procedure,
+                :project_image,
                 NOW(),
                 NOW()
             )
@@ -67,6 +69,7 @@ class Project
             ':responsibilities' => $data['responsibilities'] ?? '',
             ':location_dates' => $data['location_dates'] ?? '',
             ':test_procedure' => $data['test_procedure'] ?? '',
+            ':project_image' => $data['project_image'] ?? '',
         ]);
     
         return $this->pdo->lastInsertId();
@@ -86,6 +89,7 @@ class Project
                 responsibilities = :responsibilities,
                 location_dates = :location_dates,
                 test_procedure = :test_procedure,
+                project_image = :project_image,
                 updated_at = NOW()
             WHERE id = :id
         ");
@@ -102,6 +106,7 @@ class Project
             ':responsibilities' => $data['responsibilities'] ?? '',
             ':location_dates' => $data['location_dates'] ?? '',
             ':test_procedure' => $data['test_procedure'] ?? '',
+            ':project_image' => $data['project_image'] ?? '',
         ]);
     }
 

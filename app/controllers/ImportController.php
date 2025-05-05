@@ -105,7 +105,8 @@ class ImportController extends BaseController
                 'equipment' => 'Webcam + browser',
                 'responsibilities' => 'Moderator + Notetaker',
                 'location_dates' => 'Online / Remote — March 2025',
-                'test_procedure' => 'Introduction → Tasks → Questionnaire'
+                'test_procedure' => 'Introduction → Tasks → Questionnaire',
+                'project_image' => '',
             ],
             'tests' => [
                 [
@@ -262,8 +263,8 @@ class ImportController extends BaseController
         INSERT INTO projects (
             title, description, image, product_under_test, business_case,
             test_objectives, participants, equipment, responsibilities,
-            location_dates, test_procedure, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+            location_dates, test_procedure, project_image, created_at, updated_at,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
     "
         );
         $stmt->execute(
@@ -278,7 +279,8 @@ class ImportController extends BaseController
             $project['equipment'] ?? '',
             $project['responsibilities'] ?? '',
             $project['location_dates'] ?? '',
-            $project['test_procedure'] ?? ''
+            $project['test_procedure'] ?? '',
+            $project['project_image'] ?? '',
             ]
         );
         $project_id = $this->pdo->lastInsertId();
@@ -916,7 +918,8 @@ Your output **must** use this format:
     "equipment": "...",
     "responsibilities": "...",
     "location_dates": "...",
-    "test_procedure": "..."
+    "test_procedure": "...",
+    "project_image": "...",
   },
   "tests": [
     {

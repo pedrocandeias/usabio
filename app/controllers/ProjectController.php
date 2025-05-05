@@ -56,6 +56,7 @@ class ProjectController extends BaseController
             'responsibilities' => '',
             'location_dates' => '',
             'test_procedure' => '',
+            'project_image' => '',
         ];
 
         // Fetch all users to show in the multiselect
@@ -211,20 +212,20 @@ class ProjectController extends BaseController
         }
 
         // Fetch total evaluations
-$stmt = $this->pdo->prepare("
-SELECT
-    SUM(CASE WHEN did_tasks = 1 THEN 1 ELSE 0 END) AS total_tasks,
-    SUM(CASE WHEN did_questionnaire = 1 THEN 1 ELSE 0 END) AS total_questionnaires
-FROM evaluations
-WHERE test_id IN (
-    SELECT id FROM tests WHERE project_id = ?
-)
-");
-$stmt->execute([$project_id]);
-$evaluationTotals = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $this->pdo->prepare("
+    SELECT
+        SUM(CASE WHEN did_tasks = 1 THEN 1 ELSE 0 END) AS total_tasks,
+        SUM(CASE WHEN did_questionnaire = 1 THEN 1 ELSE 0 END) AS total_questionnaires
+    FROM evaluations
+    WHERE test_id IN (
+        SELECT id FROM tests WHERE project_id = ?
+    )
+    ");
+    $stmt->execute([$project_id]);
+    $evaluationTotals = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$totalTaskEvaluations = $evaluationTotals['total_tasks'] ?? 0;
-$totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
+    $totalTaskEvaluations = $evaluationTotals['total_tasks'] ?? 0;
+    $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
 
 
         $breadcrumbs = [
@@ -341,6 +342,21 @@ $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
                 $stmt->execute([$project_id, $user_id]);
             }
         }
+
+        $data = $_POST;
+        // Usar imagem existente se não for enviada nova
+        $projectImageName = $data['existing_project_image'] ?? '';
+
+        if (!empty($_FILES['project_image']['name'])) {
+            $projectImageName = uniqid() . '_' . basename($_FILES['project_image']['name']);
+            $targetPath = __DIR__ . '/../../uploads/' . $projectImageName;
+
+            if (!move_uploaded_file($_FILES['project_image']['tmp_name'], $targetPath)) {
+                echo "⚠️ Falha no upload da imagem.";
+                exit;
+            }
+        }
+
     
         header("Location: /index.php?controller=Project&action=show&id=" . $project_id);
         exit;

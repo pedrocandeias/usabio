@@ -1,6 +1,8 @@
 <?php
 // app/views/auth/login.php
 $error = $_GET['error'] ?? null;
+$pageTitle = "Login";
+$pageDescription = "Login to your account";
 ?>
 
 <?php require __DIR__ . '/../layouts/head.php'; ?>

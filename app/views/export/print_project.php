@@ -32,25 +32,137 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 <button class="btn btn-primary m-2 w-100" onclick="window.print()">🖨️ <?php echo __('print'); ?></button>
             </div>
         </div>
+    
+        <!--begin::Row-->
+        <div class="row g-5 g-xl-8">
 
-        <div class="card">
-            <div class="row g-0">
-                <div class="col-md-4">
-                <img src="..." class="img-fluid rounded-start" alt="...">
+            <div class="col-lx-12 mb-5">
+                <div class="card border-primary ">
+                    <div class="row ">
+                        <div class="col-md-4">
+                            <img src="..." class="img-fluid rounded-start" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h3 class="card-title fs-2 pb-5"><?php echo htmlspecialchars($project['title']) ?></h3>
+                                <p class="card-text fs-4"><?php echo nl2br(htmlspecialchars($project['description'])) ?></p>     
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-8">
-                <div class="card-body">
-                <h3 class="card-title fs-2 pb-5">📝 <?php echo __('project_details'); ?>: <?php echo htmlspecialchars($project['title']) ?></h3>
-                <p class="card-text fs-4"><strong><?php echo __('description'); ?>:</strong> <?php echo nl2br(htmlspecialchars($project['description'])) ?></p>
-                <p class="card-text fs-4"><strong><?php echo __('product_under_test'); ?>:</strong> <?php echo htmlspecialchars($project['product_under_test']) ?></p>
-                <p class="card-text fs-4"><strong><?php echo __('test_objectives'); ?>:</strong> <?php echo nl2br(htmlspecialchars($project['test_objectives'])) ?></p>
-                <p class="card-text fs-4"><strong><?php echo __('location_dates'); ?>:</strong> <?php echo nl2br(htmlspecialchars($project['location_dates'])) ?></p>
-                <p class="card-text fs-4"><strong><?php echo __('procedure'); ?>:</strong> <?php echo nl2br(htmlspecialchars($project['test_procedure'])) ?></p>
+            </div>
 
+            <!--begin::Col (Product under test)-->
+            <div class="col-xl-3">
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm">
+                     <div class="card-body d-flex flex-column">
+                    <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('product_under_test'); ?>:
+                        </h3>    
+                    <div class="card-text fs-6">
+                            <?php echo htmlspecialchars($project['product_under_test']); ?>
+                        </div>
+                    </div>
                 </div>
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                    <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('business_case'); ?>:
+                        </h3>
+                        <div class="card-text fs-6">
+                            <?php echo nl2br(htmlspecialchars($project['business_case'])); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Col-->
+
+            <!--begin::Col (Test objectives)-->
+            <div class="col-xl-3 mb-5 mb-xl-0">
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('test_objectives'); ?>
+                        </h3>    
+                        <div class="fw-semibold fs-6">
+                            <?php echo nl2br(htmlspecialchars($project['test_objectives'])); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Col-->   
+
+                
+            <!-- Participants and equipment -->
+            <div class="col-xl-3 mb-xl-8">
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm ">
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('participants'); ?>
+                        </h3>
+                        <div class="fw-semibold fs-6">
+                            <?php echo nl2br(htmlspecialchars($project['participants'])); ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm ">
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('equipment'); ?>
+                        </h3>
+                        <div class="fw-semibold fs-6">
+                            <?php echo nl2br(htmlspecialchars($project['equipment'])); ?>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+
+            <!--end::Col-->
+            <div class="col-xl-3">
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm ">
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('location_dates'); ?>
+                        </h3>
+                        <div class="fw-semibold fs-6">
+                            <?php echo nl2br(htmlspecialchars($project['location_dates'])); ?>
+                        </div>
+                    </div>
+                </div>
+
+                   
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm ">
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('responsabilities'); ?>
+                        </h3>
+                        <div class="fw-semibold fs-6">
+                            <?php echo nl2br(htmlspecialchars($project['responsibilities'])); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Col-->
+        </div>
+        <!--end::Row-->
+
+        <!--begin::Row -->
+        <div class="row mb-5 my-xl-8">
+            <div class="col-xl-12">
+                <div class="card bg-transparent border-primary mb-xl-8 shadow-sm ">
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title fs-3 fw-bold text-primary">
+                            <?php echo __('test_procedures'); ?>
+                        </h3>
+                        <div class="fw-semibold fs-6">
+                            <?php echo nl2br(htmlspecialchars($project['test_procedure'] ?? __('no_additional_information_available.'))); ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <!--end::Row-->
+        
 
         <?php foreach ($tests as $test): ?>
             <?php if($test['layout_image'] == '') { ?>

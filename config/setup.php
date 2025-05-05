@@ -33,7 +33,8 @@ try {
             equipment TEXT NOT NULL,
             responsibilities TEXT NOT NULL,
             location_dates TEXT NOT NULL,
-            test_procedure TEXT NOT NULL
+            test_procedure TEXT NOT NULL,
+            project_image VARCHAR(255),
         ) ENGINE=InnoDB;" => "projects",
 
         // === TABLE: tests ===
