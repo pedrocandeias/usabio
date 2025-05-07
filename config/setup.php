@@ -235,13 +235,24 @@ try {
             ui_theme VARCHAR(50) DEFAULT 'default',
             feature_flags TEXT DEFAULT NULL,
             allow_registration BOOLEAN DEFAULT 0,
-            max_projects_per_user varchar(100) DEFAULT '0',
-            max_projects_per_normal_user varchar(100) DEFAULT '1',
-            max_projects_per_premium_user varchar(100) DEFAULT '3',
-            max_projects_per_superpremium_user DEFAULT '9',
+            max_projects_per_user VARCHAR(100) DEFAULT '0',
+            max_projects_per_normal_user VARCHAR(100) DEFAULT '1',
+            max_projects_per_premium_user VARCHAR(100) DEFAULT '3',
+            max_projects_per_superpremium_user VARCHAR(100) DEFAULT '9',
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) ENGINE=InnoDB;" => "settings",
-        
+
+    // === TABLE: Project Invites ===
+    "CREATE TABLE IF NOT EXISTS project_invites (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        project_id INT NOT NULL,
+        moderator_id INT NOT NULL,
+        status ENUM('pending','accepted','declined') DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY ux_prj_mod (project_id, moderator_id),
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+        FOREIGN KEY (moderator_id) REFERENCES moderators(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB;"    => "project_invites",    
     ];
 
     foreach ($tables as $sql => $name) {

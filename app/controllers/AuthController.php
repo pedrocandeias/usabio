@@ -91,4 +91,34 @@ class AuthController
         header('Location: /?controller=Auth&action=login');
         exit;
     }
+
+
+    public function register() {
+        include __DIR__ . '/../views/auth/register.php';
+    }
+    
+    public function storeRegistration() {
+        $username = trim($_POST['username'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        $confirm  = trim($_POST['confirm_password'] ?? '');
+    
+        if (!$username || !$password || $password !== $confirm) {
+            header('Location: index.php?controller=Auth&action=register&error=1');
+            exit;
+        }
+    
+        // Verifica se o utilizador já existe
+        $stmt = $this->pdo->prepare("SELECT id FROM moderators WHERE username = ?");
+        $stmt->execute([$username]);
+        if ($stmt->fetch()) {
+            header('Location: index.php?controller=Auth&action=register&error=exists');
+            exit;
+        }
+    
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $this->pdo->prepare("INSERT INTO moderators (username, password_hash, is_admin) VALUES (?, ?, 0)");
+        $stmt->execute([$username, $hash]);
+    
+        header('Location: index.php?controller=Auth&action=login&success=registered');
+    }
 }

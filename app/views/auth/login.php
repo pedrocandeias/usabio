@@ -51,6 +51,8 @@ $pageDescription = "Login to your account";
                                 </button>
                             </div>
                         </form>
+                        <p>Don't have an account? <a href="index.php?controller=Auth&action=register">Register here</a></p>
+
                     </div>
 
                     <div class="d-flex flex-stack px-lg-10">
