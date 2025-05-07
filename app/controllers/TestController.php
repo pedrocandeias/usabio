@@ -455,11 +455,6 @@ class TestController extends BaseController
         $stmt->execute([$id]);
         $project_id = $stmt->fetchColumn();
 
-        if (!$this->userCanAccessProject($project_id)) {
-            echo "Access denied.";
-            exit;
-        }
-
         $stmt = $this->pdo->prepare("DELETE FROM tests WHERE id = ?");
         $stmt->execute([$id]);
         $_SESSION['toast_success'] = "Task removed successfully!";
@@ -492,14 +487,5 @@ class TestController extends BaseController
     exit;
 }
 
-    private function userCanAccessProject($project_id)
-    {
-        if ($_SESSION['is_admin']) { 
-            return true;
-        }
-
-        $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
-        $stmt->execute([$project_id, $_SESSION['user_id']]);
-        return $stmt->fetchColumn();
-    }
+   
 }

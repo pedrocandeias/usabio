@@ -57,13 +57,27 @@ require __DIR__ . '/../layouts/header.php';
                                     <p class="fs-4"><?php echo htmlspecialchars($test['description']); ?></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <?php if (!empty($test['layout_image'])) : ?>
-                                    <div class="mb-5 text-center">
-                                        <a href="uploads/<?php echo htmlspecialchars($test['layout_image']); ?>">
-                                            <img src="uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" alt="Layout image" class="img-fluid rounded shadow-sm">
-                                        </a>
-                                    </div>
+                                   
+                                    <?php if (!empty($test['layout_image'])): ?>
+                                        <div class="mt-2">
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#layoutImageModal"><img src="uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" alt="Layout image" class="img-fluid rounded shadow-sm"></a>
+                                        </div>
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="layoutImageModal" tabindex="-1" aria-labelledby="layoutImageModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="layoutImageModalLabel">Layout Image</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <img src="/uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" class="img-fluid" alt="Layout image">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     <?php endif; ?>
+
                                 </div>
                             </div>   
                         </div>

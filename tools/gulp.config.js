@@ -1,7 +1,7 @@
 const gulpConfig = {
-	name: "metronic",
+	name: "testflow",
 	desc: "Gulp build config",
-	version: "8.2.9",
+	version: "0.1.0",
 	config: {
 		debug: false,
 		encoding: false,

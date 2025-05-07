@@ -4,7 +4,10 @@
         background-repeat: repeat !important;
     }
 </style>
-<?php $title = 'Questionnaire Session'; ?>
+<?php $title = 'Questionnaire Session';
+$pageTitle = 'Project details - Task testing';
+?>
+
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">

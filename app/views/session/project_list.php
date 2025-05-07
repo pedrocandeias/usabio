@@ -27,9 +27,9 @@
             <?php endforeach; ?>
         </div>
     <?php else: ?>
-        <p class="text-muted">No projects found or assigned to you.</p>
+        <p class="text-muted"><?php echo __('no_projects_found_or_assigned_to_you'); ?>.</p>
         <a href="/index.php?controller=Project&action=create" class="btn btn-primary">
-            Create a New Project
+            <?php echo __('create_a_new_project'); ?>
         </a>
     <?php endif; ?>
 </div>

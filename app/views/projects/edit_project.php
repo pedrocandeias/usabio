@@ -84,15 +84,29 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                             <textarea class="form-control" id="description" name="description" rows="3" required><?php echo htmlspecialchars($project['description']); ?></textarea>
                                         </div>
                                         <div class="fw-semibold fs-6 my-5">
-                                            <label for="title" class="form-label fw-bold"><?php echo __('project_image'); ?></label>
-                                            <input type="file" class="form-control" id="project_image" name="project_image" accept=".jpg, .jpeg, .png">
+                                            <label for="project_image" class="form-label fw-bold"><?php echo __('project_image'); ?></label>
+                                            <input type="file" class="form-control" id="project_image" name="project_image" accept="image/*">
                                             <?php 
-                                            print_r($project);
                                             if ($project['project_image']): 
-                                                
-                                                echo $project['project_image']
-                                                ?>
-                                                <img src="<?php echo htmlspecialchars($project['project_image']); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" class="img-thumbnail mt-2" style="max-width: 200px;">
+                                            ?>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#projectImageModal">
+                                                <img src="/uploads/<?php echo htmlspecialchars($project['project_image']); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" class="img-thumbnail mt-2" style="max-width: 200px;">
+                                            </a>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="projectImageModal" tabindex="-1" aria-labelledby="projectImageModalLabel" aria-hidden="true">
+                                              <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                  <div class="modal-header">
+                                                    <h5 class="modal-title" id="projectImageModalLabel"><?php echo htmlspecialchars($project['title']); ?></h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php echo __('close'); ?>"></button>
+                                                  </div>
+                                                  <div class="modal-body text-center">
+                                                    <img src="/uploads/<?php echo htmlspecialchars($project['project_image']); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" class="img-fluid">
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
                                             <?php endif; ?>
                                         </div>
                                     </div>

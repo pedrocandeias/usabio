@@ -30,6 +30,7 @@ class Project
             INSERT INTO projects (
                 title,
                 description,
+                owner_id, 
                 product_under_test,
                 business_case,
                 test_objectives,
@@ -44,6 +45,7 @@ class Project
             ) VALUES (
                 :title,
                 :description,
+                :owner_id,
                 :product_under_test,
                 :business_case,
                 :test_objectives,
@@ -61,6 +63,7 @@ class Project
         $stmt->execute([
             ':title' => $data['title'] ?? '',
             ':description' => $data['description'] ?? '',
+            ':owner_id' => $data['owner_id'] ?? 0,
             ':product_under_test' => $data['product_under_test'] ?? '',
             ':business_case' => $data['business_case'] ?? '',
             ':test_objectives' => $data['test_objectives'] ?? '',
@@ -81,6 +84,7 @@ class Project
             UPDATE projects SET
                 title = :title,
                 description = :description,
+                owner_id = :owner_id,
                 product_under_test = :product_under_test,
                 business_case = :business_case,
                 test_objectives = :test_objectives,
@@ -98,6 +102,7 @@ class Project
             ':id' => $id,
             ':title' => $data['title'] ?? '',
             ':description' => $data['description'] ?? '',
+            ':owner_id' => $data['owner_id'] ?? 0,
             ':product_under_test' => $data['product_under_test'] ?? '',
             ':business_case' => $data['business_case'] ?? '',
             ':test_objectives' => $data['test_objectives'] ?? '',

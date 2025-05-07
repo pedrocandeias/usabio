@@ -28,25 +28,63 @@ class ProjectController extends BaseController
      */
     public function index()
     {
+        $userId = $_SESSION['user_id'] ?? null;
+        $isSuperadmin = $_SESSION['is_superadmin'] ?? false;
+    
+        if (!$userId) {
+            header("Location: /index.php?controller=Auth&action=login");
+            exit;
+        }
+    
+        if ($isSuperadmin) {
+            $stmt = $this->pdo->query("SELECT * FROM projects ORDER BY created_at DESC");
+            $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $stmt = $this->pdo->prepare("
+                SELECT DISTINCT p.*
+                FROM projects p
+                LEFT JOIN project_user pu ON pu.project_id = p.id
+                WHERE p.owner_id = :user_id OR pu.moderator_id = :user_id
+                ORDER BY p.created_at DESC
+            ");
+            $stmt->execute(['user_id' => $userId]);
+            $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    
         $breadcrumbs = [
             ['label' => __('my_projects'), 'url' => '/index.php?controller=Project&action=index', 'active' => false],
         ];
-
-        $projects = $this->projectModel->all();
+    
         include __DIR__ . '/../views/projects/index.php';
     }
+    
 
     /**
      * Show create project form
      */
     public function create()
     {
+
+
+        $data = $_POST;
+
+        // Handle image upload
+        $projectImageName = '';
+        if (!empty($_FILES['layout_image']['name'])) {
+            $projectImageName = uniqid() . '_' . basename($_FILES['project_image']['name']);
+            move_uploaded_file(
+                $_FILES['project_image']['tmp_name'],
+                __DIR__ . '/../../uploads/' . $projectImageName
+            );
+        }
+
+        $data['project_image'] = $projectImageName;
+
         // Default empty project fields
         $project = [
             'id' => 0,
             'title' => '',
             'description' => '',
-            'image' => '',
             'status' => '',
             'product_under_test' => '',
             'business_case' => '',
@@ -85,51 +123,78 @@ class ProjectController extends BaseController
         }
     
         $data = $_POST;
+
+        $ownerId = $_SESSION['user_id'] ?? null;
+        if (!$ownerId) {
+            echo "User not authenticated.";
+            exit;
+        }
+
+         // Superadmins bypass limit
+        if (empty($_SESSION['is_superadmin'])) {
+            $userType = $_SESSION['user_type'] ?? 'normal';
+            $limit = $this->getMaxProjectsForUserType($userType);
+
+            // Count current projects owned by the user
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM projects WHERE owner_id = ?");
+            $stmt->execute([$ownerId]);
+            $projectCount = $stmt->fetchColumn();
+
+
+            if ($currentCount >= $limit) {
+                $_SESSION['toast_error'] = "⚠️ Reached your limit of $limit projects for your account type.";
+                header('Location: /index.php?controller=Project&action=index');
+                exit;
+            }
+            
+        }
+
+        if (!empty($_FILES['project_image']['name'])) {
+            if ($_FILES['project_image']['size'] > 2 * 1024 * 1024) {
+                echo __('image_size_2mb');
+                exit;
+            }
+        
+            $projectImageName = uniqid() . '_' . basename($_FILES['project_image']['name']);
+            move_uploaded_file(
+                $_FILES['project_image']['tmp_name'],
+                __DIR__ . '/../../uploads/' . $projectImageName
+            );
+            $data['project_image'] = $projectImageName;
+        }
     
+        $data['owner_id'] = $ownerId;
+
         // Create the project and get its ID
-        $project_id = $this->projectModel->create($data);
-    
+        $projectId = $this->projectModel->create($data);
+        
+        $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
+        $stmt->execute([$projectId, $ownerId]);
         // Assign users if provided
         $assignedUsers = $_POST['assigned_users'] ?? [];
-        if (!empty($assignedUsers)) {
-            $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-            foreach ($assignedUsers as $user_id) {
-                $stmt->execute([$project_id, $user_id]);
+        foreach ($assignedUsers as $userId) {
+            // Evitar duplicação do owner
+            if ($userId != $ownerId) {
+                $stmt->execute([$projectId, $userId]);
             }
         }
     
         // Redirect to project detail view
-        header("Location: /index.php?controller=Project&action=show&id=" . $project_id);
+        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
         exit;
     }
     
 
     public function show()
     {
+        $this->requireProjectAccess(); // 🔐 Verifica se o user pode ver este projeto
+    
         $project_id = $_GET['id'] ?? 0;
-
         if (!$project_id) {
             echo "Invalid project ID.";
             exit;
         }
-
-        // Superadmins can always access
-        if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
-            $stmt = $this->pdo->prepare(
-                "
-            SELECT 1 FROM project_user
-            WHERE project_id = ? AND moderator_id = ?
-        "
-            );
-            $stmt->execute([$project_id, $_SESSION['user_id']]);
-            $authorized = $stmt->fetchColumn();
-
-            if (!$authorized) {
-                echo "Access denied: You are not assigned to this project.";
-                exit;
-            }
-        }
-
+    
         // Fetch project
         $project = $this->projectModel->find($project_id);
         if (!$project) {
@@ -228,6 +293,15 @@ class ProjectController extends BaseController
     $totalQuestionnaireEvaluations = $evaluationTotals['total_questionnaires'] ?? 0;
 
 
+    $stmt = $this->pdo->prepare("
+    SELECT p.*, m.fullname AS owner_name
+    FROM projects p
+    JOIN moderators m ON p.owner_id = m.id
+    WHERE p.id = ?");
+    $stmt->execute([$project_id]);
+    $owners = $stmt->fetch(PDO::FETCH_ASSOC);
+
+   
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $project['title'], 'url' => '', 'active' => true],
@@ -324,8 +398,26 @@ class ProjectController extends BaseController
             }
         }
     
+        
         // Update project data
         $data = $_POST;
+
+        if (!empty($_FILES['project_image']['name'])) {
+            if ($_FILES['project_image']['size'] > 2 * 1024 * 1024) {
+                echo "Imagem demasiado grande (limite de 2MB).";
+                exit;
+            }
+        
+            $projectImageName = uniqid() . '_' . basename($_FILES['project_image']['name']);
+            move_uploaded_file(
+                $_FILES['project_image']['tmp_name'],
+                __DIR__ . '/../../uploads/' . $projectImageName
+            );
+            $data['project_image'] = $projectImageName;
+        }
+
+
+
         $this->projectModel->update($project_id, $data);
     
         // Update assigned users
@@ -342,21 +434,6 @@ class ProjectController extends BaseController
                 $stmt->execute([$project_id, $user_id]);
             }
         }
-
-        $data = $_POST;
-        // Usar imagem existente se não for enviada nova
-        $projectImageName = $data['existing_project_image'] ?? '';
-
-        if (!empty($_FILES['project_image']['name'])) {
-            $projectImageName = uniqid() . '_' . basename($_FILES['project_image']['name']);
-            $targetPath = __DIR__ . '/../../uploads/' . $projectImageName;
-
-            if (!move_uploaded_file($_FILES['project_image']['tmp_name'], $targetPath)) {
-                echo "⚠️ Falha no upload da imagem.";
-                exit;
-            }
-        }
-
     
         header("Location: /index.php?controller=Project&action=show&id=" . $project_id);
         exit;

@@ -19,7 +19,6 @@ require __DIR__ . '/../layouts/header.php';
 <div class="content flex-row-fluid" id="kt_content">
 <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>   
 
-<div class="container py-5">
 
     <div class="row align-items-center mb-4">
         <?php if (!empty($susBreakdown)) : ?>
@@ -79,7 +78,7 @@ require __DIR__ . '/../layouts/header.php';
     <?php if (!empty($taskStats)) : ?>
     <div class="card shadow-sm mb-5">
         <div class="card-header">
-            <h5 class="mb-0">🧪 Task Performance Overview</h5>
+            <h5 class="mb-0 card-title">🧪 Task Performance Overview</h5>
         </div>
         <div class="card-body">
             <table class="table table-bordered table-hover table-striped align-middle">
@@ -110,7 +109,7 @@ require __DIR__ . '/../layouts/header.php';
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h5 class="mb-0">Average Time per Task</h5>
+                    <h5 class="mb-0 card-title"><?php echo __('average_time_per_task'); ?></h5>
                 </div>
                 <div class="card-body">
                     <canvas id="taskTimeChart"></canvas>
@@ -121,7 +120,7 @@ require __DIR__ . '/../layouts/header.php';
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h5 class="mb-0">Error Count per Task</h5>
+                    <h5 class="mb-0  card-title">Error Count per Task</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="taskErrorChart"></canvas>
@@ -132,7 +131,7 @@ require __DIR__ . '/../layouts/header.php';
 
     <div class="card shadow-sm mb-5">
         <div class="card-header">
-            <h5 class="mb-0">Success Rate per Task</h5>
+            <h5 class="mb-0 card-title">Success Rate per Task</h5>
         </div>
         <div class="card-body">
             <canvas id="taskSuccessChart"></canvas>
@@ -144,7 +143,7 @@ require __DIR__ . '/../layouts/header.php';
     <?php if (!empty($susBreakdown)) : ?>
 <div class="card shadow-sm mb-5">
     <div class="card-header">
-        <h5 class="mb-0">🎯 SUS Score Distribution</h5>
+        <h5 class="mb-0  card-title">🎯 SUS Score Distribution</h5>
     </div>
     <div class="card-body">
         <canvas id="susScoreChart"></canvas>
@@ -153,7 +152,7 @@ require __DIR__ . '/../layouts/header.php';
 
 <div class="card shadow-sm mb-5">
     <div class="card-header">
-        <h5 class="mb-0">Participant Breakdown</h5>
+        <h5 class="mb-0 card-title">Participant Breakdown</h5>
     </div>
     <div class="card-body table-responsive">
         <table class="table table-sm table-bordered">
@@ -195,7 +194,7 @@ require __DIR__ . '/../layouts/header.php';
 <?php if (!empty($susSummary)) : ?>
 <div class="card shadow-sm mb-5">
     <div class="card-header">
-        <h5 class="mb-0">🧠 SUS Interpretation</h5>
+        <h5 class="mb-0 card-title">🧠 SUS Interpretation</h5>
     </div>
     <div class="card-body">
         <ul class="mb-0">
@@ -224,9 +223,8 @@ require __DIR__ . '/../layouts/header.php';
 </div>
 <?php endif; ?>
 <?php else: ?>
-<p class="text-muted">No valid SUS questionnaires detected for this project.</p>
+<p class="text-muted"><?php echo __('no_valid_sus_questionnaires_detected_for_this_project');?>.</p>
 <?php endif; ?>
-</div> <!-- /.container -->
 </div> <!-- /.content -->
 </div> <!-- /.kt_content_container -->
 

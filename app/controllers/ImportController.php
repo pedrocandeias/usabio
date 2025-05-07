@@ -256,14 +256,21 @@ class ImportController extends BaseController
 
     private function importFromJsonArray(array $data): int
     {
+
+        $ownerId = $_SESSION['user_id'] ?? null;
+
+        if (!$ownerId) {
+            echo "You must be logged in to import a project.";
+            exit;
+        }
         // Step 1: Insert project
         $project = $data['project'] ?? [];
         $stmt = $this->pdo->prepare(
             "
         INSERT INTO projects (
-            title, description, image, product_under_test, business_case,
+            title, description, owner_id, product_under_test, business_case,
             test_objectives, participants, equipment, responsibilities,
-            location_dates, test_procedure, project_image, created_at, updated_at,
+            location_dates, test_procedure, project_image, created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
     "
         );
@@ -271,7 +278,7 @@ class ImportController extends BaseController
             [
             $project['title'] ?? 'Imported Project',
             $project['description'] ?? '',
-            $project['image'] ?? '',
+            $ownerId,
             $project['product_under_test'] ?? '',
             $project['business_case'] ?? '',
             $project['test_objectives'] ?? '',
@@ -965,8 +972,8 @@ Your output **must** use this format:
 }
 
 Additional requirements:
-- Each test should contain at least **1 task group** with **5 tasks**.
-- Each test should contain at least **1 questionnaire group** with **5 questions**.
+- Each test should contain at least **1 task group** with **10 tasks**.
+- Each test should contain at least **1 questionnaire group** with **10 questions**.
 - Tasks and questions must be fully filled out (no placeholders).
 - Respond with valid **JSON only**, no explanations or comments.
 

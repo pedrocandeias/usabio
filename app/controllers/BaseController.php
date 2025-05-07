@@ -9,6 +9,7 @@ class BaseController
     protected $projectTests = [];
     protected $projectParticipants = [];
     protected $projectAssignedUsers = [];
+    protected $projectImage = null;
     public $lang = [];
 
     public function __construct($pdo)
@@ -96,5 +97,92 @@ class BaseController
             : include __DIR__ . '/../lang/en.php';
     
         $GLOBALS['lang'] = $this->lang; // Make it available to views and __()
+    }
+
+
+    protected function getMaxProjectsForUserType($userType)
+    {
+        $defaultLimits = [
+            'normal' => 1,
+            'premium' => 3,
+            'superpremium' => 9,
+        ];
+    
+        // Always allow superadmins unlimited access
+        if ($_SESSION['is_superadmin'] ?? false) {
+            return PHP_INT_MAX;
+        }
+    
+        $key = 'max_projects_per_' . strtolower($userType) . '_user';
+        $limit = (int) $this->getSetting($key);
+    
+        return $limit > 0 ? $limit : ($defaultLimits[$userType] ?? 0);
+    }
+    
+
+    protected function getMaxProjectsPerUser()
+{
+    return (int) $this->getSetting('max_projects_per_user') ?: 3;
+}
+
+
+public function userCanCreateProject(): bool
+{
+    // Superadmins podem sempre criar
+    if (!empty($_SESSION['is_superadmin'])) {
+        return true;
+    }
+
+    $userId = $_SESSION['user_id'] ?? null;
+    $userType = $_SESSION['user_type'] ?? 'normal';
+
+    // Conta projetos atuais do utilizador
+    $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM projects WHERE owner_id = ?");
+    $stmt->execute([$userId]);
+    $projectCount = $stmt->fetchColumn();
+
+    // Obtem o limite máximo
+    $max = $this->getMaxProjectsForUserType($userType);
+
+    return $projectCount < $max;
+}
+
+
+
+    protected function userCanAccessProject($projectId)
+    {
+        $userId = $_SESSION['user_id'] ?? null;
+        $isSuperadmin = $_SESSION['is_superadmin'] ?? false;
+
+        if ($isSuperadmin) {
+            return true;
+        }
+
+        // Verifica se é dono do projeto
+        $stmt = $this->pdo->prepare("SELECT owner_id FROM projects WHERE id = ?");
+        $stmt->execute([$projectId]);
+        $ownerId = $stmt->fetchColumn();
+
+        if ($ownerId == $userId) {
+            return true;
+        }
+
+        // Verifica se é utilizador atribuído
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM project_user
+            WHERE project_id = ? AND moderator_id = ?
+        ");
+        $stmt->execute([$projectId, $userId]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+    protected function requireProjectAccess()
+    {
+        $projectId = $this->projectBase['id'] ?? null;
+        if (!$projectId || !$this->userCanAccessProject($projectId)) {
+            header("HTTP/1.1 403 Forbidden");
+            echo "Access denied.";
+            exit;
+        }
     }
 }

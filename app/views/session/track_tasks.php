@@ -104,6 +104,7 @@ require __DIR__ . '/../layouts/header.php';
                                 <input type="hidden" name="time_spent[<?php echo $task['id']; ?>]" id="input-<?php echo $task['id']; ?>" value="0">
                             </div>
 
+                           
                             <!-- Answer Input -->
                             <div class="my-10">
                                 <?php
@@ -162,6 +163,13 @@ require __DIR__ . '/../layouts/header.php';
                             <div class="mb-2">
                                 <textarea name="notes[<?php echo $task['id']; ?>]" class="form-control" placeholder="Moderator notes..." rows="2"></textarea>
                             </div>
+                            <div class="d-flex align-items-center gap-3 flex-wrap my-10">
+                                <input class="form-check-input btn-check" type="checkbox" value="Error occurred" id="error-<?php echo $task['id']; ?>" name="errors[<?php echo $task['id']; ?>]">
+                                <label class="form-check-label btn btn-danger btn-bordered fs-3" for="error-<?php echo $task['id']; ?>">
+                                    <?php echo __('task_failed'); ?>
+                                </label>
+                            </div>
+
 
                         </div>
                     </div>

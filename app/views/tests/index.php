@@ -53,14 +53,19 @@ require __DIR__ . '/../layouts/header.php';
                                     <!--begin::Header-->
                                     <div class="d-flex flex-stack mb-3">
                                         <!--begin::Badge-->
-                                        <?php if ($test['status'] == 'complete') : ?>
-                                            <div class="badge badge-light-success"><?php echo __('completed'); ?></div>
-                                        <?php else : ?>
-                                            <?php if ($test['session_count'] > 0) : ?>
-                                                <div class="badge badge-light-warning"><?php echo __('in_progress'); ?></div>
-                                            <?php elseif ($test['session_count'] == 0) : ?>
-                                                <div class="badge badge-light-info"><?php echo __('not_yet_started'); ?></div>
+                                        <?php if (!empty($test['status'])) : ?>
+                                                <div class="badge badge-light-danger"><?php echo __('incomplete'); ?></div>
+                                            <?php if ($test['status'] == 'complete') : ?>
+                                                <div class="badge badge-light-success"><?php echo __('completed'); ?></div>
+                                            <?php else : ?>
+                                                <?php if ($test['session_count'] > 0) : ?>
+                                                    <div class="badge badge-light-warning"><?php echo __('in_progress'); ?></div>
+                                                <?php elseif ($test['session_count'] == 0) : ?>
+                                                    <div class="badge badge-light-info"><?php echo __('not_yet_started'); ?></div>
+                                                <?php endif; ?>
                                             <?php endif; ?>
+                                        <?php else: ?>
+                                            <div class="badge badge-light-danger"><?php echo __('not_yet_started'); ?></div>
                                         <?php endif; ?>
                                       
                                         <!--end::Badge-->

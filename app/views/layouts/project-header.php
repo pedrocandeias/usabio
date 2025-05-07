@@ -6,7 +6,6 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
     $projectAssignedUsers = $this->projectAssignedUsers;
 }
 ?>
-
 <!--begin::Navbar-->
 <div class="card mb-6 mb-xl-9 d-print-none">
     <div class="card-body pt-9 pb-0">
@@ -14,10 +13,8 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
         <div class="d-flex flex-wrap flex-sm-nowrap mb-6">
             <!--begin::Image-->
             <div class="d-flex flex-center flex-shrink-0 bg-light rounded w-100px h-100px w-lg-150px h-lg-150px me-7 mb-4">
-                <?php if (!empty($projectBase['image'])) : ?>
-                <img class="mw-50px mw-lg-75px" src="<?php echo htmlspecialchars($projectBase['image']); ?>" alt="<?php echo $projectBase; ?>" />
-                <?php else : ?>
-                <img class="mw-50px mw-lg-75px" src="assets/media/svg/brand-logos/plurk.svg" alt="<?php echo $projectBase; ?>" />
+                <?php if (!empty($projectBase['project_image'])) : ?>
+                <img class="img-fluid" src="/uploads/<?php echo htmlspecialchars($projectBase['project_image']); ?>" alt="<?php echo $projectBase['title']; ?>" />
                 <?php endif; ?>
             </div>
             <!--end::Image-->

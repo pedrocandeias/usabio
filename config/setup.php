@@ -18,24 +18,28 @@ try {
     $tables = [
 
         // === TABLE: projects ===
-        "CREATE TABLE IF NOT EXISTS projects (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            description TEXT,
-            image VARCHAR(255),
-            status ENUM('complete', 'inprogress') DEFAULT 'inprogress',
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            product_under_test TEXT NOT NULL,
-            business_case TEXT NOT NULL,
-            test_objectives TEXT NOT NULL,
-            participants TEXT NOT NULL,
-            equipment TEXT NOT NULL,
-            responsibilities TEXT NOT NULL,
-            location_dates TEXT NOT NULL,
-            test_procedure TEXT NOT NULL,
-            project_image VARCHAR(255),
-        ) ENGINE=InnoDB;" => "projects",
+      "CREATE TABLE IF NOT EXISTS projects (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        owner_id INT NOT NULL,
+        status ENUM('complete', 'inprogress') DEFAULT 'inprogress',
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        product_under_test TEXT NOT NULL,
+        business_case TEXT NOT NULL,
+        test_objectives TEXT NOT NULL,
+        participants TEXT NOT NULL,
+        equipment TEXT NOT NULL,
+        responsibilities TEXT NOT NULL,
+        location_dates TEXT NOT NULL,
+        test_procedure TEXT NOT NULL,
+        project_image VARCHAR(255),
+        CONSTRAINT fk_projects_owner FOREIGN KEY (owner_id) REFERENCES moderators(id)
+            ON DELETE CASCADE
+            ON UPDATE RESTRICT
+    ) ENGINE=InnoDB;" => "projects",
+
 
         // === TABLE: tests ===
         "CREATE TABLE IF NOT EXISTS tests (
@@ -65,7 +69,8 @@ try {
             password_hash VARCHAR(255) NOT NULL,
             reset_token VARCHAR(255)  DEFAULT NULL,
             is_superadmin BOOLEAN NOT NULL DEFAULT 0,
-            is_admin BOOLEAN NOT NULL DEFAULT 0
+            is_admin BOOLEAN NOT NULL DEFAULT 0,
+            user_type VARCHAR(20) DEFAULT 'normal'
         ) ENGINE=InnoDB;" => "moderators",
         
         // === TABLE: project_user ===
@@ -77,15 +82,7 @@ try {
             FOREIGN KEY (moderator_id) REFERENCES moderators(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "project_user",
 
-        // === TABLE: moderator_test ===
-        "CREATE TABLE IF NOT EXISTS moderator_test (
-            moderator_id INT NOT NULL,
-            test_id INT NOT NULL,
-            PRIMARY KEY (moderator_id, test_id),
-            FOREIGN KEY (moderator_id) REFERENCES moderators(id) ON DELETE CASCADE,
-            FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB;" => "moderator_test",
-
+       
         // === TABLE: task_groups ===
         "CREATE TABLE IF NOT EXISTS task_groups (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -238,6 +235,10 @@ try {
             ui_theme VARCHAR(50) DEFAULT 'default',
             feature_flags TEXT DEFAULT NULL,
             allow_registration BOOLEAN DEFAULT 0,
+            max_projects_per_user varchar(100) DEFAULT '0',
+            max_projects_per_normal_user varchar(100) DEFAULT '1',
+            max_projects_per_premium_user varchar(100) DEFAULT '3',
+            max_projects_per_superpremium_user DEFAULT '9',
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) ENGINE=InnoDB;" => "settings",
         

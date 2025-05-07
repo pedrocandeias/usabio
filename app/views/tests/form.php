@@ -32,7 +32,21 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <input type="file" name="layout_image" class="form-control" accept="image/*">
                     <?php if (!empty($test['layout_image'])): ?>
                         <div class="mt-2">
-                            <img src="/uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" style="max-width: 100%; height: auto;" alt="Layout image">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#layoutImageModal">View Layout Image</a>
+                        </div>
+                        <!-- Modal -->
+                        <div class="modal fade" id="layoutImageModal" tabindex="-1" aria-labelledby="layoutImageModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="layoutImageModalLabel">Layout Image</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="/uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" style="max-width: 100%; height: auto;" alt="Layout image">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </div>

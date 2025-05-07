@@ -44,7 +44,12 @@ require __DIR__ . '/../layouts/header.php';
                                 <?php if (!empty($assignedUsers)) : ?>
                                     <ul class="list-group mb-4">
                                         <?php foreach ($assignedUsers as $user): ?>
-                                            <li class="list-group-item"><?php echo htmlspecialchars($user['username']); ?></li>
+                                            <li class="list-group-item">
+                                            <?php if ($user['id'] == $project['owner_id']): ?>
+            <span class="badge bg-primary ms-2">Admin</span>
+        <?php endif; ?>    
+                                            
+                                            <?php echo $user['fullname'];?> - <?php echo htmlspecialchars($user['username']); ?></li>
                                         <?php endforeach; ?>
                                     </ul>
                                 <?php else: ?>

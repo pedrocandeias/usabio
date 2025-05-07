@@ -11,7 +11,7 @@ $headerNavbuttons = [
         'id' => 'kt_back_home_primary_button',
     ],
 ];
-
+$canCreateProject = $this->userCanCreateProject();
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 

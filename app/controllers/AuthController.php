@@ -41,45 +41,42 @@ class AuthController
             header('Location: /?controller=Auth&action=login');
             exit;
         }
-
+    
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-
+    
         $stmt = $this->pdo->prepare("SELECT * FROM moderators WHERE username = :username LIMIT 1");
         $stmt->bindValue(':username', $username);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
+        // ✅ Só verifica após confirmação do utilizador
         if ($user && password_verify($password, $user['password_hash'])) {
-            // ✅ Store session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['fullname'] = $user['fullname'] ?? $user['username'];
+            $_SESSION['user_type'] = $user['user_type'] ?? 'normal';
             $_SESSION['is_admin'] = $user['is_admin'];
-            $_SESSION['is_superadmin'] = $user['is_superadmin']; // fix here too
-
-            $stmt = $this->pdo->prepare(
-                "
-            UPDATE moderators
-            SET last_login = NOW(),
-                last_login_ip = ?,
-                last_login_user_agent = ?
-            WHERE id = ?
-        "
-            );
-            $stmt->execute(
-                [
+            $_SESSION['is_superadmin'] = $user['is_superadmin'];
+    
+            // Track login data
+            $stmt = $this->pdo->prepare("
+                UPDATE moderators
+                SET last_login = NOW(),
+                    last_login_ip = ?,
+                    last_login_user_agent = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([
                 $_SERVER['REMOTE_ADDR'],
                 $_SERVER['HTTP_USER_AGENT'],
                 $user['id']
-                ]
-            );
-
-            // ✅ Redirect after login
+            ]);
+    
             header('Location: /?controller=Project&action=index');
             exit;
         }
-
+    
         header('Location: /?controller=Auth&action=login&error=Invalid%20credentials');
         exit;
     }

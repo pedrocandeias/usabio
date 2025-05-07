@@ -24,17 +24,21 @@ require __DIR__ . '/../layouts/header.php';
 
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Moderators for <?php echo htmlspecialchars($project['title']); ?></h3>
+                <h3 class="card-title"><?php echo __('moderators_for'); ?> <?php echo htmlspecialchars($project['title']); ?></h3>
                 <div class="card-toolbar">
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_moderator">Assign Moderators</button>
                 </div>
             </div>
+                  
             <div class="card-body">
                 <?php if (!empty($assignedUsers)) : ?>
                     <ul class="list-group">
                         <?php foreach ($assignedUsers as $user): ?>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span><?php echo htmlspecialchars($user['username']); ?></span>
+                            <li class="list-group-item d-flex justify-content-between fs-5">
+                                <span><?php echo $user['fullname'];?> - <?php echo htmlspecialchars($user['username']); ?>
+                                <?php if ($user['id'] == $project['owner_id']): ?>
+                                <span class="badge bg-primary ms-2 text-white">Admin</span>
+                                <?php endif; ?></span>
                                 <a href="/index.php?controller=ProjectUser&action=delete&project_id=<?php echo $project_id; ?>&user_id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm">Remove</a>
                             </li>
                         <?php endforeach; ?>
@@ -50,7 +54,7 @@ require __DIR__ . '/../layouts/header.php';
             <div class="modal-dialog modal-dialog-centered mw-700px">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>Assign Moderators</h2>
+                        <h2><?php echo __('assign_moderators'); ?></h2>
                         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
                             <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                         </div>
@@ -59,7 +63,7 @@ require __DIR__ . '/../layouts/header.php';
                         <form method="POST" action="/index.php?controller=ProjectUser&action=save">
                             <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
                             <div class="mb-4">
-                                <label class="form-label">Select moderators to assign:</label>
+                                <label class="form-label"><?php echo __('select_moderators_to_assign'); ?></label>
                                 <select name="assigned_users[]" class="form-select" multiple size="10">
                                     <?php foreach ($allModerators as $moderator): ?>
                                         <option value="<?php echo $moderator['id']; ?>" <?php echo in_array($moderator['id'], $assignedModeratorIds) ? 'selected' : ''; ?>>
@@ -67,11 +71,11 @@ require __DIR__ . '/../layouts/header.php';
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple moderators.</small>
+                                <small class="text-muted"><?php echo __('hold_ctrl_windows_or_cmd_mac_to_select_multiple_moderators'); ?>.</small>
                             </div>
                             <div class="text-end">
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></button>
                             </div>
                         </form>
                     </div>

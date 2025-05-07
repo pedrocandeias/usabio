@@ -42,7 +42,7 @@ class ProjectUserController extends BaseController
 
         $stmt = $this->pdo->prepare(
             "
-            SELECT m.id, m.username 
+            SELECT m.id, m.username, m.fullname
             FROM project_user pu 
             JOIN moderators m ON pu.moderator_id = m.id 
             WHERE pu.project_id = ?
