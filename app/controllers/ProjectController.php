@@ -107,7 +107,6 @@ class ProjectController extends BaseController
 
         ];
 
-
         include __DIR__ . '/../views/projects/add_project.php';
 
     }

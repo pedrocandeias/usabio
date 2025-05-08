@@ -16,7 +16,7 @@ $pageDescription = "Create a new account";
                     <a href="/" class="mb-7">
                         <img alt="Logo" src="/assets/media/logos/logo-white-login.svg" />
                     </a>
-                    <h2 class="text-white fw-normal m-0">Workflow Usability Tests</h2>
+                    <h2 class="text-white fw-normal m-0">Industrial Design Usability Assessments</h2>
                 </div>
             </div>
 
@@ -25,8 +25,8 @@ $pageDescription = "Create a new account";
                 <div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-4 w-md-600px p-20">
 
                     <div class="d-flex flex-center flex-column flex-column-fluid px-lg-10 pb-15 pb-lg-20">
-                        <form class="form w-100" method="POST" action="/?controller=Auth&action=storeRegistration" id="kt_sign_up_form">
-                            <!--begin::Heading-->
+<form class="form w-100" method="POST" action="/?controller=Auth&action=storeRegistration" id="kt_sign_up_form">
+    <!--begin::Heading-->
     <div class="text-center mb-11">
         <h1 class="text-gray-900 fw-bolder mb-3">Sign Up</h1>
         <div class="text-gray-500 fw-semibold fs-6">Create your moderator account</div>
@@ -40,7 +40,7 @@ $pageDescription = "Create a new account";
     <div class="fv-row mb-8" data-kt-password-meter="true">
         <div class="mb-1">
             <div class="position-relative mb-3">
-        <div class="text-muted">Use 8 or more characters with a mix of letters, numbers & symbols.</div>
+                <div class="text-muted py-2 px-2">Use 8 or more characters with a mix of letters, numbers & symbols.</div>
                 <input class="form-control bg-transparent" type="password" placeholder="Password" name="password" autocomplete="off" required />
                 <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2" data-kt-password-meter-control="visibility">
                     <i class="ki-duotone ki-eye-slash fs-2"></i>
@@ -48,13 +48,12 @@ $pageDescription = "Create a new account";
                 </span>
             </div>
             <div class="d-flex align-items-center mb-3" data-kt-password-meter-control="highlight">
-                <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
-                <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
-                <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
-                <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px"></div>
+                <div class="flex-grow-1 bg-light bg-active-success rounded h-5px me-2"></div>
+                <div class="flex-grow-1 bg-light bg-active-success rounded h-5px me-2"></div>
+                <div class="flex-grow-1 bg-light bg-active-success rounded h-5px me-2"></div>
+                <div class="flex-grow-1 bg-light bg-active-success rounded h-5px"></div>
             </div>
         </div>
-        <div class="text-muted">Use 8 or more characters with a mix of letters, numbers & symbols.</div>
     </div>
 
     <div class="fv-row mb-8">
@@ -70,7 +69,7 @@ $pageDescription = "Create a new account";
     </div>
 
     <div class="d-grid mb-10">
-        <button type="submit" id="kt_sign_up_submit" class="btn btn-primary">
+        <button type="submit"  class="btn btn-primary">
             <span class="indicator-label">Sign up</span>
             <span class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -99,10 +98,5 @@ $pageDescription = "Create a new account";
 
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
 <script src="assets/js/custom/authentication/sign-up/general.js"></script>
-<script>
-KTUtil.onDOMContentLoaded(function () {
-    KTPasswordMeter.init();
-});
-</script>
 </body>
 </html>

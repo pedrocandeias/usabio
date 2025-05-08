@@ -149,7 +149,7 @@ if (!empty($_SESSION['fullname']) ) {
                                 <!--end:Item-->
                                 <!--begin:Item-->
                                 <div class="col-6">
-                                    <a href="https://usabio.ddev.site:8443/index.php?controller=Settings&action=index" class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-bottom">
+                                    <a href="/index.php?controller=Settings&action=index" class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-bottom">
                                         <i class="ki-duotone ki-gear fs-3x text-primary mb-2">
                                             <span class="path1"></span>
                                             <span class="path2"></span>

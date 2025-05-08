@@ -253,7 +253,20 @@ try {
         FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
         FOREIGN KEY (moderator_id) REFERENCES moderators(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;"    => "project_invites",    
+   
+
+// === TABLE: pending_invite_emails ===
+"CREATE TABLE pending_invite_emails (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    project_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    status ENUM('sent','registered') DEFAULT 'sent',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;" => "pending_invite_emails",
+
     ];
+    // Create tables if they don't exist
+
 
     foreach ($tables as $sql => $name) {
         $pdo->exec($sql);

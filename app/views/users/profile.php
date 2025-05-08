@@ -19,6 +19,24 @@ require __DIR__ . '/../layouts/header.php';
 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
     <!--begin::Post-->
     <div class="content flex-row-fluid" id="kt_content">
+
+    <div class="card mb-5">
+        <div class="card-body py-0">
+            <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold">
+                <li class="nav-item">
+                    <a class="nav-link text-active-primary py-5 me-6 active" href="index.php?controller=User&action=profile">
+                        <?php echo __('account_settings'); ?>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-active-primary py-5 me-6 " href="index.php?controller=Invite&action=index">
+                        <?php echo __('project_invitations'); ?>
+                    </a>
+                </li>   
+            </ul>
+        </div>
+    </div>
+
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">My profile

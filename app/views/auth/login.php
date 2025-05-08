@@ -16,7 +16,7 @@ $pageDescription = "Login to your account";
                     <a href="/" class="mb-7">
                         <img alt="Logo" src="/assets/media/logos/logo-white-login.svg" />
                     </a>
-                    <h2 class="text-white fw-normal m-0">Workflow Usability Tests</h2>
+                    <h2 class="text-white fw-normal m-0">Industrial Design Usability Assessments</h2>
                 </div>
             </div>
 

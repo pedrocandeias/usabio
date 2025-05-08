@@ -13,7 +13,6 @@ $headerNavbuttons = [
 ];
 
 require __DIR__ . '/../layouts/header.php'; 
-
 ?>
 
 <!--begin::Container-->
@@ -31,21 +30,55 @@ require __DIR__ . '/../layouts/header.php';
             </div>
                   
             <div class="card-body">
-                <?php if (!empty($assignedUsers)) : ?>
-                    <ul class="list-group">
-                        <?php foreach ($assignedUsers as $user): ?>
-                            <li class="list-group-item d-flex justify-content-between fs-5">
-                                <span><?php echo $user['fullname'];?> - <?php echo htmlspecialchars($user['username']); ?>
-                                <?php if ($user['id'] == $project['owner_id']): ?>
-                                <span class="badge bg-primary ms-2 text-white">Admin</span>
-                                <?php endif; ?></span>
-                                <a href="/index.php?controller=ProjectUser&action=delete&project_id=<?php echo $project_id; ?>&user_id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm">Remove</a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else: ?>
-                    <p class="text-muted">No moderators assigned to this project.</p>
-                <?php endif; ?>
+            <?php if (!empty($visibleModerators)) : ?>
+            <ul class="list-group">
+            <?php foreach ($visibleModerators as $key => $moderator): ?>
+            <?php
+                $id = $moderator['id'];
+                $isAssigned = in_array($id, $assignedModeratorIds);
+                $isPending = in_array($id, $pendingInviteModeratorIds);
+            ?>
+            <li class="list-group-item d-flex justify-content-between align-items-center fs-5">
+                <span>
+                    <?php if (!empty($moderator['email']) && empty($moderator['fullname'])): ?>
+                        <?php echo htmlspecialchars($moderator['email']); ?>
+                    <?php else: ?>
+                        <?php echo htmlspecialchars($moderator['fullname'] ?? $moderator['username']); ?>
+                    <?php endif; ?>
+
+                    <?php if ($moderator['status'] === 'assigned'): ?>
+                        <span class="badge bg-success ms-2">Assigned</span>
+                    <?php elseif ($moderator['status'] === 'pending'): ?>
+                        <span class="badge bg-warning text-dark ms-2">Pending Invite</span>
+                    <?php elseif ($moderator['status'] === 'email_sent'): ?>
+                        <span class="badge bg-info text-white ms-2">Email Sent</span>
+                    <?php endif; ?>
+                </span>
+
+                <div class="d-flex gap-2">
+                    <?php if ($moderator['status'] === 'assigned'): ?>
+                        <a href="/index.php?controller=ProjectUser&action=delete&project_id=<?php echo $project_id; ?>&user_id=<?php echo $moderator['id']; ?>" class="btn btn-danger btn-sm">Remove</a>
+                    <?php elseif ($moderator['status'] === 'pending'): ?>
+                        <form method="POST" action="/index.php?controller=Invite&action=cancel" onsubmit="return confirm('Cancel this invite?')">
+                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                            <input type="hidden" name="moderator_id" value="<?php echo $moderator['id']; ?>">
+                            <button class="btn btn-outline-secondary btn-sm">Cancel Invite</button>
+                        </form>
+                    <?php elseif ($moderator['status'] === 'email_sent'): ?>
+                        <form method="POST" action="/index.php?controller=Invite&action=cancelEmail" onsubmit="return confirm('Cancel email invite?')">
+                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                            <input type="hidden" name="email" value="<?php echo htmlspecialchars($moderator['email']); ?>">
+                            <button class="btn btn-outline-secondary btn-sm">Cancel Email</button>
+                        </form>
+                    <?php endif; ?>
+                </div>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+<?php else: ?>
+    <p class="text-muted">No moderators found.</p>
+<?php endif; ?>
+
             </div>
         </div>
 
@@ -60,24 +93,20 @@ require __DIR__ . '/../layouts/header.php';
                         </div>
                     </div>
                     <div class="modal-body py-10 px-10">
-                        <form method="POST" action="/index.php?controller=ProjectUser&action=save">
+                       
+                        <form method="POST" action="/index.php?controller=Invite&action=create">
                             <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
                             <div class="mb-4">
-                                <label class="form-label"><?php echo __('select_moderators_to_assign'); ?></label>
-                                <select name="assigned_users[]" class="form-select" multiple size="10">
-                                    <?php foreach ($allModerators as $moderator): ?>
-                                        <option value="<?php echo $moderator['id']; ?>" <?php echo in_array($moderator['id'], $assignedModeratorIds) ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($moderator['username']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <small class="text-muted"><?php echo __('hold_ctrl_windows_or_cmd_mac_to_select_multiple_moderators'); ?>.</small>
+                                <label class="form-label"><?php echo __('invite_by_email'); ?></label>
+                                <input type="email" name="email" class="form-control" placeholder="Enter moderator's email" required />
+                                <small class="text-muted"><?php echo __('if_the_user_does_not_exist_they_will_be_invited_to_register'); ?>.</small>
                             </div>
                             <div class="text-end">
-                                <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
+                                <button type="submit" class="btn btn-primary"><?php echo __('send_invite'); ?></button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -89,5 +118,51 @@ require __DIR__ . '/../layouts/header.php';
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
+
+
+<?php
+$toastMessage = '';
+$toastType = 'success'; // ou 'danger' se for erro
+
+if (!empty($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'moderator_removed':
+            $toastMessage = 'Moderator removed successfully.';
+            break;
+        case 'invite_sent':
+            $toastMessage = 'Invite sent successfully.';
+            break;
+        case 'invite_email_sent':
+            $toastMessage = 'Email invitation sent.';
+            break;
+    }
+}
+
+if (!empty($_GET['error'])) {
+    $toastMessage = htmlspecialchars($_GET['error']);
+    $toastType = 'danger';
+}
+?>
+
+<?php if (!empty($toastMessage)): ?>
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            const toastEl = document.getElementById('savedToast');
+            const toastMsg = document.getElementById('toastMessage');
+
+            if (toastEl && toastMsg) {
+                toastMsg.innerText = "<?php echo $toastMessage; ?>";
+
+                toastEl.classList.remove('text-bg-success', 'text-bg-danger');
+                toastEl.classList.add('text-bg-<?php echo $toastType; ?>');
+
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
+    </script>
+<?php endif; ?>
+
+
 </body>
 </html>

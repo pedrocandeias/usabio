@@ -20,6 +20,9 @@ require __DIR__ . '/../layouts/header.php';
     <!--begin::Post-->
     <div class="content flex-row-fluid" id="kt_content">
 
+
+
+
 <?php require_once __DIR__ . '/../layouts/admin-header.php'; ?>
 
 <div class="card">
@@ -73,6 +76,35 @@ require __DIR__ . '/../layouts/header.php';
             <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" name="allow_registration" <?php echo $settings['allow_registration'] ? 'checked' : ''; ?>>
                 <label class="form-check-label">Allow Public Registration</label>
+            </div>
+
+            <div class="mb-4">
+                <h3>Mailserver Settings</h3>
+                <p>Provide your mailserver configuration below.</p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mailserver Host</label>
+                <input type="text" class="form-control" name="mailserver_host" value="<?php echo htmlspecialchars($settings['mailserver_host'] ?? ''); ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mailserver Port</label>
+                <input type="text" class="form-control" name="mailserver_port" value="<?php echo htmlspecialchars($settings['mailserver_port'] ?? ''); ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mailserver Username</label>
+                <input type="text" class="form-control" name="mailserver_username" value="<?php echo htmlspecialchars($settings['mailserver_username'] ?? ''); ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mailserver Password</label>
+                <input type="password" class="form-control" name="mailserver_password" value="<?php echo htmlspecialchars($settings['mailserver_password'] ?? ''); ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mailserver Encryption</label>
+                <select name="mailserver_encryption" class="form-select">
+                    <option value="" <?php echo empty($settings['mailserver_encryption']) ? 'selected' : ''; ?>>None</option>
+                    <option value="ssl" <?php echo (isset($settings['mailserver_encryption']) && $settings['mailserver_encryption'] === 'ssl') ? 'selected' : ''; ?>>SSL</option>
+                    <option value="tls" <?php echo (isset($settings['mailserver_encryption']) && $settings['mailserver_encryption'] === 'tls') ? 'selected' : ''; ?>>TLS</option>
+                </select>
             </div>
 
             <button type="submit" class="btn btn-primary">Save Settings</button>

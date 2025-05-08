@@ -73,6 +73,7 @@ class AuthController
                 $user['id']
             ]);
     
+      
             header('Location: /?controller=Project&action=index');
             exit;
         }
@@ -82,6 +83,7 @@ class AuthController
     }
 
 
+    
     /**
      * Logout the user by destroying the session.
      */
@@ -98,27 +100,83 @@ class AuthController
     }
     
     public function storeRegistration() {
-        $username = trim($_POST['username'] ?? '');
+        $email = trim($_POST['email'] ?? '');
         $password = trim($_POST['password'] ?? '');
         $confirm  = trim($_POST['confirm_password'] ?? '');
+        $toc = $_POST['toc'] ?? '';
     
-        if (!$username || !$password || $password !== $confirm) {
-            header('Location: index.php?controller=Auth&action=register&error=1');
+        // Validação básica dos campos
+        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            header('Location: index.php?controller=Auth&action=register&error=invalid_email');
             exit;
         }
     
-        // Verifica se o utilizador já existe
+        if (!$password || $password !== $confirm) {
+            header('Location: index.php?controller=Auth&action=register&error=password_mismatch');
+            exit;
+        }
+    
+        if (!$toc) {
+            header('Location: index.php?controller=Auth&action=register&error=terms');
+            exit;
+        }
+    
+        // Gera username automático a partir do email
+        $baseUsername = strtolower(strstr($email, '@', true));
+        $username = $baseUsername;
+        $counter = 1;
+    
+        // Verifica se username já existe, se sim, acrescenta número incremental
         $stmt = $this->pdo->prepare("SELECT id FROM moderators WHERE username = ?");
-        $stmt->execute([$username]);
+        while (true) {
+            $stmt->execute([$username]);
+            if (!$stmt->fetch()) {
+                break;  // Username livre
+            }
+            $username = $baseUsername . '-' . $counter++;
+        }
+    
+        // Verifica duplicação de email
+        $stmt = $this->pdo->prepare("SELECT id FROM moderators WHERE email = ?");
+        $stmt->execute([$email]);
         if ($stmt->fetch()) {
-            header('Location: index.php?controller=Auth&action=register&error=exists');
+            header('Location: index.php?controller=Auth&action=register&error=exists_email');
             exit;
         }
     
+        // Insere novo moderador na base de dados
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->pdo->prepare("INSERT INTO moderators (username, password_hash, is_admin) VALUES (?, ?, 0)");
-        $stmt->execute([$username, $hash]);
-    
+        $stmt = $this->pdo->prepare("INSERT INTO moderators (username, email, password_hash, is_admin) VALUES (?, ?, ?, 0)");
+        $stmt->execute([$username, $email, $hash]);
+
+        $newUserId = $this->pdo->lastInsertId();
+
+        // Verifica se havia convites pendentes para este email
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM pending_invite_emails WHERE email = ?
+        ");
+        $stmt->execute([$email]);
+        $pendingInvites = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (!empty($pendingInvites)) {
+            require_once __DIR__ . '/../models/ProjectInvite.php';
+            $inviteModel = new ProjectInvite($this->pdo);
+        
+            foreach ($pendingInvites as $invite) {
+                // Cria convite real
+                $inviteModel->createInvite($invite['project_id'], $newUserId);
+        
+                // Marca como "registered"
+                $stmt = $this->pdo->prepare("
+                    UPDATE pending_invite_emails SET status = 'registered' WHERE id = ?
+                ");
+                $stmt->execute([$invite['id']]);
+            }
+        }
+        
+
         header('Location: index.php?controller=Auth&action=login&success=registered');
+        exit;
     }
+    
 }
