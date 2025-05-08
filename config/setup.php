@@ -17,6 +17,46 @@ try {
     // Table definitions
     $tables = [
 
+
+        // === TABLE: moderators ===
+        "CREATE TABLE IF NOT EXISTS moderators (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            last_login DATETIME DEFAULT NULL,
+            last_login_ip VARCHAR(45) DEFAULT NULL,
+            last_login_user_agent VARCHAR(255) DEFAULT NULL,
+            last_login_location VARCHAR(255) DEFAULT NULL,
+            fullname VARCHAR(255) DEFAULT NULL,
+            company VARCHAR(255) DEFAULT NULL,
+            password_hash VARCHAR(255) NOT NULL,
+            reset_token VARCHAR(255)  DEFAULT NULL,
+            is_superadmin BOOLEAN NOT NULL DEFAULT 0,
+            is_admin BOOLEAN NOT NULL DEFAULT 0,
+            user_type VARCHAR(20) DEFAULT 'none'
+        ) ENGINE=InnoDB;" => "moderators",
+        
+   // === TABLE: settings ===
+   "CREATE TABLE IF NOT EXISTS settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(100) NOT NULL UNIQUE,
+    setting_value TEXT NOT NULL,
+    enable_apikey BOOLEAN DEFAULT 0,
+    enable_registration BOOLEAN DEFAULT 0,
+    enable_login BOOLEAN DEFAULT 0,
+    default_language VARCHAR(10) DEFAULT 'en',
+    ui_theme VARCHAR(50) DEFAULT 'default',
+    feature_flags TEXT DEFAULT NULL,
+    allow_registration BOOLEAN DEFAULT 0,
+    max_projects_per_user VARCHAR(100) DEFAULT '0',
+    max_projects_per_normal_user VARCHAR(100) DEFAULT '1',
+    max_projects_per_premium_user VARCHAR(100) DEFAULT '3',
+    max_projects_per_superpremium_user VARCHAR(100) DEFAULT '9',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;" => "settings",
+
         // === TABLE: projects ===
       "CREATE TABLE IF NOT EXISTS projects (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,26 +93,6 @@ try {
             FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "tests",
 
-        // === TABLE: moderators ===
-        "CREATE TABLE IF NOT EXISTS moderators (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) NOT NULL UNIQUE,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            last_login DATETIME DEFAULT NULL,
-            last_login_ip VARCHAR(45) DEFAULT NULL,
-            last_login_user_agent VARCHAR(255) DEFAULT NULL,
-            last_login_location VARCHAR(255) DEFAULT NULL,
-            fullname VARCHAR(255) DEFAULT NULL,
-            company VARCHAR(255) DEFAULT NULL,
-            password_hash VARCHAR(255) NOT NULL,
-            reset_token VARCHAR(255)  DEFAULT NULL,
-            is_superadmin BOOLEAN NOT NULL DEFAULT 0,
-            is_admin BOOLEAN NOT NULL DEFAULT 0,
-            user_type VARCHAR(20) DEFAULT 'normal'
-        ) ENGINE=InnoDB;" => "moderators",
-        
         // === TABLE: project_user ===
         "CREATE TABLE IF NOT EXISTS project_user (
             project_id INT NOT NULL,
@@ -223,24 +243,7 @@ try {
             FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "test_sessions",
 
-        // === TABLE: settings ===
-      "CREATE TABLE IF NOT EXISTS settings (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            setting_key VARCHAR(100) NOT NULL UNIQUE,
-            setting_value TEXT NOT NULL,
-            enable_apikey BOOLEAN DEFAULT 0,
-            enable_registration BOOLEAN DEFAULT 0,
-            enable_login BOOLEAN DEFAULT 0,
-            default_language VARCHAR(10) DEFAULT 'en',
-            ui_theme VARCHAR(50) DEFAULT 'default',
-            feature_flags TEXT DEFAULT NULL,
-            allow_registration BOOLEAN DEFAULT 0,
-            max_projects_per_user VARCHAR(100) DEFAULT '0',
-            max_projects_per_normal_user VARCHAR(100) DEFAULT '1',
-            max_projects_per_premium_user VARCHAR(100) DEFAULT '3',
-            max_projects_per_superpremium_user VARCHAR(100) DEFAULT '9',
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB;" => "settings",
+     
 
     // === TABLE: Project Invites ===
     "CREATE TABLE IF NOT EXISTS project_invites (

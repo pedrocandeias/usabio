@@ -278,5 +278,17 @@ return [
     'generate_with_ai' => 'Gerar com IA',
     'assign_moderators' => 'Atribuir Moderadores',
     'select_moderators_to_assign' => 'Selecione os moderadores a atribuir',
+    'no_projects_found' => 'Nenhum projecto encontrado.',
+    'send_invite' => 'Enviar Convite',
+    'cancel_invite' => 'Cancelar Convite',
+    'pending_invite' => 'Convite Pendente',
+    'project_invitations' => 'Convites para Projectos',
+    'already_invited' => 'Já convidado',
+    'send' => 'Enviar',
+    'you_have_no_pending_invitations_at_the_moment' => 'Não tem convites pendentes no momento',
+    'back_to_moderator_management' => 'Voltar para a Gestão de Moderadores',
+    'invite_by_email' => 'Convidar por Email',
+    'if_the_user_does_not_exist_they_will_be_invited_to_register' => 'Se o utilizador não existir, será convidado a registar-se.',
+    'export_data_for' => 'Export data for',
 ];
 ?>

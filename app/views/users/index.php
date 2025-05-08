@@ -54,19 +54,20 @@ require __DIR__ . '/../layouts/header.php';
                         </tr>
                     </thead>
                     <tbody class="fs-6">
-                        <?php foreach ($users as $user): ?>
+         
+                        <?php foreach ($users as $moderator): ?>
                             <tr>
-                                <td><?php echo $user['id']; ?></td>
-                                <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                <td><?php echo htmlspecialchars($user['fullname']); ?></td>
-                                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                <td><?php echo htmlspecialchars($user['company']); ?></td>
-                                <td><?php echo $user['is_admin'] ? '✅' : ''; ?></td>
-                                <td><?php echo $user['is_superadmin'] ? '✅' : ''; ?></td>
+                                <td><?php echo $moderator['id']; ?></td>
+                                <td><?php echo htmlspecialchars($moderator['username']); ?></td>
+                                <td><?php echo htmlspecialchars($moderator['fullname']); ?></td>
+                                <td><?php echo htmlspecialchars($moderator['email']); ?></td>
+                                <td><?php echo htmlspecialchars($moderator['company']); ?></td>
+                                <td><?php echo $moderator['is_admin'] ? '✅' : ''; ?></td>
+                                <td><?php echo $moderator['is_superadmin'] ? '✅' : ''; ?></td>
                                 <td>
-                                    <?php if (!empty($user['projects'])): ?>
+                                    <?php if (!empty($moderator['projects'])): ?>
                                         <ul class="mb-0 ps-3 small">
-                                            <?php foreach ($user['projects'] as $project): ?>
+                                            <?php foreach ($moderator['projects'] as $project): ?>
                                                 <li><?php echo htmlspecialchars($project); ?></li>
                                             <?php endforeach; ?>
                                         </ul>
@@ -74,15 +75,15 @@ require __DIR__ . '/../layouts/header.php';
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo $user['last_login'] ?: '—'; ?></td>
-                                <td class="text-muted small"><?php echo htmlspecialchars($user['last_login_ip'] ?? ''); ?></td>
-                                <td class="text-muted small"><?php echo htmlspecialchars($user['last_login_user_agent'] ?? ''); ?></td>
-                                <td><?php echo $user['created_at']; ?></td>
-                                <td><?php echo $user['updated_at']; ?></td>
+                                <td><?php echo $moderator['last_login'] ?: '—'; ?></td>
+                                <td class="text-muted small"><?php echo htmlspecialchars($moderator['last_login_ip'] ?? ''); ?></td>
+                                <td class="text-muted small"><?php echo htmlspecialchars($moderator['last_login_user_agent'] ?? ''); ?></td>
+                                <td><?php echo $moderator['created_at']; ?></td>
+                                <td><?php echo $moderator['updated_at']; ?></td>
                                 <td class="text-nowrap">
-                                    <a href="/index.php?controller=User&action=edit&id=<?php echo $user['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
+                                    <a href="/index.php?controller=User&action=edit&id=<?php echo $moderator['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
                                     <?php if ($_SESSION['is_superadmin'] ?? false): ?>
-                                        <a href="/index.php?controller=User&action=destroy&id=<?php echo $user['id']; ?>"
+                                        <a href="/index.php?controller=User&action=destroy&id=<?php echo $moderator['id']; ?>"
                                         class="btn btn-sm btn-danger"
                                         onclick="return confirm('Are you sure you want to delete this user?');">
                                             Delete
@@ -94,7 +95,7 @@ require __DIR__ . '/../layouts/header.php';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-                                    </div> 
+            </div> 
     </div>
     <!--end::Post-->
 </div>

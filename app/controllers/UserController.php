@@ -6,14 +6,23 @@ class UserController extends BaseController
 {
     public function __construct($pdo)
     {
-        parent::__construct($pdo); // chama o construtor do BaseController
-
-        if (!isset($_SESSION['username']) || !$_SESSION['is_admin']) {
+        parent::__construct($pdo);
+    
+        if (!isset($_SESSION['username'])) {
+            header('Location: /index.php?controller=Auth&action=login&error=Please+login+first');
+            exit;
+        }
+    
+        // Só exige admin em todas as ações exceto estas:
+        $publicActions = ['profile', 'updateProfile'];
+        $currentAction = $_GET['action'] ?? '';
+    
+        if (!in_array($currentAction, $publicActions) && empty($_SESSION['is_admin'])) {
             header('Location: /index.php?controller=Auth&action=login&error=Admin+access+required');
             exit;
         }
     }
-
+    
     public function index()
     {
         $stmt = $this->pdo->query("
@@ -100,35 +109,42 @@ class UserController extends BaseController
     }
 
     public function update()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?controller=User&action=index');
-            exit;
-        }
-
-        $id = $_POST['id'];
-        $email = $_POST['email'];
-        $fullname = $_POST['fullname'] ?? null;
-        $company = $_POST['company'] ?? null;
-        $isAdmin = !empty($_POST['is_admin']) ? 1 : 0;
-
-        $stmt = $this->pdo->prepare("
-            UPDATE moderators
-            SET email = ?, username = ?, fullname = ?, company = ?, is_admin = ?, updated_at = NOW()
-            WHERE id = ?
-        ");
-        $stmt->execute([
-            $email,
-            $email,
-            $fullname,
-            $company,
-            $isAdmin,
-            $id
-        ]);
-
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         header('Location: /index.php?controller=User&action=index');
         exit;
     }
+
+    $id       = (int)$_POST['id'];
+    $email    = $_POST['email'];
+    $fullname = $_POST['fullname'] ?? null;
+    $company  = $_POST['company']  ?? null;
+    $isAdmin  = !empty($_POST['is_admin']) ? 1 : 0;
+    $password = $_POST['password'] ?? null;          // <-- NEW
+
+    // --- build the base query ---
+    $sql  = "UPDATE moderators
+             SET email = ?, username = ?, fullname = ?, company = ?, is_admin = ?, updated_at = NOW()";
+
+    $params = [$email, $email, $fullname, $company, $isAdmin];
+
+    // --- add password if supplied ---
+    if (!empty($password)) {
+        $sql     .= ", password_hash = ?";
+        $params[] = password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    $sql .= " WHERE id = ?";
+    $params[] = $id;
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute($params);
+
+    header('Location: /index.php?controller=User&action=index');
+    exit;
+}
+
+
 
     public function profile()
     {

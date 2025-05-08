@@ -35,13 +35,25 @@ class ProjectInvite
      * Cria um novo convite
      */
     public function createInvite($project_id, $moderator_id)
-    {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO project_invites (project_id, moderator_id, status, created_at)
-            VALUES (?, ?, 'pending', NOW())
-        ");
-        return $stmt->execute([$project_id, $moderator_id]);
+{
+    // Verifica se já existe um convite para este moderador neste projeto
+    $stmt = $this->pdo->prepare("
+        SELECT 1 FROM project_invites WHERE project_id = ? AND moderator_id = ?
+    ");
+    $stmt->execute([$project_id, $moderator_id]);
+
+    if ($stmt->fetchColumn()) {
+        // Já existe — não duplica
+        throw new Exception("⚠️ This user has already been invited to this project.");
     }
+
+    // Caso não exista, insere normalmente
+    $stmt = $this->pdo->prepare("
+        INSERT INTO project_invites (project_id, moderator_id, status, created_at)
+        VALUES (?, ?, 'pending', NOW())
+    ");
+    return $stmt->execute([$project_id, $moderator_id]);
+}
 
     /**
      * Atualiza o status de um convite

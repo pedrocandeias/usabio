@@ -281,5 +281,16 @@ return [
     'generate_with_ai' => 'Generate with AI',
     'assign_moderators' => 'Assign Moderators',
     'select_moderators_to_assign' => 'Select moderators to assign',
+    'no_projects_found' => 'No projects found.',
+    'send_invite' => 'Send Invite',
+    'cancel_invite' => 'Cancel Invite',
+    'pending_invite' => 'Pending Invite',
+    'project_invitations' => 'Project Invitations',
+    'already_invited' => 'Already invited',
+    'you_have_no_pending_invitations_at_the_moment' => 'You have no pending invitations at the moment',
+    'back_to_moderator_management' => 'Back to Moderator Management',
+    'invite_by_email' => 'Invite by Email',
+    'if_the_user_does_not_exist_they_will_be_invited_to_register' => 'If the user does not exist, they will be invited to register.',
+    'export_data_for' => 'Export data for',
 ];
 ?>

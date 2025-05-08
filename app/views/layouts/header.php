@@ -16,8 +16,6 @@ if (!empty($_SESSION['fullname']) ) {
 }
 ?>
 
-
-
 <?php require __DIR__ . '/../layouts/head.php';  ?>
 
 <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled">
@@ -191,6 +189,7 @@ if (!empty($_SESSION['fullname']) ) {
                             <?php endif; ?>
                                 
                     <!--begin::Chat-->
+
                     <div class="d-flex align-items-center ms-1 ms-lg-3">
                         <!--begin::Menu wrapper-->
                         <div class="position-relative btn btn-icon btn-active-light-primary btn-custom w-30px h-30px w-md-40px h-md-40px" id="kt_drawer_chat_toggle">
@@ -203,6 +202,7 @@ if (!empty($_SESSION['fullname']) ) {
                         </div>
                         <!--end::Menu wrapper-->
                     </div>
+                    
                     <!--end::Chat-->
                             
                     <!--begin::Theme mode-->

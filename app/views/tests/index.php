@@ -377,6 +377,3 @@ require __DIR__ . '/../layouts/header.php';
 
 </body>
 </html>
------------------------------------------------------------
-
-In this update each user-visible string is now wrapped in a translation function (for example, __('manage_tasks_questions')). You can adjust the translation keys as needed for your localization setup.

@@ -49,7 +49,7 @@ require __DIR__ . '/../layouts/header.php';
                 <form method="POST" action="/index.php?controller=User&action=updateProfile">
                     <div class="mb-3">
                         <label class="form-label">Email (Username)</label>
-                        <input type="email" name="email" class="form-control disabled" value="<?php echo htmlspecialchars($user['email']); ?>" readonly disabled>
+                        <input type="email" name="email" class="form-control disabled bg-light" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
 
                     </div>
 

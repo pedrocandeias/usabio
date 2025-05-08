@@ -26,6 +26,16 @@ class ExportController extends BaseController {
     {
         $project_id = $_GET['project_id'] ?? 0;
     
+        // Access control
+        if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
+            $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
+            $stmt->execute([$project_id, $_SESSION['user_id']]);
+            if (!$stmt->fetchColumn()) {
+                echo "Access denied.";
+                exit;
+            }
+        }
+    
         $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
         $stmt->execute([$project_id]);
         $project = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -41,7 +51,7 @@ class ExportController extends BaseController {
         $stmt = $this->pdo->prepare("SELECT id, title FROM tests WHERE project_id = ?");
         $stmt->execute([$project_id]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
             ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id=' . $project['id'], 'active' => false],
@@ -50,7 +60,7 @@ class ExportController extends BaseController {
     
         include __DIR__ . '/../views/export/index.php';
     }
-
+    
     public function demographicsCSV()
     {
         $project_id = $_GET['project_id'] ?? 0;
@@ -706,6 +716,16 @@ public function exportProjectJSON()
     public function printProject()
     {
         $project_id = $_GET['project_id'] ?? 0;
+
+        // Access control
+        if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
+            $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
+            $stmt->execute([$project_id, $_SESSION['user_id']]);
+            if (!$stmt->fetchColumn()) {
+                echo "Access denied.";
+                exit;
+            }
+        }
 
         // Load project
         $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");

@@ -104,7 +104,15 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <!--end::Col-->                
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <p class="text-muted"><?php echo __('no_projects_found'); ?>.</p>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <img src="/assets/media/illustrations/sigma-1/1.png" alt="No projects found" class="mw-100 mb-10" />
+                                <h2 class="fs-1"><?php echo __('no_projects_found'); ?>..</h2>
+                            </div>
+                        </div>
+                    </div>
+
                 <?php endif; ?>
                 </div>
                 <!--end::Row-->

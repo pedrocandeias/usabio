@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/BaseController.php'; // carrega o base
+require_once __DIR__ . '/BaseController.php'; // carrega o baseindex
 require_once __DIR__ . '/../helpers/openai.php';
 require_once __DIR__ . '/../helpers/settings.php'; // needed for getOpenAIKey()
 
@@ -32,6 +32,16 @@ class ImportController extends BaseController
         if (!$project_id) {
             echo "Missing project ID.";
             exit;
+        }
+
+        // Access control
+        if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
+            $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
+            $stmt->execute([$project_id, $_SESSION['user_id']]);
+            if (!$stmt->fetchColumn()) {
+                echo "Access denied.";
+                exit;
+            }
         }
 
         $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
