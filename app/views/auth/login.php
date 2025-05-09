@@ -45,8 +45,6 @@ $error = $_GET['error'] ?? null;
                             ⚠️ Please confirm your email address before logging in.
                         <?php elseif ($error === 'Invalid credentialsl'): ?>
                             ⚠️ Invalid credentials, please try again.
-                       <?php else: ?>
-                            An unknown error occurred, please try again.
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>

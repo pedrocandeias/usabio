@@ -139,8 +139,11 @@ dist
 # ddev
 /.ddev
 
-/vendor/
-
 # Local dev files
-/indev/*
-/uploads/*
+/indev/demos/
+/indev/demo1/
+/indev/demo2/
+/indev/tools/
+/indev/testflow/
+/uploads/
+/indev/_demo1/

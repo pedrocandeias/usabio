@@ -35,10 +35,8 @@ $pageDescription = "Create a new account";
             echo 'Invalid email address, please enter a valid email.';
         } elseif ($error === 'terms') {
             echo 'You must accept the terms.';
-        } else {
-            echo 'An unknown error occurred, please try again.';
         }
-        
+    
         ?>
     </div>
 <?php endif; ?>
