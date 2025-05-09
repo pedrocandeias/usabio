@@ -165,21 +165,21 @@ class ProjectController extends BaseController
         $data['owner_id'] = $ownerId;
 
         // Create the project and get its ID
-        $projectId = $this->projectModel->create($data);
+        $project_id = $this->projectModel->create($data);
         
         $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-        $stmt->execute([$projectId, $ownerId]);
+        $stmt->execute([$project_id, $ownerId]);
         // Assign users if provided
         $assignedUsers = $_POST['assigned_users'] ?? [];
         foreach ($assignedUsers as $userId) {
             // Evitar duplicação do owner
             if ($userId != $ownerId) {
-                $stmt->execute([$projectId, $userId]);
+                $stmt->execute([$project_id, $userId]);
             }
         }
     
         // Redirect to project detail view
-        header("Location: /index.php?controller=Project&action=show&id=" . $projectId);
+        header("Location: /index.php?controller=Project&action=show&id=" . $project_id);
         exit;
     }
     
@@ -326,7 +326,7 @@ class ProjectController extends BaseController
             echo "Invalid project ID.";
             exit;
         }
-    
+        
         // Allow superadmins and admins, restrict for regular moderators
         if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
             $stmt = $this->pdo->prepare(
@@ -350,6 +350,11 @@ class ProjectController extends BaseController
             exit;
         }
     
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
+        
         // Load all moderators for assignment UI
         $stmt = $this->pdo->query("SELECT id, username FROM moderators ORDER BY username");
         $allUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -385,6 +390,13 @@ class ProjectController extends BaseController
             exit;
         }
     
+
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
+        
+
         // Access control
         if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
@@ -456,7 +468,18 @@ class ProjectController extends BaseController
                 exit;
             }
         }
-        $id = $_GET['id'] ?? 0;
+        $project_id = $_GET['id'] ?? 0;
+        if (!$project_id) {
+            echo "Missing project ID.";
+            exit;
+        }
+
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
+        
+
         $this->projectModel->delete($id);
 
         header('Location: /index.php?controller=Project&action=index');

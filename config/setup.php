@@ -35,27 +35,87 @@ try {
             reset_token VARCHAR(255)  DEFAULT NULL,
             is_superadmin BOOLEAN NOT NULL DEFAULT 0,
             is_admin BOOLEAN NOT NULL DEFAULT 0,
-            user_type VARCHAR(20) DEFAULT 'none'
+            user_type VARCHAR(20) DEFAULT 'none',
+            is_confirmed TINYINT(1) DEFAULT 0,
+            confirmation_token VARCHAR(64) DEFAULT NULL
         ) ENGINE=InnoDB;" => "moderators",
         
    // === TABLE: settings ===
-   "CREATE TABLE IF NOT EXISTS settings (
+"CREATE TABLE IF NOT EXISTS settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     setting_key VARCHAR(100) NOT NULL UNIQUE,
-    setting_value TEXT NOT NULL,
-    enable_apikey BOOLEAN DEFAULT 0,
-    enable_registration BOOLEAN DEFAULT 0,
-    enable_login BOOLEAN DEFAULT 0,
-    default_language VARCHAR(10) DEFAULT 'en',
-    ui_theme VARCHAR(50) DEFAULT 'default',
-    feature_flags TEXT DEFAULT NULL,
-    allow_registration BOOLEAN DEFAULT 0,
-    max_projects_per_user VARCHAR(100) DEFAULT '0',
-    max_projects_per_normal_user VARCHAR(100) DEFAULT '1',
-    max_projects_per_premium_user VARCHAR(100) DEFAULT '3',
-    max_projects_per_superpremium_user VARCHAR(100) DEFAULT '9',
+    setting_value TEXT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;" => "settings",
+
+// === INSERT default settings ===
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'openai_api_key', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'openai_api_key') LIMIT 1;" => "openai_api_key settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'platform_base_url', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'platform_base_url') LIMIT 1;" => "platform_base_url settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'max_projects_per_user', '3') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'max_projects_per_user') LIMIT 1;" => "max_projects_per_user settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'max_projects_per_normal_user', '1') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'max_projects_per_normal_user') LIMIT 1;" => "max_projects_per_normal_user settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'max_projects_per_premium_user', '3') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'max_projects_per_premium_user') LIMIT 1;" => "max_projects_per_premium_user settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'max_projects_per_superpremium_user', '9') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'max_projects_per_superpremium_user') LIMIT 1;" => "max_projects_per_superpremium_user settings",
+
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'enable_ai_features', '1') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'enable_ai_features') LIMIT 1;" => "enable_ai_features settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'enable_user_registration', '1') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'enable_user_registration') LIMIT 1;" => "enable_user_registration settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'enable_login', '1') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'enable_login') LIMIT 1;" => "enable_login settings",
+
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'default_language', 'en') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'default_language') LIMIT 1;" => "default_language settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'ui_theme', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'ui_theme') LIMIT 1;" => "ui_theme settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'feature_flags_json', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'feature_flags_json') LIMIT 1;" => "feature_flags_json settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'allow_public_registration', '1') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'allow_public_registration') LIMIT 1;" => "allow_public_registration settings",
+
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'mailserver_host', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_host') LIMIT 1;" => "mailserver_host settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'mailserver_port', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_port') LIMIT 1;" => "mailserver_port settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'mailserver_username', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_username') LIMIT 1;" => "mailserver_username settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'mailserver_password', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_password') LIMIT 1;" => "mailserver_password settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'mailserver_encryption', '') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_encryption') LIMIT 1;" => "mailserver_encryption settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'noreplymail', 'no-reply@usabio.test') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'noreplymail') LIMIT 1;" => "settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'platform_name', 'TestFlow') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'platform_name') LIMIT 1;" => "settings",
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'support_email', 'sayhi@testflow.design') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'support_email') LIMIT 1;" => "settings",
+
 
         // === TABLE: projects ===
       "CREATE TABLE IF NOT EXISTS projects (
@@ -97,6 +157,7 @@ try {
         "CREATE TABLE IF NOT EXISTS project_user (
             project_id INT NOT NULL,
             moderator_id INT NOT NULL,
+            is_admin TINYINT(1) DEFAULT 0,
             PRIMARY KEY (project_id, moderator_id),
             FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
             FOREIGN KEY (moderator_id) REFERENCES moderators(id) ON DELETE CASCADE
@@ -258,14 +319,50 @@ try {
     ) ENGINE=InnoDB;"    => "project_invites",    
    
 
-// === TABLE: pending_invite_emails ===
-"CREATE TABLE pending_invite_emails (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    project_id INT NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    status ENUM('sent','registered') DEFAULT 'sent',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;" => "pending_invite_emails",
+    // === TABLE: pending_invite_emails ===
+    "CREATE TABLE IF NOT EXISTS pending_invite_emails (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        project_id INT NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        status ENUM('sent','registered') DEFAULT 'sent',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;" => "pending_invite_emails",
+
+    // === TABLE: email_templates ===
+    "CREATE TABLE IF NOT EXISTS email_templates (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        template_key VARCHAR(100) NOT NULL UNIQUE,
+        subject TEXT NOT NULL,
+        body TEXT NOT NULL,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;" => "email_templates",
+// === INSERT default email templates ===
+"INSERT INTO email_templates (template_key, subject, body)
+SELECT * FROM (SELECT 'test_email', 'Test Email from {{platform_name}}', '<p>Hello,</p><p>This is a test email confirming your mailserver settings are working.</p><p>If you received this, everything is set up correctly 🎉</p>') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM email_templates WHERE template_key = 'test_email') LIMIT 1;" => "email_templates",
+
+"INSERT INTO email_templates (template_key, subject, body)
+SELECT * FROM (SELECT 'registration_confirmation', 'Welcome to {{platform_name}}', '<p>Hello {{fullname}},</p><p>Thank you for registering on <strong>{{platform_name}}</strong>.</p><p>You can now access your dashboard and start participating in projects.</p>') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM email_templates WHERE template_key = 'registration_confirmation') LIMIT 1;" => "email_templates",
+
+"INSERT INTO email_templates (template_key, subject, body)
+SELECT * FROM (SELECT 'invite_accepted_notification', 'Moderator {{fullname}} accepted your project invite', '<p>Hello,</p><p><strong>{{fullname}}</strong> has accepted the invitation to join your project: <strong>{{project_title}}</strong>.</p><p>You can now assign tasks and start testing.</p>') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM email_templates WHERE template_key = 'invite_accepted_notification') LIMIT 1;" => "email_templates",
+
+"INSERT INTO email_templates (template_key, subject, body)
+SELECT * FROM (SELECT 'invite_declined_notification', 'Moderator {{fullname}} declined your project invite', '<p>Hello,</p><p><strong>{{fullname}}</strong> has declined the invitation to join your project: <strong>{{project_title}}</strong>.</p><p>You may invite someone else if needed.</p>') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM email_templates WHERE template_key = 'invite_declined_notification') LIMIT 1;" => "email_templates",
+
+"INSERT INTO email_templates (template_key, subject, body)
+SELECT * FROM (
+  SELECT
+    'email_confirmation_request',
+    'Please confirm your email on {{platform_name}}',
+    '<p>Hello {{fullname}},</p><p>Thanks for registering on <strong>{{platform_name}}</strong>.</p><p>To activate your account, please click the button below:</p><p><a href=\"{{confirmation_link}}\" class=\"btn btn-primary\">Confirm Email</a></p><p>If you didn’t request this, you can ignore this message.</p>'
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM email_templates WHERE template_key = 'email_confirmation_request'
+) LIMIT 1;" => "email_templates",
 
     ];
     // Create tables if they don't exist

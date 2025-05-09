@@ -29,9 +29,10 @@ class ProjectUserController extends BaseController
             exit;
         }
     
-        // Moderadores já atribuídos
+        // Moderadores já atribuídos + is_admin
         $stmt = $this->pdo->prepare("
-            SELECT m.* FROM moderators m
+            SELECT m.*, pu.is_admin 
+            FROM moderators m
             INNER JOIN project_user pu ON pu.moderator_id = m.id
             WHERE pu.project_id = ?
         ");
@@ -39,12 +40,12 @@ class ProjectUserController extends BaseController
         $assignedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $assignedModeratorIds = array_column($assignedUsers, 'id');
     
-        // Todos os moderadores
+        // Todos os moderadores (para dropdown de convite)
         $stmt = $this->pdo->prepare("SELECT * FROM moderators ORDER BY username");
         $stmt->execute();
         $allModerators = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-        // Convites pendentes (moderadores existentes)
+        // Convites pendentes (moderadores registados)
         require_once __DIR__ . '/../models/ProjectInvite.php';
         $inviteModel = new ProjectInvite($this->pdo);
         $pendingInvites = $inviteModel->getPendingInvitesForProject($project_id);
@@ -93,7 +94,6 @@ class ProjectUserController extends BaseController
             ['label' => 'Users', 'url' => '', 'active' => true],
         ];
     
-        // Renderizar a view
         include __DIR__ . '/../views/project_users/assign.php';
     }
     
@@ -105,6 +105,7 @@ class ProjectUserController extends BaseController
             exit;
         }
 
+       
         $project_id = $_POST['project_id'] ?? 0;
         $assignedUsers = $_POST['assigned_users'] ?? [];
 
@@ -112,6 +113,12 @@ class ProjectUserController extends BaseController
             echo "Missing project ID.";
             exit;
         }
+
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
+        
 
         // Apagar anteriores
         $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
@@ -140,6 +147,11 @@ class ProjectUserController extends BaseController
             exit;
         }
 
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
+        
         $stmt = $this->pdo->prepare("
             DELETE FROM project_user 
             WHERE project_id = ? AND moderator_id = ?
@@ -150,5 +162,60 @@ class ProjectUserController extends BaseController
         header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=moderator_removed');
         exit;
     }
+
+    public function promote()
+{
+    $project_id = $_POST['project_id'] ?? null;
+    $moderator_id = $_POST['moderator_id'] ?? null;
+
+    if (!$project_id || !$moderator_id) {
+        echo "Missing data.";
+        exit;
+    }
+
+    if (!$this->userIsProjectAdmin($project_id)) {
+        echo "Access denied.";
+        exit;
+    }
+
+    $stmt = $this->pdo->prepare("
+        UPDATE project_user 
+        SET is_admin = 1 
+        WHERE project_id = ? AND moderator_id = ?
+    ");
+    $stmt->execute([$project_id, $moderator_id]);
+
+    $_SESSION['toast_success'] = "Moderator promoted to admin.";
+    header("Location: /index.php?controller=ProjectUser&action=index&project_id=" . $project_id);
+    exit;
+}
+
+public function demote()
+{
+    $project_id = $_POST['project_id'] ?? null;
+    $moderator_id = $_POST['moderator_id'] ?? null;
+
+    if (!$project_id || !$moderator_id) {
+        echo "Missing data.";
+        exit;
+    }
+
+    if (!$this->userIsProjectAdmin($project_id)) {
+        echo "Access denied.";
+        exit;
+    }
+
+    $stmt = $this->pdo->prepare("
+        UPDATE project_user 
+        SET is_admin = 0 
+        WHERE project_id = ? AND moderator_id = ?
+    ");
+    $stmt->execute([$project_id, $moderator_id]);
+
+    $_SESSION['toast_success'] = "Admin rights removed.";
+    header("Location: /index.php?controller=ProjectUser&action=index&project_id=" . $project_id);
+    exit;
+}
+
 
 }

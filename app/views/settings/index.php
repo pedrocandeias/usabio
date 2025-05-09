@@ -14,7 +14,6 @@ $headerNavbuttons = [
 
 require __DIR__ . '/../layouts/header.php'; 
 ?>
-
 <!--begin::Container-->
 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
     <!--begin::Post-->
@@ -34,19 +33,34 @@ require __DIR__ . '/../layouts/header.php';
             <div class="alert alert-success">✅ Settings updated!</div>
         <?php endif; ?>
 
+        <?php
+        if (!empty($_GET['email_success']) && $_GET['email_success'] === 'email_test_sent') { ?>
+       <div class="alert alert-success">email sent successfully</div>
+       <?php }
+        if (!empty($_GET['email_error']) && $_GET['email_error'] === 'email_test_failed') { ?>
+        <div class="alert alert-danger">Failed to send test email</div>
+       <?php  } ?>
+       
+
+
         <form method="POST" action="/index.php?controller=Settings&action=save">
             <div class="mb-3">
+                <label class="form-label">Platform Base URL</label>
+                <input type="text" class="form-control" name="platform_base_url" value="<?php echo htmlspecialchars($settings['platform_base_url'] ?? ''); ?>">
+            </div>
+        
+            <div class="mb-3">
                 <label class="form-label">OpenAI API Key</label>
-                <input type="text" class="form-control" name="openai_api_key" value="<?php echo htmlspecialchars($decrypted); ?>">
+                <input type="text" class="form-control" name="openai_api_key" value="<?php echo $settings['openai_api_key']; ?>">
             </div>
 
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" name="enable_apikey" <?php echo $settings['enable_apikey'] ? 'checked' : ''; ?>>
+                <input class="form-check-input" type="checkbox" name="enable_ai_features" <?php echo $settings['enable_ai_features'] ? 'checked' : ''; ?>>
                 <label class="form-check-label">Enable AI Features</label>
             </div>
 
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" name="enable_registration" <?php echo $settings['enable_registration'] ? 'checked' : ''; ?>>
+                <input class="form-check-input" type="checkbox" name="enable_user_registration" <?php echo $settings['enable_user_registration'] ? 'checked' : ''; ?>>
                 <label class="form-check-label">Enable User Registration</label>
             </div>
 
@@ -71,11 +85,6 @@ require __DIR__ . '/../layouts/header.php';
             <div class="mb-3">
                 <label class="form-label">Feature Flags (JSON)</label>
                 <textarea class="form-control" name="feature_flags" rows="3"><?php echo htmlspecialchars($settings['feature_flags'] ?? ''); ?></textarea>
-            </div>
-
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" name="allow_registration" <?php echo $settings['allow_registration'] ? 'checked' : ''; ?>>
-                <label class="form-check-label">Allow Public Registration</label>
             </div>
 
             <div class="mb-4">
@@ -106,10 +115,23 @@ require __DIR__ . '/../layouts/header.php';
                     <option value="tls" <?php echo (isset($settings['mailserver_encryption']) && $settings['mailserver_encryption'] === 'tls') ? 'selected' : ''; ?>>TLS</option>
                 </select>
             </div>
-
+            <div class="mb-3">
+                <label class="form-label">Send test email to</label>
+                <input type="email" class="form-control" name="test_email" value="<?php echo htmlspecialchars($settings['test_email']); ?>">
+            </div>
             <button type="submit" class="btn btn-primary">Save Settings</button>
         </form>
     </div>
+    
+
+    <div class="d-flex justify-content-between align-items-center mt-5">
+        <!-- Test Email Form: fora do form principal -->
+        <form method="POST" action="/index.php?controller=Settings&action=testEmail" class="d-inline mt-4">
+            <input type="hidden" name="test_email" value="<?php echo $settings['test_email']; ?>">
+            <button type="submit" class="btn btn-outline-info">Test Email</button>
+        </form>
+    </div>
+
 </div>
 
     </div>

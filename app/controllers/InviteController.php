@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/ProjectInvite.php';
+require_once __DIR__ . '/../helpers/mailhelper.php';
 
 class InviteController extends BaseController
 {
@@ -14,73 +15,74 @@ class InviteController extends BaseController
     }
 
     public function create()
-{
-    $project_id = $_POST['project_id'] ?? null;
-    $email = trim($_POST['email'] ?? '');
-
-    if (!$project_id || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&error=invalid_email');
-        exit;
-    }
-
-    // Carrega info do projeto (para incluir no email)
-    $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
-    $stmt->execute([$project_id]);
-    $project = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$project) {
-        header('Location: /?controller=Project&action=index&error=project_not_found');
-        exit;
-    }
-
-    require_once __DIR__ . '/../models/ProjectInvite.php';
-    $inviteModel = new ProjectInvite($this->pdo);
-
-    // Verifica se o utilizador já existe
-    $stmt = $this->pdo->prepare("SELECT id FROM moderators WHERE email = ?");
-    $stmt->execute([$email]);
-    $moderator_id = $stmt->fetchColumn();
-
-    if ($moderator_id) {
-        // Já existe — verificar se já foi convidado
-        if ($inviteModel->inviteExists($project_id, $moderator_id)) {
-            header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&error=already_invited');
+    {
+        $project_id = $_POST['project_id'] ?? null;
+        $email = trim($_POST['email'] ?? '');
+    
+        if (!$project_id || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&error=invalid_email');
             exit;
         }
+    
+        // Carrega info do projeto (para incluir no email)
+        $stmt = $this->pdo->prepare("SELECT * FROM projects WHERE id = ?");
+        $stmt->execute([$project_id]);
+        $project = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$project) {
+            header('Location: /?controller=Project&action=index&error=project_not_found');
+            exit;
+        }
+    
 
-        // Criar convite real
-        $inviteModel->createInvite($project_id, $moderator_id);
-
-        header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=invite_sent');
-        exit;
-    } else {
-        // Verificar se já foi convidado por email
-        $stmt = $this->pdo->prepare("
-            SELECT id FROM pending_invite_emails 
-            WHERE project_id = ? AND email = ?
-        ");
-        $stmt->execute([$project_id, $email]);
-        $alreadyPending = $stmt->fetchColumn();
-
-        if (!$alreadyPending) {
-            // Registar convite pendente
+        $inviteModel = new ProjectInvite($this->pdo);
+    
+        // Verifica se o utilizador já existe
+        $stmt = $this->pdo->prepare("SELECT id FROM moderators WHERE email = ?");
+        $stmt->execute([$email]);
+        $moderator_id = $stmt->fetchColumn();
+    
+        if ($moderator_id) {
+            // Já existe — verificar se já foi convidado
+            if ($inviteModel->inviteExists($project_id, $moderator_id)) {
+                header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&error=already_invited');
+                exit;
+            }
+    
+            // Criar convite real
+            $inviteModel->createInvite($project_id, $moderator_id);
+    
+            header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=invite_sent');
+            exit;
+        } else {
+            // Verificar se já foi convidado por email
             $stmt = $this->pdo->prepare("
-                INSERT INTO pending_invite_emails (project_id, email, status, created_at)
-                VALUES (?, ?, 'sent', NOW())
+                SELECT id FROM pending_invite_emails 
+                WHERE project_id = ? AND email = ?
             ");
             $stmt->execute([$project_id, $email]);
-
-            // Enviar email com PHPMailer
-            require_once __DIR__ . '/../helpers/MailHelper.php';
-            $registerLink = "https://usabio.ddev.site/index.php?controller=Auth&action=register&prefill=" . urlencode($email);
-            MailHelper::sendInviteEmail($email, $project['title'], $registerLink);
+            $alreadyPending = $stmt->fetchColumn();
+    
+            if (!$alreadyPending) {
+                // Registar convite pendente
+                $stmt = $this->pdo->prepare("
+                    INSERT INTO pending_invite_emails (project_id, email, status, created_at)
+                    VALUES (?, ?, 'sent', NOW())
+                ");
+                $stmt->execute([$project_id, $email]);
+    
+                // Enviar email com PHPMailer
+          
+                $base_url = $this->getSetting('platform_base_url') ?: 'https://localhost';
+                $registerLink = rtrim($base_url, '/') . "/index.php?controller=Auth&action=register&prefill=" . urlencode($email);
+                MailHelper::sendInviteEmail($email, $project['title'], $registerLink, $this->pdo);
+            }
+    
+            header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=invite_email_sent');
+            exit;
         }
-
-        header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=invite_email_sent');
-        exit;
     }
-}
-
+    
 
     public function index()
     {

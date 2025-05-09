@@ -3,6 +3,10 @@
 $error = $_GET['error'] ?? null;
 $pageTitle = "Login";
 $pageDescription = "Login to your account";
+
+$success = $_GET['success'] ?? null;
+$error = $_GET['error'] ?? null;
+
 ?>
 
 <?php require __DIR__ . '/../layouts/head.php'; ?>
@@ -24,15 +28,33 @@ $pageDescription = "Login to your account";
             <div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12 p-lg-20">
                 <div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-4 w-md-600px p-20">
 
+                 
+                <?php if ($success): ?>
+                    <div class="alert alert-success fs-4">
+                        <?php if ($success === 'registered'): ?>
+                            ✅ Your email has been confirmed. You may now log in.
+                        <?php endif; ?>
+                        <?php if ($success === 'confirm_required'): ?>
+                            ✅ Your account has been created. Please check your email to activate it.
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                <?php if ($error): ?>
+                    <div class="alert alert-warning fs-4">
+                        <?php if ($error === 'confirm_required'): ?>
+                            ⚠️ Please confirm your email address before logging in.
+                        <?php elseif ($error === 'Invalid credentialsl'): ?>
+                            ⚠️ Invalid credentials, please try again.
+                       <?php else: ?>
+                            An unknown error occurred, please try again.
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
                     <div class="d-flex flex-center flex-column flex-column-fluid px-lg-10 pb-15 pb-lg-20">
                         <form class="form w-100" method="POST" action="/?controller=Auth&action=processLogin" id="kt_sign_in_form">
                             <div class="text-center mb-11">
                                 <h1 class="text-gray-900 fw-bolder mb-3">Sign In</h1>
-                                <?php if ($error): ?>
-                                    <div class="alert alert-danger">
-                                        <?php echo htmlspecialchars($error); ?>
-                                    </div>
-                                <?php endif; ?>
                             </div>
 
                             <div class="fv-row mb-8">

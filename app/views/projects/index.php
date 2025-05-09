@@ -14,6 +14,8 @@ $menuActive = 'overview';
 $pageTitle = 'Projects';
 $pageDescription = 'Manage your projects and test sessions.';
 $title = __('my_projects');
+
+
 if($canCreateProject) {
 $headerNavbuttons = [
     __('create_a_new_project') => [

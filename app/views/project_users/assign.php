@@ -53,24 +53,31 @@ require __DIR__ . '/../layouts/header.php';
                     <?php elseif ($moderator['status'] === 'email_sent'): ?>
                         <span class="badge bg-info text-white ms-2">Email Sent</span>
                     <?php endif; ?>
+                    <?php if (!empty($moderator['is_admin'])): ?>
+                        <span class="badge bg-success ms-2">Admin</span>
+                    <?php endif; ?>
                 </span>
 
                 <div class="d-flex gap-2">
-                    <?php if ($moderator['status'] === 'assigned'): ?>
-                        <a href="/index.php?controller=ProjectUser&action=delete&project_id=<?php echo $project_id; ?>&user_id=<?php echo $moderator['id']; ?>" class="btn btn-danger btn-sm">Remove</a>
-                    <?php elseif ($moderator['status'] === 'pending'): ?>
-                        <form method="POST" action="/index.php?controller=Invite&action=cancel" onsubmit="return confirm('Cancel this invite?')">
-                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <input type="hidden" name="moderator_id" value="<?php echo $moderator['id']; ?>">
-                            <button class="btn btn-outline-secondary btn-sm">Cancel Invite</button>
-                        </form>
-                    <?php elseif ($moderator['status'] === 'email_sent'): ?>
-                        <form method="POST" action="/index.php?controller=Invite&action=cancelEmail" onsubmit="return confirm('Cancel email invite?')">
-                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <input type="hidden" name="email" value="<?php echo htmlspecialchars($moderator['email']); ?>">
-                            <button class="btn btn-outline-secondary btn-sm">Cancel Email</button>
-                        </form>
-                    <?php endif; ?>
+                <?php if ($moderator['status'] === 'assigned'): ?>
+    <?php if ($this->userIsProjectAdmin($project_id) && $moderator['id'] != $project['owner_id']): ?>
+        <?php if (!empty($moderator['is_admin'])): ?>
+            <form method="POST" action="/index.php?controller=ProjectUser&action=demote" class="d-inline">
+                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                <input type="hidden" name="moderator_id" value="<?php echo $moderator['id']; ?>">
+                <button class="btn btn-outline-secondary btn-sm">Remove Admin</button>
+            </form>
+        <?php else: ?>
+            <form method="POST" action="/index.php?controller=ProjectUser&action=promote" class="d-inline">
+                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                <input type="hidden" name="moderator_id" value="<?php echo $moderator['id']; ?>">
+                <button class="btn btn-outline-primary btn-sm">Promote to Admin</button>
+            </form>
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <a href="/index.php?controller=ProjectUser&action=delete&project_id=<?php echo $project_id; ?>&user_id=<?php echo $moderator['id']; ?>" class="btn btn-danger btn-sm">Remove</a>
+<?php endif; ?>
                 </div>
         </li>
         <?php endforeach; ?>

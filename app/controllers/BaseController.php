@@ -103,6 +103,7 @@ class BaseController
     protected function getMaxProjectsForUserType($userType)
     {
         $defaultLimits = [
+            'none' => 0, 
             'normal' => 1,
             'premium' => 3,
             'superpremium' => 9,
@@ -113,6 +114,13 @@ class BaseController
             return PHP_INT_MAX;
         }
     
+         // Fallback to 'normal' if userType is missing or unknown
+        $userType = strtolower(trim($userType));
+        if (!isset($defaultLimits[$userType])) {
+            $userType = 'normal';
+        }
+
+
         $key = 'max_projects_per_' . strtolower($userType) . '_user';
         $limit = (int) $this->getSetting($key);
     
@@ -122,7 +130,7 @@ class BaseController
 
     protected function getMaxProjectsPerUser()
 {
-    return (int) $this->getSetting('max_projects_per_user') ?: 3;
+    return (int) $this->getSetting('max_projects_per_user') ?: 0;
 }
 
 
@@ -185,4 +193,38 @@ public function userCanCreateProject(): bool
             exit;
         }
     }
+
+    protected function userIsProjectAdmin($projectId): bool
+{
+    $userId = $_SESSION['user_id'] ?? null;
+
+    if (!$userId) {
+        return false;
+    }
+
+    // Superadmins têm sempre acesso total
+    if (!empty($_SESSION['is_superadmin'])) {
+        return true;
+    }
+
+    // Verifica se é o dono do projeto
+    $stmt = $this->pdo->prepare("SELECT owner_id FROM projects WHERE id = ?");
+    $stmt->execute([$projectId]);
+    $ownerId = $stmt->fetchColumn();
+
+    if ($ownerId == $userId) {
+        return true;
+    }
+
+    // Verifica se é moderador com is_admin = 1 no projeto
+    $stmt = $this->pdo->prepare("
+        SELECT is_admin FROM project_user 
+        WHERE project_id = ? AND moderator_id = ? LIMIT 1
+    ");
+    $stmt->execute([$projectId, $userId]);
+    $isAdmin = $stmt->fetchColumn();
+
+    return (int)$isAdmin === 1;
+}
+
 }
