@@ -78,7 +78,7 @@ class InviteController extends BaseController
                 MailHelper::sendInviteEmail($email, $project['title'], $registerLink, $this->pdo);
             }
     
-            header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=invite_email_sent');
+            header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=pending_invite_email_sent');
             exit;
         }
     }

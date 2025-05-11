@@ -73,17 +73,31 @@ class ParticipantController extends BaseController
         }
 
         // Fetch tests linked to this project
-$stmt = $this->pdo->prepare("SELECT id, title FROM tests WHERE project_id = ?");
-$stmt->execute([$project_id]);
-$tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare("SELECT id, title FROM tests WHERE project_id = ?");
+        $stmt->execute([$project_id]);
+        $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-                $customFields = [];
-        if ($project_id) {
-            $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
-            $stmt->execute([$project_id]);
-            $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $customFields = [];
+
+        $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
+        $stmt->execute([$project_id]);
+        $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+
+        foreach ($participants as &$p) {
+        $stmt = $this->pdo->prepare("
+        SELECT field_id, value
+        FROM participant_custom_data
+        WHERE participant_id = ?
+        ");
+            $stmt->execute([$p['id']]);
+            $p['custom_fields'] = [];
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $p['custom_fields'][$row['field_id']] = $row['value'];
+            }
         }
+        unset($p);  // break reference
 
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],

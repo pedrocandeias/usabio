@@ -53,7 +53,7 @@ try {
 SELECT * FROM (SELECT 'openai_api_key', '') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'openai_api_key') LIMIT 1;" => "openai_api_key settings",
 "INSERT INTO settings (setting_key, setting_value)
-SELECT * FROM (SELECT 'platform_base_url', '') AS tmp
+SELECT * FROM (SELECT 'platform_base_url', 'https://usabio.ddev.site') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'platform_base_url') LIMIT 1;" => "platform_base_url settings",
 "INSERT INTO settings (setting_key, setting_value)
 SELECT * FROM (SELECT 'max_projects_per_user', '3') AS tmp
@@ -92,22 +92,22 @@ SELECT * FROM (SELECT 'allow_public_registration', '1') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'allow_public_registration') LIMIT 1;" => "allow_public_registration settings",
 
 "INSERT INTO settings (setting_key, setting_value)
-SELECT * FROM (SELECT 'mailserver_host', '') AS tmp
+SELECT * FROM (SELECT 'mailserver_host', 'mail.testflow.design') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_host') LIMIT 1;" => "mailserver_host settings",
 "INSERT INTO settings (setting_key, setting_value)
-SELECT * FROM (SELECT 'mailserver_port', '') AS tmp
+SELECT * FROM (SELECT 'mailserver_port', '465') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_port') LIMIT 1;" => "mailserver_port settings",
 "INSERT INTO settings (setting_key, setting_value)
-SELECT * FROM (SELECT 'mailserver_username', '') AS tmp
+SELECT * FROM (SELECT 'mailserver_username', 'noreply@testflow.design') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_username') LIMIT 1;" => "mailserver_username settings",
 "INSERT INTO settings (setting_key, setting_value)
 SELECT * FROM (SELECT 'mailserver_password', '') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_password') LIMIT 1;" => "mailserver_password settings",
 "INSERT INTO settings (setting_key, setting_value)
-SELECT * FROM (SELECT 'mailserver_encryption', '') AS tmp
+SELECT * FROM (SELECT 'mailserver_encryption', 'ssl') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'mailserver_encryption') LIMIT 1;" => "mailserver_encryption settings",
 "INSERT INTO settings (setting_key, setting_value)
-SELECT * FROM (SELECT 'noreplymail', 'no-reply@usabio.test') AS tmp
+SELECT * FROM (SELECT 'noreplymail', 'noreply@testflow.design') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'noreplymail') LIMIT 1;" => "settings",
 "INSERT INTO settings (setting_key, setting_value)
 SELECT * FROM (SELECT 'platform_name', 'TestFlow') AS tmp
@@ -115,7 +115,9 @@ WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'platform_name') LI
 "INSERT INTO settings (setting_key, setting_value)
 SELECT * FROM (SELECT 'support_email', 'sayhi@testflow.design') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'support_email') LIMIT 1;" => "settings",
-
+"INSERT INTO settings (setting_key, setting_value)
+SELECT * FROM (SELECT 'test_email', 'sayhi@testflow.design') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'test_email') LIMIT 1;" => "settings",
 
         // === TABLE: projects ===
       "CREATE TABLE IF NOT EXISTS projects (
@@ -350,18 +352,18 @@ SELECT * FROM (SELECT 'invite_accepted_notification', 'Moderator {{fullname}} ac
 WHERE NOT EXISTS (SELECT 1 FROM email_templates WHERE template_key = 'invite_accepted_notification') LIMIT 1;" => "email_templates",
 
 "INSERT INTO email_templates (template_key, subject, body)
-SELECT * FROM (SELECT 'invite_declined_notification', 'Moderator {{fullname}} declined your project invite', '<p>Hello,</p><p><strong>{{fullname}}</strong> has declined the invitation to join your project: <strong>{{project_title}}</strong>.</p><p>You may invite someone else if needed.</p>') AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM email_templates WHERE template_key = 'invite_declined_notification') LIMIT 1;" => "email_templates",
-
-"INSERT INTO email_templates (template_key, subject, body)
 SELECT * FROM (
   SELECT
-    'email_confirmation_request',
-    'Please confirm your email on {{platform_name}}',
-    '<p>Hello {{fullname}},</p><p>Thanks for registering on <strong>{{platform_name}}</strong>.</p><p>To activate your account, please click the button below:</p><p><a href=\"{{confirmation_link}}\" class=\"btn btn-primary\">Confirm Email</a></p><p>If you didn’t request this, you can ignore this message.</p>'
+    'invite_email',
+    'You''ve been invited to join a project on {{platform_name}}',
+    '<p>Hello,</p>
+     <p>You''ve been invited to participate as a moderator in a project on <strong>{{platform_name}}</strong>.</p>
+     <p>Click the button below to register and accept the invitation:</p>
+     <p><a href=\"{{register_url}}\" class=\"btn btn-primary\">Join Us</a></p>
+     <p>If you already have an account, you can ignore this message.</p>'
 ) AS tmp
 WHERE NOT EXISTS (
-  SELECT 1 FROM email_templates WHERE template_key = 'email_confirmation_request'
+  SELECT 1 FROM email_templates WHERE template_key = 'invite_email'
 ) LIMIT 1;" => "email_templates",
 
     ];

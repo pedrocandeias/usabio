@@ -431,21 +431,6 @@ class ProjectController extends BaseController
 
         $this->projectModel->update($project_id, $data);
     
-        // Update assigned users
-        $assignedUsers = $_POST['assigned_users'] ?? [];
-    
-        // Clear old assignments
-        $stmt = $this->pdo->prepare("DELETE FROM project_user WHERE project_id = ?");
-        $stmt->execute([$project_id]);
-    
-        // Insert new ones
-        if (!empty($assignedUsers)) {
-            $stmt = $this->pdo->prepare("INSERT INTO project_user (project_id, moderator_id) VALUES (?, ?)");
-            foreach ($assignedUsers as $user_id) {
-                $stmt->execute([$project_id, $user_id]);
-            }
-        }
-    
         header("Location: /index.php?controller=Project&action=show&id=" . $project_id);
         exit;
     }
@@ -456,9 +441,10 @@ class ProjectController extends BaseController
      */
     public function destroy()
     {
-        if (!$_SESSION['is_admin']) {
-            $id = $_GET['id'] ?? 0;
-            $project_id = $id;
+        $id = $_GET['id'] ?? 0;
+        $project_id = $id;
+
+        if (!$_SESSION['is_admin']) {   
             $stmt = $this->pdo->prepare("SELECT 1 FROM project_user WHERE project_id = ? AND moderator_id = ?");
             $stmt->execute([$project_id, $_SESSION['user_id']]);
             $authorized = $stmt->fetchColumn();
@@ -468,7 +454,6 @@ class ProjectController extends BaseController
                 exit;
             }
         }
-        $project_id = $_GET['id'] ?? 0;
         if (!$project_id) {
             echo "Missing project ID.";
             exit;
@@ -478,7 +463,6 @@ class ProjectController extends BaseController
             echo "Access denied.";
             exit;
         }
-        
 
         $this->projectModel->delete($id);
 

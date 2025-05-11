@@ -58,7 +58,7 @@ require __DIR__ . '/../layouts/header.php';
                                 </div>
                                 <div class="col-md-6">
                                    
-                                    <?php if (!empty($test['layout_image'])): ?>
+                                    <?php if (!empty($test['layout_image'])) : ?>
                                         <div class="mt-2">
                                             <a href="#" data-bs-toggle="modal" data-bs-target="#layoutImageModal"><img src="uploads/<?php echo htmlspecialchars($test['layout_image']); ?>" alt="Layout image" class="img-fluid rounded shadow-sm"></a>
                                         </div>
@@ -82,15 +82,15 @@ require __DIR__ . '/../layouts/header.php';
                             </div>   
                         </div>
 
-                        <div class="tab-pane fade" id="taskgroup" role="tabpanel">
+                        <div class="tab-pane fade draggable-zone" id="taskgroup" role="tabpanel">
                         <!-- Task Groups -->
                         <?php if (!empty($taskGroups)) : ?>
                             <div id="task-group-list">
                                 <?php foreach ($taskGroups as $group): ?>
-                                    <div class="card mb-4 shadow-sm task-group" id="taskgroup<?php echo $group['id']; ?>" data-id="<?php echo $group['id']; ?>">
+                                    <div class="card mb-4 shadow-sm task-group draggable" id="taskgroup<?php echo $group['id']; ?>" data-id="<?php echo $group['id']; ?>">
                                         <div class="card-header d-flex justify-content-between align-items-center p-4">
                                             <div class="d-flex align-items-center">
-                                                <div style="cursor: grab;"> 
+                                                <div class="draggable-handle"> 
                                                     <i class="ki-duotone ki-abstract-14 fs-2x">
                                                         <span class="path1"></span>
                                                         <span class="path2"></span>
@@ -141,12 +141,12 @@ require __DIR__ . '/../layouts/header.php';
                                             </div>
                                         </div>
 
-                                        <ul class="list-group list-group-flush task-list" data-group-id="<?php echo $group['id']; ?>">
+                                       <ul class="list-group list-group-flush task-items draggable-zone" data-group-id="<?php echo $group['id']; ?>">
                                             <?php if (!empty($group['tasks'])) : ?>
                                                 <?php foreach ($group['tasks'] as $task): ?>
                                                     <li class="list-group-item d-flex justify-content-between task-item draggable" data-id="<?php echo $task['id']; ?>">
                                                         <div class="d-flex align-items-center">
-                                                            <div style="cursor: grab;"> 
+                                                            <div  class="draggable-handle"> 
                                                                 <i class="ki-duotone ki-abstract-14 fs-2x">
                                                                     <span class="path1"></span>
                                                                     <span class="path2"></span>
@@ -367,7 +367,7 @@ require __DIR__ . '/../layouts/header.php';
                                                 </div>
                                                 <!--end::Modal - View task-->
 
-                                            <?php endforeach; ?>
+                                                <?php endforeach; ?>
                                             <?php else: ?>
                                                 <li class="list-group-item text-muted"><?php echo __('no_tasks_in_this_group_yet'); ?>.</li>
                                             <?php endif; ?>
@@ -548,15 +548,16 @@ require __DIR__ . '/../layouts/header.php';
 
                         <div class="tab-pane fade" id="questionnairegroup" role="tabpanel">
                             <!-- Questionnaire Groups -->
-                            <!-- Task Groups -->
+                   
                             <?php if (!empty($questionnaireGroups)) : ?>
                             
-                            <div id="questions-group-list">
+                            <div class="draggable-zone" id="questions-group-list">
                                 <?php foreach ($questionnaireGroups as $qGroup): ?>
-                                     <div class="card mb-4 shadow-sm task-group" id="questionnairegroup<?php echo $qgroup['id']; ?>" data-id="<?php echo $qGroup['id']; ?>">
+                                     <div class="card mb-4 shadow-sm questionnaire-group draggable" id="questionnairegroup<?php echo $qGroup['id']; ?>" data-id="<?php echo $qGroup['id']; ?>">
+                                     
                                         <div class="card-header d-flex justify-content-between align-items-center p-4">
                                             <div class="d-flex align-items-center">
-                                                <div style="cursor: grab;"> 
+                                                <div class="draggable-handle"> 
                                                     <i class="ki-duotone ki-abstract-14 fs-2x">
                                                         <span class="path1"></span>
                                                         <span class="path2"></span>
@@ -614,12 +615,12 @@ require __DIR__ . '/../layouts/header.php';
                                             </div>
                                         </div>
 
-                                        <ul class="list-group list-group-flush task-list" data-group-id="<?php echo $qGroup['id']; ?>">
+                                        <ul class="list-group list-group-flush question-items draggable-zone" data-group-id="<?php echo $qGroup['id']; ?>">
                                             <?php if (!empty($qGroup['questions'])) : ?>
                                                 <?php foreach ($qGroup['questions'] as $question): ?>
-                                                    <li class="list-group-item d-flex justify-content-between task-item draggable" data-id="<?php echo $question['id']; ?>">
+                                                    <li class="list-group-item d-flex justify-content-between question-item draggable" data-id="<?php echo $question['id']; ?>">
                                                         <div class="d-flex align-items-center">
-                                                            <div style="cursor: grab;"> 
+                                                            <div class="draggable-handle"> 
                                                                 <i class="ki-duotone ki-abstract-14 fs-2x">
                                                                     <span class="path1"></span>
                                                                     <span class="path2"></span>
@@ -694,9 +695,9 @@ require __DIR__ . '/../layouts/header.php';
                                                                     <!--begin::Modal body-->
                                                                     <div class="modal-body py-lg-10 px-lg-10">
         <form method="POST" action="/index.php?controller=Question&action=update">
-        <?php if ($question['id']) : ?>
+                                                    <?php if ($question['id']) : ?>
             <input type="hidden" name="id" value="<?php echo $question['id']; ?>">
-        <?php endif; ?>
+                                                    <?php endif; ?>
 
         <input type="hidden" name="questionnaire_group_id" value="<?php echo $qGroup['id']; ?>">
         <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
@@ -710,11 +711,11 @@ require __DIR__ . '/../layouts/header.php';
             <div class="col-md-6">
                 <label class="form-label"><?php echo __('type_of_response') ?></label>
                 <select name="question_type" id="question_type" class="form-select">
-                    <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
+                                                    <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
                         <option value="<?php echo $type; ?>" <?php echo $question['question_type'] === $type ? 'selected' : ''; ?>>
-                            <?php echo ucfirst($type); ?>
+                                                        <?php echo ucfirst($type); ?>
                         </option>
-                    <?php endforeach; ?>
+                                                    <?php endforeach; ?>
                 </select>
 
                 <label class="form-label mt-4"><?php echo __('predefined_evaluation_type'); ?> (<?php echo __('optional'); ?>)</label>
@@ -755,10 +756,10 @@ require __DIR__ . '/../layouts/header.php';
                                                         </div>
                                                         <!--end::Modal dialog-->
                                                     </div>
-                                                    <!--end::Modal - Create new task-->
+                                                    <!--end::Modal - Create new question-->
 
 
-                                                    <!--begin::Modal - view task -->
+                                                    <!--begin::Modal - view question -->
                                                     <div class="modal fade" id="kt_modal_view_question<?php echo $question['id']; ?>" tabindex="-1" aria-hidden="true">
                                                         <!--begin::Modal dialog-->
                                                         <div class="modal-dialog modal-dialog-centered mw-900px">
@@ -819,11 +820,11 @@ require __DIR__ . '/../layouts/header.php';
                                                     </div>
                                                     <!--end::Modal dialog-->
                                                 </div>
-                                                <!--end::Modal - View task-->
+                                                <!--end::Modal - View question-->
 
-                                            <?php endforeach; ?>
+                                                <?php endforeach; ?>
                                             <?php else: ?>
-                                                <li class="list-group-item text-muted"><?php echo __('no_tasks_in_this_group_yet'); ?>.</li>
+                                                <li class="list-group-item text-muted"><?php echo __('no_questions_in_this_group_yet'); ?>.</li>
                                             <?php endif; ?>
                                         </ul>
 
@@ -831,7 +832,7 @@ require __DIR__ . '/../layouts/header.php';
                                 </div>
 
                         <!--begin::Modals-->
-                            <!--begin::Modal - Edit task group-->
+                            <!--begin::Modal - Edit question group-->
                             <div class="modal fade" id="kt_modal_edit_questionnaire_group<?php echo $qGroup['id'];?>" tabindex="-1" aria-hidden="true">
                                 <!--begin::Modal dialog-->
                                 <div class="modal-dialog modal-dialog-centered mw-900px">
@@ -856,7 +857,7 @@ require __DIR__ . '/../layouts/header.php';
                                         <div class="modal-body py-lg-10 px-lg-10">
                                             <div class="row g-4">
                                             <?php echo $qGroup['id']; ?>
-                                                <form method="POST" action="/index.php?controller=TaskGroup&action=<?php echo $qGroup['id'] ? 'update' : 'store'; ?>">
+                                                <form method="POST" action="/index.php?controller=QuestionGroup&action=<?php echo $qGroup['id'] ? 'update' : 'store'; ?>">
                                                     <?php if ($qGroup['id']) : ?>
                                                         <input type="hidden" name="id" value="<?php echo $qGroup['id']; ?>">
                                                     <?php endif; ?>
@@ -885,7 +886,7 @@ require __DIR__ . '/../layouts/header.php';
                                 </div>
                                 <!--end::Modal dialog-->
                             </div>
-                            <!--end::Modal - Edit task group-->
+                            <!--end::Modal - Edit question group-->
 
 
                             <!--begin::Modals-->
@@ -925,11 +926,11 @@ require __DIR__ . '/../layouts/header.php';
             <div class="col-md-6">
                 <label class="form-label"><?php echo __('type_of_response') ?></label>
                 <select name="question_type" id="question_type" class="form-select">
-                    <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
+                                    <?php foreach (['text', 'radio', 'checkbox', 'dropdown'] as $type): ?>
                         <option value="<?php echo $type; ?>" <?php echo $question['question_type'] === $type ? 'selected' : ''; ?>>
-                            <?php echo ucfirst($type); ?>
+                                        <?php echo ucfirst($type); ?>
                         </option>
-                    <?php endforeach; ?>
+                                    <?php endforeach; ?>
                 </select>
 
                 <label class="form-label mt-4"><?php echo __('predefined_evaluation_type'); ?> (<?php echo __('optional'); ?>)</label>
@@ -955,86 +956,86 @@ require __DIR__ . '/../layouts/header.php';
 
         <div class="d-flex gap-2 mt-4">
             <button type="submit" class="btn btn-primary"><?php echo __('save_question'); ?></button>
-            <?php
-$anchor = $question['id'] ? '#questionnaire-group' . $question['questionnaire_group_id'] : '#questionnaire-group-list';
-$cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] . $anchor;
-?>
-<a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary"><?php echo __('cancel'); ?></a>
-        </div>
-    </form>
+                                    <?php
+                                    $anchor = $question['id'] ? '#questionnaire-group' . $question['questionnaire_group_id'] : '#questionnaire-group-list';
+                                    $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] . $anchor;
+                                    ?>
+            <a href="<?php echo $cancelUrl; ?>" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
+                </div>
+                </form>
 
-                                        </div>
-                                        <!--end::Modal body-->
-                                    </div>
-                                    <!--end::Modal content-->
-                                </div>
-                                <!--end::Modal dialog-->
-                            </div>
-                            <!--end::Modal - Create new task-->
-                            <!--end::Modals-->
+                    </div>
+                    <!--end::Modal body-->
+                    </div>
+                    <!--end::Modal content-->
+                </div>
+                <!--end::Modal dialog-->
+                </div>
+                <!--end::Modal - Create new question-->
+                <!--end::Modals-->
 
                                 <?php endforeach; ?>
-                            <div class="my-3 text-end">
-                                
-                                <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ <?php echo __('add_questionnaire_group'); ?></a>
-                            </div>
-                      
-                            </div>
-                        <?php else: ?>
-                            <div class="alert alert-warning text-center py-3">No Questionnaire Groups yet. <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ Add Questionnaire Group</a>
-                            </div>
-                        <?php endif; ?>
-
-                      
-                        </div>
-                    </div>
+                <div class="my-3 text-end">
+                
+                <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ <?php echo __('add_questionnaire_group'); ?></a>
                 </div>
+              
+                </div>
+            <?php else: ?>
+                <div class="alert alert-warning text-center py-3">No Questionnaire Groups yet. <a href="/index.php?controller=QuestionnaireGroup&action=create&test_id=<?php echo $test['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_create_questionnaire_group">+ Add Questionnaire Group</a>
+                </div>
+            <?php endif; ?>
+
+              
+            </div>
             </div>
         </div>
-        
+        </div>
+    </div>
+    
 
-        <!--begin::Modal - Create Task Group-->
-        <div class="modal fade" id="kt_modal_create_task_group" tabindex="-1" aria-hidden="true">
-            <!--begin::Modal dialog-->
-            <div class="modal-dialog modal-dialog-centered mw-900px">
-                <!--begin::Modal content-->
-                <div class="modal-content">
-                    <!--begin::Modal header-->
-                    <div class="modal-header">
-                        <!--begin::Modal title-->
-                        <h2><?php echo __('create_a_new_task_group'); ?></h2>
-                        <!--end::Modal title-->
-                        <!--begin::Close-->
-                        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
-                            <i class="ki-duotone ki-cross fs-1">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-                        </div>
-                        <!--end::Close-->
-                    </div>
-                    <!--end::Modal header-->
-                    <!--begin::Modal body-->
-                    <div class="modal-body py-lg-10 px-lg-10">
-                        
-                        <form method="POST" action="/index.php?controller=TaskGroup&action=store">
-                            <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
+    <!--begin::Modal - Create Task Group-->
+    <div class="modal fade" id="kt_modal_create_task_group" tabindex="-1" aria-hidden="true">
+        <!--begin::Modal dialog-->
+        <div class="modal-dialog modal-dialog-centered mw-900px">
+        <!--begin::Modal content-->
+        <div class="modal-content">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+            <!--begin::Modal title-->
+            <h2><?php echo __('create_a_new_task_group'); ?></h2>
+            <!--end::Modal title-->
+            <!--begin::Close-->
+            <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                <i class="ki-duotone ki-cross fs-1">
+                <span class="path1"></span>
+                <span class="path2"></span>
+                </i>
+            </div>
+            <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+            <!--begin::Modal body-->
+            <div class="modal-body py-lg-10 px-lg-10">
+            
+            <form method="POST" action="/index.php?controller=TaskGroup&action=store">
+                <input type="hidden" name="test_id" value="<?php echo $test['id']; ?>">
 
-                            <div class="mb-3">
-                                <label class="form-label"><?php echo __('title'); ?></label>
-                                <input type="text" name="title" class="form-control" required value="">
-                            </div>
+                <div class="mb-3">
+                <label class="form-label"><?php echo __('title'); ?></label>
+                <input type="text" name="title" class="form-control" required value="">
+                </div>
 
-                                <input type="hidden" name="position" class="form-control" value="0">
-                     
+                <input type="hidden" name="position" class="form-control" value="0">
+             
 
-                            <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
-                            
-                            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
+                <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
+                
+                <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
 
-                        </form>
-                    
-                    </div>
+            </form>
+            
+            </div>
                     <!--end::Modal body-->
                 </div>
                 <!--end::Modal content-->
@@ -1108,12 +1109,13 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
 </div>
 <!--end::Toast Container-->
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
+<script src="assets/plugins/custom/draggable/draggable.bundle.js"></script>
+
 
 <script>
+    
     document.addEventListener("DOMContentLoaded", function () {
         const hash = window.location.hash;
 
@@ -1141,7 +1143,7 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
 
                 // Faz scroll suave até ao grupo
                 const target = document.querySelector(hash);
-                if (target) {$qGroup['id']
+                if (target) {
                     setTimeout(() => {
                         target.scrollIntoView({ behavior: "smooth", block: "start" });
                     }, 300); // aguarda a transição da tab
@@ -1202,6 +1204,191 @@ document.getElementById('preset-options').addEventListener('change', function ()
         document.getElementById('task_type').value = preset.type;
     }
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    function sendOrder(url, orderData) {
+        fetch(url, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => {
+            console.log("✅ Server responded:", response.status);
+            if (response.ok) {
+                // console.log("✅ Reorder saved successfully");
+            } else {
+                // console.error("❌ Reorder failed");
+            }
+        }).catch(error => console.error("❌ Fetch error:", error));
+    }
+
+    // --- TASK GROUPS ---
+    document.querySelectorAll('.task-group').forEach(group => {
+        const handle = group.querySelector('.draggable-handle');
+        if (handle) {
+            handle.style.cursor = "grab";
+            handle.addEventListener("mousedown", e => {
+                group.draggable = true;
+            });
+            handle.addEventListener("mouseup", e => {
+                group.draggable = false;
+            });
+        }
+
+        group.addEventListener("dragstart", e => {
+            console.log("🔵 Drag start TASK GROUP:", group.dataset.id);
+            e.dataTransfer.setData("text/plain", "taskgroup:" + group.dataset.id);
+        });
+    });
+
+    const taskGroupList = document.getElementById("task-group-list");
+    if (taskGroupList) {
+        taskGroupList.addEventListener("dragover", e => e.preventDefault());
+        taskGroupList.addEventListener("drop", e => {
+            e.preventDefault();
+            const data = e.dataTransfer.getData("text/plain");
+            if (data.startsWith("taskgroup:")) {
+                const draggedId = data.replace("taskgroup:", "");
+                const dragged = document.querySelector(`.task-group[data-id="${draggedId}"]`);
+                const target = e.target.closest(".task-group");
+                if (dragged && target && dragged !== target) {
+                    taskGroupList.insertBefore(dragged, target.nextSibling);
+                    const order = Array.from(taskGroupList.children).map(el => el.dataset.id);
+                    sendOrder("/index.php?controller=TaskGroup&action=reorder", { order });
+                }
+            }
+        });
+    }
+
+    // --- TASKS inside a task group ---
+    document.querySelectorAll('.task-items').forEach(list => {
+        list.querySelectorAll('.task-item').forEach(item => {
+            const handle = item.querySelector('.draggable-handle');
+            if (handle) {
+                handle.style.cursor = "grab";
+                handle.addEventListener("mousedown", e => {
+                    item.draggable = true;
+                });
+                handle.addEventListener("mouseup", e => {
+                    item.draggable = false;
+                });
+            }
+
+            item.addEventListener("dragstart", e => {
+                console.log("🟢 Drag start TASK:", item.dataset.id);
+                e.dataTransfer.setData("text/plain", "task:" + item.dataset.id);
+                e.stopPropagation();
+            });
+        });
+
+        list.addEventListener("dragover", e => e.preventDefault());
+        list.addEventListener("drop", e => {
+            e.preventDefault();
+            const data = e.dataTransfer.getData("text/plain");
+            if (data.startsWith("task:")) {
+                const draggedId = data.replace("task:", "");
+                const dragged = document.querySelector(`.task-item[data-id="${draggedId}"]`);
+                const target = e.target.closest(".task-item");
+                if (dragged && target && dragged !== target) {
+                    console.log("📥 Dropping task:", draggedId, "before:", target.dataset.id);
+                    list.insertBefore(dragged, target.nextSibling);
+                    const groupId = list.dataset.groupId;
+                    const order = Array.from(list.children)
+                        .filter(el => el.classList.contains("task-item"))
+                        .map(el => el.dataset.id);
+                    console.log("📤 New order:", order, "Group ID:", groupId);
+                    sendOrder("/index.php?controller=Task&action=reorder", { group_id: groupId, order });
+                }
+            }
+        });
+    });
+
+    // --- QUESTIONNAIRE GROUPS ---
+
+// --- QUESTIONNAIRE GROUPS ---
+document.querySelectorAll('.questionnaire-group').forEach(group => {
+    const handle = group.querySelector('.draggable-handle');
+    if (handle) {
+        handle.style.cursor = "grab";
+        handle.addEventListener("mousedown", e => {
+            group.draggable = true;
+        });
+        handle.addEventListener("mouseup", e => {
+            group.draggable = false;
+        });
+    }
+
+    group.addEventListener("dragstart", e => {
+        console.log("🟣 Drag start QUESTIONNAIRE GROUP:", group.dataset.id);
+        e.dataTransfer.setData("text/plain", "qgroup:" + group.dataset.id);
+    });
+});
+
+const questionnaireGroupList = document.getElementById("questions-group-list");
+if (questionnaireGroupList) {
+    questionnaireGroupList.addEventListener("dragover", e => e.preventDefault());
+    questionnaireGroupList.addEventListener("drop", e => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData("text/plain");
+        if (data.startsWith("qgroup:")) {
+            const draggedId = data.replace("qgroup:", "");
+            const dragged = document.querySelector(`.questionnaire-group[data-id="${draggedId}"]`);
+            const target = e.target.closest(".questionnaire-group");
+            if (dragged && target && dragged !== target) {
+                questionnaireGroupList.insertBefore(dragged, target.nextSibling);
+                const order = Array.from(questionnaireGroupList.children).map(el => el.dataset.id);
+                sendOrder("/index.php?controller=QuestionnaireGroup&action=reorder", { order });
+            }
+        }
+    });
+}
+
+// --- QUESTIONS inside a questionnaire group ---
+document.querySelectorAll('.question-items').forEach(list => {
+    list.querySelectorAll('.question-item').forEach(item => {
+        const handle = item.querySelector('.draggable-handle');
+        if (handle) {
+            handle.style.cursor = "grab";
+            handle.addEventListener("mousedown", e => {
+                item.draggable = true;
+            });
+            handle.addEventListener("mouseup", e => {
+                item.draggable = false;
+            });
+        }
+
+        item.addEventListener("dragstart", e => {
+            console.log("🟢 Drag start QUESTION:", item.dataset.id);
+            e.dataTransfer.setData("text/plain", "question:" + item.dataset.id);
+            e.stopPropagation();
+        });
+    });
+
+    list.addEventListener("dragover", e => e.preventDefault());
+    list.addEventListener("drop", e => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData("text/plain");
+        if (data.startsWith("question:")) {
+            const draggedId = data.replace("question:", "");
+            const dragged = document.querySelector(`.question-item[data-id="${draggedId}"]`);
+            const target = e.target.closest(".question-item");
+            if (dragged && target && dragged !== target) {
+                list.insertBefore(dragged, target.nextSibling);
+                const groupId = list.dataset.groupId;
+                const order = Array.from(list.children)
+                    .filter(el => el.classList.contains("question-item"))
+                    .map(el => el.dataset.id);
+                sendOrder("/index.php?controller=Question&action=reorder", { group_id: groupId, order });
+            }
+        }
+    });
+});
+
+});
+
+
 </script>
 
 </body>

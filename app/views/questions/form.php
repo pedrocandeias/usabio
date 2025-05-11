@@ -2,7 +2,7 @@
 $title = $question['id'] ? 'Edit Question' : 'Create Question';
 require __DIR__ . '/../layouts/header.php'; 
 ?>
-
+<div class="card"></div>
     <div class="container py-5">
     <?php if (!empty($context)): ?>
         <a href="/index.php?controller=Test&action=show&id=<?php echo $context['test_id']; ?>#questionnaire-group<?php echo $question['questionnaire_group_id']; ?>" class="btn btn-secondary btn-xs mb-4">
@@ -68,7 +68,7 @@ $cancelUrl = '/index.php?controller=Test&action=show&id=' . $context['test_id'] 
         </div>
     </form>
 </div>
-
+</div>
 <script>
 const presets = {
     "Completed/Incompleted": {

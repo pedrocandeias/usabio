@@ -67,7 +67,10 @@ class UserController extends BaseController
         $fullname = $_POST['fullname'] ?? null;
         $company = $_POST['company'] ?? null;
         $isAdmin = !empty($_POST['is_admin']) ? 1 : 0;
+        $isSuperadmin = !empty($_POST['is_superadmin']) ? 1 : 0;
         $password = $_POST['password'] ?? null;
+        $user_type = $_POST['user_type'] ?? null;
+        $is_confirmed = '1';
 
         if (!$email || !$password) {
             echo "Email and password are required.";
@@ -77,16 +80,18 @@ class UserController extends BaseController
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         $stmt = $this->pdo->prepare("
-            INSERT INTO moderators (username, email, fullname, company, password_hash, is_admin)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO moderators (username, email, fullname, company, password_hash, is_admin, is_superadmin, is_confirmed)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
-            $email,
             $email,
             $fullname,
             $company,
             $passwordHash,
-            $isAdmin
+            $isAdmin,
+            $isSuperadmin,
+            $user_type,
+            $is_confirmed
         ]);
 
         header('Location: /index.php?controller=User&action=index');
@@ -120,13 +125,15 @@ class UserController extends BaseController
     $fullname = $_POST['fullname'] ?? null;
     $company  = $_POST['company']  ?? null;
     $isAdmin  = !empty($_POST['is_admin']) ? 1 : 0;
+    $isSuperadmin = !empty($_POST['is_superadmin']) ? 1 : 0;
+    $user_type = $_POST['user_type'] ?? null;
     $password = $_POST['password'] ?? null;          // <-- NEW
 
     // --- build the base query ---
     $sql  = "UPDATE moderators
-             SET email = ?, username = ?, fullname = ?, company = ?, is_admin = ?, updated_at = NOW()";
+             SET email = ?, username = ?, fullname = ?, company = ?, is_admin = ?, is_superadmin = ?, user_type = ?, updated_at = NOW()";
 
-    $params = [$email, $email, $fullname, $company, $isAdmin];
+    $params = [$email, $email, $fullname, $company, $isAdmin, $isSuperadmin, $user_type];
 
     // --- add password if supplied ---
     if (!empty($password)) {
@@ -167,11 +174,14 @@ class UserController extends BaseController
         $fullname = $_POST['fullname'] ?? null;
         $company = $_POST['company'] ?? null;
         $email = $_POST['email'] ?? null;
+        $is_admin = !empty($_POST['is_admin']) ? 1 : 0;
+        $is_superadmin = !empty($_POST['is_superadmin']) ? 1 : 0;
+        $user_type = $_POST['user_type'] ?? null;
         $password = $_POST['new_password'] ?? null;
 
         $stmt = $this->pdo->prepare("
             UPDATE moderators
-            SET email = ?, username = ?, fullname = ?, company = ?, updated_at = NOW()
+            SET email = ?, username = ?, fullname = ?, company = ?, is_admin = ?, is_superadmin = ?, user_type = ?, updated_at = NOW()
             WHERE id = ?
         ");
         $stmt->execute([
@@ -179,6 +189,10 @@ class UserController extends BaseController
             $email,
             $fullname,
             $company,
+            $is_admin,
+            $is_superadmin,
+            $user_type,
+            $user_type,
             $id
         ]);
 

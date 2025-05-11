@@ -1,17 +1,31 @@
 <?php
+require_once __DIR__ . '/BaseController.php';
 
-class ParticipantCustomFieldController
+class ParticipantCustomFieldController extends BaseController
 {
-    protected $pdo;
-
     public function __construct($pdo)
     {
-        $this->pdo = $pdo;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['username'])) {
+            header('Location: /index.php?controller=Auth&action=login&error=Please+login+first');
+            exit;
+        }
+
+        parent::__construct($pdo);
     }
+
 
     public function index()
     {
         $project_id = $_GET['project_id'] ?? 0;
+
+           if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
 
         $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
         $stmt->execute([$project_id]);
@@ -29,8 +43,15 @@ class ParticipantCustomFieldController
 
     public function create()
     {
+
+        
         $project_id = $_GET['project_id'] ?? 0;
         $field = null;
+
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
 
         $breadcrumbs = [
             ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=show&id=' . $project_id, 'active' => false],
@@ -43,6 +64,14 @@ class ParticipantCustomFieldController
 
     public function store()
     {
+
+        $project_id = str_replace(' ', '', $_POST['project_id'] ?? 0);
+
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
+
         $stmt = $this->pdo->prepare(
             "
             INSERT INTO participants_custom_fields (project_id, label, field_type, options, position)
@@ -59,13 +88,14 @@ class ParticipantCustomFieldController
             ]
         );
 
-        header("Location: /index.php?controller=ParticipantCustomField&action=index&project_id=" . $_POST['project_id']);
+        header("Location: /index.php?controller=Participant&action=index&project_id=".$project_id."#custom-fields-list");
         exit;
     }
 
     public function edit()
     {
         $id = $_GET['id'] ?? 0;
+
         $stmt = $this->pdo->prepare("SELECT * FROM participants_custom_fields WHERE id = ?");
         $stmt->execute([$id]);
         $field = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -82,6 +112,14 @@ class ParticipantCustomFieldController
 
     public function update()
     {
+
+        $project_id = str_replace(' ', '', $_POST['project_id'] ?? 0);
+
+           if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
+
         $stmt = $this->pdo->prepare(
             "
             UPDATE participants_custom_fields SET
@@ -99,21 +137,24 @@ class ParticipantCustomFieldController
             ]
         );
 
-        
-
-        header("Location: /index.php?controller=ParticipantCustomField&action=index&project_id=" . $_POST['project_id']);
+        header("Location: /index.php?controller=Participant&action=index&project_id=".$project_id."#custom-fields-list");
         exit;
     }
 
     public function destroy()
     {
         $id = $_GET['id'] ?? 0;
+        
         $project_id = $_GET['project_id'] ?? 0;
-
+        
+        if (!$this->userIsProjectAdmin($project_id)) {
+            echo "Access denied.";
+            exit;
+        }
         $stmt = $this->pdo->prepare("DELETE FROM participants_custom_fields WHERE id = ?");
         $stmt->execute([$id]);
 
-        header("Location: /index.php?controller=ParticipantCustomField&action=index&project_id=$project_id");
+        header("Location: /index.php?controller=Participant&action=index&project_id=".$project_id."#custom-fields-list");
         exit;
     }
 }

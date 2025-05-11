@@ -396,6 +396,7 @@ class SessionController extends BaseController
         $evaluationId = $_POST['evaluation_id'];
         $timeSpent = $_POST['time_spent'] ?? [];
         $notes = $_POST['notes'] ?? [];
+        $errors = $_POST['task_error'] ?? [];
 
         foreach ($timeSpent as $taskId => $seconds) {
             // Get task text
@@ -405,11 +406,11 @@ class SessionController extends BaseController
             if (!$task) { 
                 continue;
             }
-
+            $hasError = isset($errors[$taskId]) && $errors[$taskId] === '1' ? 1 : null;
             $stmt = $this->pdo->prepare(
                 "
             INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors, type)
-            VALUES (?, ?, ?, ?, NULL, 'task')
+            VALUES (?, ?, ?, ?, ?, 'task')
         "
             );
             $stmt->execute(
@@ -417,7 +418,8 @@ class SessionController extends BaseController
                 $evaluationId,
                 $task['task_text'],
                 trim($notes[$taskId] ?? ''),
-                (int)$seconds
+                (int)$seconds,
+                $hasError,
                 ]
             );
         }
@@ -749,57 +751,60 @@ $breadcrumbs = [
 
 
     public function saveQuestionnaireResponses()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?controller=Session&action=dashboard');
-            exit;
-        }
-
-        $evaluationId = $_POST['evaluation_id'] ?? null;
-
-        if (!$evaluationId) {
-            echo "Missing evaluation ID.";
-            exit;
-        }
-
-        $answers = $_POST['answer'] ?? [];
-
-        // Loop through each question answered
-        foreach ($answers as $questionId => $answer) {
-            // Handle checkbox answers (arrays)
-            if (is_array($answer)) {
-                $answer = implode('; ', $answer);
-            }
-
-            // Get the original question text for display (optional)
-            $stmt = $this->pdo->prepare("SELECT text FROM questions WHERE id = ?");
-            $stmt->execute([$questionId]);
-            $questionText = $stmt->fetchColumn() ?? 'Unknown question';
-
-            // Save the response
-            $stmt = $this->pdo->prepare(
-                "
-            INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors, type)
-            VALUES (?, ?, ?, ?, NULL, 'question')
-        "
-            );
-            $stmt->execute(
-                [
-                $evaluationId,
-                $questionText,
-                $answer,
-                0 // time_spent is not tracked in questionnaires for now
-                ]
-            );
-        }
-
-        // Redirect to confirmation page
-        $stmt = $this->pdo->prepare("SELECT t.project_id FROM evaluations e JOIN tests t ON e.test_id = t.id WHERE e.id = ?");
-        $stmt->execute([$evaluationId]);
-        $project_id = $stmt->fetchColumn();
-        header("Location: /index.php?controller=Session&action=questionnaireComplete&project_id=" . $project_id);
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: /index.php?controller=Session&action=dashboard');
         exit;
     }
+
+    $evaluationId = $_POST['evaluation_id'] ?? null;
+
+    if (!$evaluationId) {
+        echo "Missing evaluation ID.";
+        exit;
+    }
+
+    $answers = $_POST['answer'] ?? [];
+
+    foreach ($answers as $questionId => $answer) {
+        if (is_array($answer)) {
+            $answer = implode('; ', $answer);
+        }
+
+        $stmt = $this->pdo->prepare("SELECT text FROM questions WHERE id = ?");
+        $stmt->execute([$questionId]);
+        $questionText = $stmt->fetchColumn() ?? 'Unknown question';
+
+        // Inserção do código recomendado começa aqui
+        $type = 'questionnaire';
+        $allowedTypes = ['task', 'questionnaire'];
+        if (!in_array($type, $allowedTypes)) {
+            $type = 'questionnaire'; // padrão seguro
+        }
+
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors, type)
+             VALUES (?, ?, ?, ?, NULL, ?)"
+        );
+        $stmt->execute([
+            $evaluationId,
+            $questionText,
+            $answer,
+            0,
+            $type
+        ]);
+        // Inserção do código recomendado termina aqui
+    }
+
+    $stmt = $this->pdo->prepare(
+        "SELECT t.project_id FROM evaluations e JOIN tests t ON e.test_id = t.id WHERE e.id = ?"
+    );
+    $stmt->execute([$evaluationId]);
+    $project_id = $stmt->fetchColumn();
+
+    header("Location: /index.php?controller=Session&action=questionnaireComplete&project_id=" . $project_id);
+    exit;
+}
 
     public function questionnaireComplete()
     {

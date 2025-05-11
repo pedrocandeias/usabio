@@ -116,6 +116,15 @@ require __DIR__ . '/../layouts/header.php';
                 </select>
             </div>
             <div class="mb-3">
+                <label class="form-label">Support Email</label>
+                <input type="email" class="form-control" name="support_email" value="<?php echo htmlspecialchars($settings['support_email']); ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">No Reply Email</label>
+                <input type="email" class="form-control" name="noreplymail" value="<?php echo htmlspecialchars($settings['noreplymail']); ?>">
+            </div>
+         
+            <div class="mb-3">
                 <label class="form-label">Send test email to</label>
                 <input type="email" class="form-control" name="test_email" value="<?php echo htmlspecialchars($settings['test_email']); ?>">
             </div>
@@ -124,11 +133,11 @@ require __DIR__ . '/../layouts/header.php';
     </div>
     
 
-    <div class="d-flex justify-content-between align-items-center mt-5">
+    <div class="m-5">
         <!-- Test Email Form: fora do form principal -->
         <form method="POST" action="/index.php?controller=Settings&action=testEmail" class="d-inline mt-4">
             <input type="hidden" name="test_email" value="<?php echo $settings['test_email']; ?>">
-            <button type="submit" class="btn btn-outline-info">Test Email</button>
+            <button type="submit" class="btn btn-info">Test Email</button>
         </form>
     </div>
 

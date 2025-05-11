@@ -25,34 +25,37 @@ $error = $_GET['error'] ?? null;
             </div>
 
             <!-- Right Section (Form) -->
-            <div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12 p-lg-20">
+            <div class="d-flex align-items-center flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12 p-lg-20">
                 <div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-4 w-md-600px p-20">
 
                  
-                <?php if ($success): ?>
+                  <?php if ($success === 'registered'): ?> 
                     <div class="alert alert-success fs-4">
-                        <?php if ($success === 'registered'): ?>
-                            ✅ Your email has been confirmed. You may now log in.
-                        <?php endif; ?>
-                        <?php if ($success === 'confirm_required'): ?>
-                            ✅ Your account has been created. Please check your email to activate it.
-                        <?php endif; ?>
+                        ✅ Your email has been confirmed. You may now log in.
                     </div>
                 <?php endif; ?>
-                <?php if ($error): ?>
+                <?php if ($success === 'confirm_required'): ?>
+                    <div class="alert alert-success fs-4">
+                        ✅ Your account has been created. Please check your email to activate it.
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($error === 'confirm_required'): ?>
                     <div class="alert alert-warning fs-4">
-                        <?php if ($error === 'confirm_required'): ?>
-                            ⚠️ Please confirm your email address before logging in.
-                        <?php elseif ($error === 'Invalid credentialsl'): ?>
-                            ⚠️ Invalid credentials, please try again.
-                        <?php endif; ?>
+                        ⚠️ Please confirm your email address before logging in.
+                    </div>
+                <?php endif; ?>
+                <?php if ($error === 'Invalid credentialsl'): ?>
+                    <div class="alert alert-warning fs-4">
+                        ⚠️ Invalid credentials, please try again.        
                     </div>
                 <?php endif; ?>
 
-                    <div class="d-flex flex-center flex-column flex-column-fluid px-lg-10 pb-15 pb-lg-20">
+
+                    <div class="d-flex flex-center flex-column flex-column-fluid pb-15 pb-lg-20">
                         <form class="form w-100" method="POST" action="/?controller=Auth&action=processLogin" id="kt_sign_in_form">
-                            <div class="text-center mb-11">
-                                <h1 class="text-gray-900 fw-bolder mb-3">Sign In</h1>
+                            <div class="py-5">
+                                <h1 class="text-gray-900 fw-bolder">Sign in</h1>
                             </div>
 
                             <div class="fv-row mb-8">

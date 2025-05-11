@@ -207,25 +207,28 @@ class QuestionController
         exit;
     }
 
-    public function reorder()
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $groupId = $data['group_id'] ?? 0;
-        $order = $data['order'] ?? [];
-    
-        if (!$this->userCanAccessGroup($groupId)) {
-            http_response_code(403);
-            echo "Access denied.";
-            exit;
-        }
-    
-        foreach ($order as $position => $questionId) {
-            $stmt = $this->pdo->prepare("UPDATE questions SET position = ? WHERE id = ?");
-            $stmt->execute([$position, $questionId]);
-        }
-    
-        http_response_code(204);
+  public function reorder() {
+    if (!isset($_SESSION['username'])) {
+        http_response_code(403);
+        exit('Not authorized');
     }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    $groupId = $data['group_id'] ?? 0;
+    $order = $data['order'] ?? [];
+
+    if (!is_array($order) || !$groupId) {
+        http_response_code(400);
+        exit('Invalid data');
+    }
+
+    foreach ($order as $position => $id) {
+        $stmt = $this->pdo->prepare("UPDATE questions SET position = ? WHERE id = ? AND questionnaire_group_id = ?");
+        $stmt->execute([$position, $id, $groupId]);
+    }
+
+    http_response_code(204);
+}
 
     public function generateSUS()
     {

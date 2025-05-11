@@ -201,10 +201,9 @@ require __DIR__ . '/../layouts/header.php';
                 <!--end::Modal header-->
                 <!--begin::Modal body-->
                 <div class="modal-body py-lg-10 px-lg-10">
-<?php $participant_id = $participant['id'];
-?>
+                <?php $participant_id = $participant['id']; ?>
                 <form method="POST" action="/index.php?controller=Participant&action=update">
-                    <input type="hidden" name="project_id" value="<?php echo $participant_id; ?>">
+                    <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                     <?php if (!empty($participant_id)): ?>
                         <input type="hidden" name="participant_id" value="<?php echo $participant_id; ?>">
                     <?php endif; ?>
@@ -261,7 +260,7 @@ require __DIR__ . '/../layouts/header.php';
                             <div class="mb-3">
                                 <label class="form-label"><?php echo htmlspecialchars($field['label']); ?></label>
                                 <?php
-                                    $value = $customFieldValues[$field['id']] ?? '';
+                                    $value = $participant['custom_fields'][$field['id']] ?? '-';
                                     if ($field['field_type'] === 'select') {
                                         echo '<select name="custom_field[' . $field['id'] . ']" class="form-select">';
                                         echo '<option value="">Select...</option>';
@@ -317,13 +316,13 @@ require __DIR__ . '/../layouts/header.php';
                     </div>
                     <?php else : ?>
                         <div class="alert alert-warning mt-3 mb-3" role="alert">
-                            ⚠️ No tests found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list">Create tests</a> to assign to participants.
+                            ⚠️<?php echo __('no_tests_found_for_this_project');?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list">Create tests</a> to assign to participants.
                         </div>
                     <?php endif; ?>
                     </div>
                     <div class="mt-2">
-                        <button type="submit" class="btn btn-primary">Save Participant</button>
-                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                        <button type="submit" class="btn btn-primary"><?php echo __('save_participant'); ?></button>
+                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
                     </div>
                 </form>
             </div>
@@ -334,6 +333,164 @@ require __DIR__ . '/../layouts/header.php';
     <!--end::Modal dialog-->
 </div>
 <!--end::Modal - Edit new participant-->
+
+
+
+<!--begin::Modal - View participant -->
+    <div class="modal fade" id="kt_modal_view_participant<?php echo $participant['id']; ?>" tabindex="-1" aria-hidden="true">
+        <!--begin::Modal dialog-->
+        <div class="modal-dialog modal-dialog-centered mw-900px">
+            <!--begin::Modal content-->
+            <div class="modal-content">
+                <!--begin::Modal header-->
+                <div class="modal-header">
+                    <!--begin::Modal title-->
+                    <h2><?php echo __('view_participant');?></h2>
+                    <!--end::Modal title-->
+                    <!--begin::Close-->
+                    <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                        <i class="ki-duotone ki-cross fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                    <!--end::Close-->
+                </div>
+                <!--end::Modal header-->
+                <!--begin::Modal body-->
+                <div class="modal-body py-lg-10 px-lg-10">
+                <?php $participant_id = $participant['id']; ?>
+                    
+                    <!--begin::Row-->
+                    <div class="row mb-7">
+                        <!--begin::Label-->
+                        <label class="col-lg-4 fw-semibold text-muted"><?php echo __('participant_name'); ?></label>
+                        <!--end::Label-->
+                        <!--begin::Col-->
+                        <div class="col-lg-8">
+                            <span class="fw-bold fs-6 text-gray-800"><?php echo htmlspecialchars($participant['participant_name'] ?? ''); ?></span>
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Row-->
+
+                    <!--begin::Row-->
+                    <div class="row mb-7">
+                        <!--begin::Label-->
+                        <label class="col-lg-4 fw-semibold text-muted"><?php echo __('age'); ?></label>
+                        <!--end::Label-->
+                        <!--begin::Col-->
+                        <div class="col-lg-8">
+                            <span class="fw-bold fs-6 text-gray-800"><?php echo htmlspecialchars($participant['participant_age'] ?? ''); ?></span>
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Row-->
+
+                    <!--begin::Row-->
+                    <div class="row mb-7">
+                        <!--begin::Label-->
+                        <label class="col-lg-4 fw-semibold text-muted"><?php echo __('gender'); ?></label>
+                        <!--end::Label-->
+                        <!--begin::Col-->
+                        <div class="col-lg-8">
+                            <span class="fw-bold fs-6 text-gray-800"><?php echo ($participant['participant_gender'] ?? ''); ?></span>
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Row-->
+                    <!--begin::Row-->
+                    <div class="row mb-7">
+                        <!--begin::Label-->
+                        <label class="col-lg-4 fw-semibold text-muted"><?php echo __('academic_qualification'); ?></label>
+                        <!--end::Label-->
+                        <!--begin::Col-->
+                        <div class="col-lg-8">
+                            <span class="fw-bold fs-6 text-gray-800"><?php echo $participant['participant_academic_level'] ?? ''; ?></span>
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Row-->
+
+                    <?php 
+
+
+                    if (!empty($customFields)) { ?>
+                        <hr class="my-4">
+                        <h5><?php echo __('custom_fields'); ?></h5>
+                        <?php foreach ($customFields as $field): ?>
+                              <!--begin::Row-->
+                      <div class="row mb-7">
+                        <!-- Label -->
+                        <label class="col-lg-4 fw-semibold text-muted"><?php echo htmlspecialchars($field['label']); ?></label>
+
+                        <!-- Value -->
+                        <div class="col-lg-8">
+                            <span class="fw-bold fs-6 text-gray-800">
+                                <?php
+                                    // Get the value for this field (by field ID)
+                                    $value = $participant['custom_fields'][$field['id']] ?? '-';
+                                    echo htmlspecialchars($value);
+                                ?>
+                            </span>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+                        
+                    <?php } else { ?>
+                        <div class="alert alert-warning mt-3 mb-3" role="alert">
+                            ⚠️ <?php echo __('no_custom_fields_for_participants_found_for_this_project.'); ?> <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list">Create custom fields</a> to collect additional information about participants.
+                        </div>
+                    <?php } ?>
+
+                    <div class="col-md-12">
+                    <?php 
+                    $tests_by_participant = $testsByParticipant[$participant['id']] ?? [];
+                    if (!empty($tests_by_participant)) {
+                        $assignedTestIds = array_map(function($test) {
+                            return $test['participant_test_id'];
+                        }, $tests_by_participant);
+                    }
+                    if(!empty($tests)): ?>
+                    
+                        <hr class="my-4">
+                        <h5><?php echo __('tests'); ?></h5>
+                        <p class="text-muted"><?php echo __('tests_that_this_participant_is_assigned_to'); ?>.</p>
+                      
+                        <div class="mb-5">
+                        
+                            <?php foreach ($tests as $test): ?>
+                            <div class="row mb-7">
+                                <!--begin::Col-->
+                                <div class="col-lg-8">
+                                    <span class="fw-bold fs-6 text-gray-800"><?php echo htmlspecialchars($test['title']) ?></span>
+                                </div>
+                                <!--end::Col-->
+                            </div>
+                                    
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else : ?>
+                        <div class="alert alert-warning mt-3 mb-3" role="alert">
+                            ⚠️ <?php echo __('no_tests_found_for_this_project'); ?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list">Create tests</a> to assign to participants.
+                        </div>
+                    <?php endif; ?>
+                    </div>
+                    <div class="mt-2">
+                        <button type="submit" class="btn btn-primary"><?php echo __('save_participant'); ?></button>
+                        <a href="#" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo __('cancel'); ?></a>
+                    </div>
+                </form>
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Edit new participant-->
+
+
 
                     <?php endforeach; ?>
                 </tbody>
@@ -368,9 +525,9 @@ require __DIR__ . '/../layouts/header.php';
 
                 <div class="col-md-4">
                     <select name="field_type" class="form-select" required>
-                        <option value="text">Text</option>
-                        <option value="number">Number</option>
-                        <option value="select">Dropdown (select)</option>
+                        <option value="text"><?php echo __('text'); ?></option>
+                        <option value="number"><?php echo __('number'); ?></option>
+                        <option value="select"><?php echo __('dropdown (select)'); ?></option>
                     </select>
                 </div>
 
@@ -387,9 +544,9 @@ require __DIR__ . '/../layouts/header.php';
                 <table class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th>Label</th>
-                            <th>Type</th>
-                            <th>Options</th>
+                            <th><?php echo __('label'); ?></th>
+                            <th><?php echo __('type'); ?></th>
+                            <th><?php echo __('options'); ?></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -400,10 +557,79 @@ require __DIR__ . '/../layouts/header.php';
                             <td><?php echo $field['field_type']; ?></td>
                             <td><?php echo htmlspecialchars($field['options']); ?></td>
                             <td class="text-end">
-                                <a href="/index.php?controller=ParticipantCustomField&action=edit&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-primary"><?php echo __('edit'); ?></a>
-                                <a href="/index.php?controller=ParticipantCustomField&action=destroy&id=<?php echo $field['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('<?php echo __('are_you_sure_you_want_to_delete_this_field?'); ?>')"><?php echo __('delete'); ?></a>
+                                <a href="/index.php?controller=ParticipantCustomField&action=edit&id=<?php echo $field['id'] ?>&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_edit_custom_field<?php echo $field['id']; ?>"><?php echo __('edit'); ?></a>
+                                <a href="/index.php?controller=ParticipantCustomField&action=destroy&id=<?php echo $field['id'] ?>&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('<?php echo __('are_you_sure_you_want_to_delete_this_field?'); ?>')"><?php echo __('delete'); ?></a>
                             </td>
                         </tr>
+
+
+                        <!--begin::Modal - Add Custom Field -->
+                        <div class="modal fade" id="kt_modal_edit_custom_field<?php echo $field['id']; ?>" tabindex="-1" aria-hidden="true">
+                            <!--begin::Modal dialog-->
+                            <div class="modal-dialog modal-dialog-centered mw-900px">
+                                <!--begin::Modal content-->
+                                <div class="modal-content">
+                                    <!--begin::Modal header-->
+                                    <div class="modal-header">
+                                        <!--begin::Modal title-->
+                                        <h2><?php echo __('edit_custom_field'); ?></h2>
+                                        <!--end::Modal title-->
+                                        <!--begin::Close-->
+                                        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                            <i class="ki-duotone ki-cross fs-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </div>
+                                        <!--end::Close-->
+                                    </div>
+                                    <!--end::Modal header-->
+                                    <!--begin::Modal body-->
+                                    <div class="modal-body py-lg-10 px-lg-10">
+                                                                                
+                                        <form method="POST" action="/index.php?controller=ParticipantCustomField&action=<?= $field ? 'update' : 'store' ?>">
+                                            <?php if ($field): ?>
+                                                <input type="hidden" name="id" value="<?= $field['id'] ?>">
+                                            <?php endif; ?>
+                                            <input type="hidden" name="project_id" value="<?= $_GET['project_id'] ?? $field['project_id'] ?>">
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Label</label>
+                                                <input type="text" name="label" class="form-control" required value="<?= htmlspecialchars($field['label'] ?? '') ?>">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Field Type</label>
+                                                <select name="field_type" class="form-select">
+                                                    <option value="text" <?= ($field['field_type'] ?? '') === 'text' ? 'selected' : '' ?>>Text</option>
+                                                    <option value="number" <?= ($field['field_type'] ?? '') === 'number' ? 'selected' : '' ?>>Number</option>
+                                                    <option value="select" <?= ($field['field_type'] ?? '') === 'select' ? 'selected' : '' ?>>Dropdown</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Options (for dropdown; use `;` to separate)</label>
+                                                <input type="text" name="options" class="form-control" value="<?= htmlspecialchars($field['options'] ?? '') ?>">
+                                            </div>
+
+                                        
+                                                <input type="hidden" name="position" class="form-control" value="<?= htmlspecialchars($field['position'] ?? 0) ?>">
+                                        
+
+                                            <button type="submit" class="btn btn-primary"><?php echo __('save'); ?></button>
+                                            <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                                        </form>
+
+                                    </div>
+                                    <!--end::Modal body-->
+                                </div>
+                                <!--end::Modal content-->
+                            </div>
+                            <!--end::Modal dialog-->
+                        </div>
+                        <!--end::Modal - Add Custom Field -->
+
+
                     <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -520,7 +746,7 @@ require __DIR__ . '/../layouts/header.php';
                         
                     <?php } else { ?>
                         <div class="alert alert-warning mt-3 mb-3" role="alert">
-                            ⚠️ No custom fields for participants found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list">Create custom fields</a> to collect additional information about participants.
+                            ⚠️ <?php echo __('no_custom_fields_for_participants_found_for_this_project');?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list"><?php echo __('create_custom_fields'); ?></a> <?php echo __('to_collect_additional_information_about_participants'); ?>.
                         </div>
                     <?php } ?>
 

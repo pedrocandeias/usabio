@@ -155,17 +155,29 @@ class TaskGroupController
         include __DIR__ . '/../views/task_groups/form.php';
     }
 
-    public function reorder()
-    {
+    public function reorder() {
+        if (!isset($_SESSION['username'])) {
+            http_response_code(403);
+            exit('Not authorized');
+        }
+
+        // Read JSON body
         $data = json_decode(file_get_contents('php://input'), true);
         $order = $data['order'] ?? [];
 
+        // Validate array
+        if (!is_array($order)) {
+            http_response_code(400);
+            exit('Invalid data');
+        }
+
+        // Update positions in DB
         foreach ($order as $position => $id) {
             $stmt = $this->pdo->prepare("UPDATE task_groups SET position = ? WHERE id = ?");
             $stmt->execute([$position, $id]);
         }
 
-        http_response_code(204);
+        http_response_code(204); // success, no content
     }
 
     public function update()

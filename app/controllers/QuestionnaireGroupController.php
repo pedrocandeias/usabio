@@ -168,19 +168,27 @@ class QuestionnaireGroupController
     }
     
 
-    public function reorder()
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $order = $data['order'] ?? [];
-
-        foreach ($order as $position => $id) {
-            $stmt = $this->pdo->prepare("UPDATE questionnaire_groups SET position = ? WHERE id = ?");
-            $stmt->execute([$position, $id]);
-        }
-
-        http_response_code(204);
+   public function reorder() {
+    if (!isset($_SESSION['username'])) {
+        http_response_code(403);
+        exit('Not authorized');
     }
 
+    $data = json_decode(file_get_contents('php://input'), true);
+    $order = $data['order'] ?? [];
+
+    if (!is_array($order)) {
+        http_response_code(400);
+        exit('Invalid data');
+    }
+
+    foreach ($order as $position => $id) {
+        $stmt = $this->pdo->prepare("UPDATE questionnaire_groups SET position = ? WHERE id = ?");
+        $stmt->execute([$position, $id]);
+    }
+
+    http_response_code(204);
+}
 
     public function update()
     {

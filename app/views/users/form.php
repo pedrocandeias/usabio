@@ -57,14 +57,28 @@ require __DIR__ . '/../layouts/header.php';
                     </div>
                 </div>
 
+                
+                <div class="mb-3">
+                    <label class="form-label">User Type</label>
+                    <select name="user_type" class="form-select">
+                        <option value="none" <?php echo $user['user_type'] == 'none' ? 'selected' : ''; ?>>None</option>
+                        <option value="normal" <?php echo $user['user_type'] == 'normal' ? 'selected' : ''; ?>>Normal</option>
+                        <option value="premium" <?php echo $user['user_type'] ==  'premium' ? 'selected' : ''; ?>>Premium</option>
+                        <option value="superpremium" <?php echo $user['user_type'] ==  'superpremium' ? 'selected' : ''; ?>>Superpremium</option>
+                    </select>
+                </div>
+
                 <div class="form-check mb-3">
                     <input type="checkbox" name="is_admin" value="1" class="form-check-input" id="isAdmin"
                         <?php echo $user['is_admin'] ? 'checked' : ''; ?>>
-                    <label class="form-check-label" for="isAdmin">Administrator</label>
+                    <label class="form-check-label" for="isAdmin">Admin?</label>
                 </div>
 
-
-
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="is_superadmin" value="1" class="form-check-input" id="is_superadmin"
+                        <?php echo $user['is_superadmin'] ? 'checked' : ''; ?>>
+                    <label class="form-check-label" for="is_superadmin">Superadmin?</label>
+                </div>
                 
                 <button type="submit" class="btn btn-primary">Save User</button>
                 <a href="/index.php?controller=User&action=index" class="btn btn-secondary">Cancel</a>

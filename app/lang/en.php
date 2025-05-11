@@ -292,5 +292,15 @@ return [
     'invite_by_email' => 'Invite by Email',
     'if_the_user_does_not_exist_they_will_be_invited_to_register' => 'If the user does not exist, they will be invited to register.',
     'export_data_for' => 'Export data for',
+
+ 'no_tests_found_for_this_project' => 'No tests found for this project.',
+ 'create_tests' => 'Create Tests',
+ 'to_assign_to_participants' => 'to assign to participants',
+ 'save_participant' => 'Save Participant',
+ 'no_task_groups_yet' => 'No task groups yet',
+ 'no_tasks_in_this_group_yet' => 'No tasks in this group yet',
+ 'add_question' => 'Add Question',
+ 'no_questions_in_this_group_yet' => 'No questions in this group yet',
+
 ];
 ?>

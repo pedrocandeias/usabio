@@ -34,7 +34,7 @@ class CustomFieldController
             $data['position'] ?? 0
         ]);
     
-        header("Location: /index.php?controller=Project&action=show&id=$projectId#custom-fields-list");
+        header("Location: /index.php?controller=Participant&action=index&project_id=$projectId#custom-fields-list");
         exit;
     }
     
@@ -44,12 +44,12 @@ class CustomFieldController
     public function destroy()
     {
         $id = $_GET['id'];
-        $projectId = $_GET['project_id'];
+        $project_id = $_GET['project_id'];
 
         $stmt = $this->pdo->prepare("DELETE FROM participants_custom_fields WHERE id = ?");
         $stmt->execute([$id]);
 
-        header("Location: /index.php?controller=Project&action=show&id=" . $projecttId. "#custom-fields-list");
+        header("Location: /index.php?controller=Participant&action=index&project_id=".$project_id."#custom-fields-list");
         exit;
     }
 }

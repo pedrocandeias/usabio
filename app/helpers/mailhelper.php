@@ -37,7 +37,7 @@ class MailHelper
             ]);
     
             if (!$template) {
-                // error_log("Missing template: invite_email");
+                error_log("Missing template: invite_email");
                 return false;
             }
     
@@ -49,7 +49,7 @@ class MailHelper
             return true;
     
         } catch (Exception $e) {
-           //  error_log("Invite email failed: " . $mail->ErrorInfo);
+            error_log("Invite email failed: " . $mail->ErrorInfo);
             return false;
         }
     }
@@ -70,7 +70,7 @@ class MailHelper
         $mail->SMTPSecure = $smtp['mailserver_encryption'] ?? '';
 
         $defaults = self::getEmailDefaults($pdo);
-        // error_log("Email defaults: " . json_encode($defaults));
+        error_log("Email defaults: " . json_encode($defaults));
         $mail->setFrom($defaults['from_email'], $defaults['from_name']);
         $mail->addAddress($toEmail);
         $mail->isHTML(true);
@@ -81,23 +81,23 @@ class MailHelper
             'email' => $toEmail
             // login_url e platform_name são automáticos
         ]);
-        // error_log("Loaded template: " . json_encode($template));
+        error_log("Loaded template: " . json_encode($template));
 
         if (!$template) {
-            // error_log("Missing template: registration_confirmation");
+            error_log("Missing template: registration_confirmation");
             return false;
         }
 
         $mail->Subject = $template['subject'];
         $mail->Body = $template['body'];
         $mail->AltBody = strip_tags($template['body']);
-        // error_log("subject:" . $template['subject']);
-        // error_log("body:" . $template['body']);
+        error_log("subject:" . $template['subject']);
+        error_log("body:" . $template['body']);
         $mail->send();
         return true;
 
     } catch (Exception $e) {
-       //  error_log("Registration confirmation failed: " . $mail->ErrorInfo);
+        error_log("Registration confirmation failed: " . $mail->ErrorInfo);
         return false;
     }
 }
@@ -131,11 +131,10 @@ class MailHelper
             return true;
         } catch (Exception $e) {
             $error = $mail->ErrorInfo;
-            // error_log("Test email failed: " . $mail->ErrorInfo);
+            error_log("Test email failed: " . $mail->ErrorInfo);
             return false;
         }
     }
-
 
     public static function getSmtpConfig($pdo)
     {
@@ -143,7 +142,7 @@ class MailHelper
             $stmt = $pdo->query("SELECT setting_key, setting_value FROM settings WHERE setting_key LIKE 'mailserver_%'");
             return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
         } catch (Exception $e) {
-            // error_log("Failed to load SMTP settings: " . $e->getMessage());
+            error_log("Failed to load SMTP settings: " . $e->getMessage());
             return [];
         }
     }
@@ -156,7 +155,7 @@ class MailHelper
             WHERE setting_key IN ('noreplymail', 'platform_name')
         ");
         $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-        // error_log("Email defaults loaded: " . implode(', ', array_keys($settings)));
+        error_log("Email defaults loaded: " . implode(', ', array_keys($settings)));
     
         return [
             'from_email' => $settings['noreplymail'] ?? 'noreply@testflow.design',
@@ -222,7 +221,7 @@ class MailHelper
 
 function load_email_template($pdo, string $template_key, array $placeholders = []): ?array
 {
-    // error_log("loading this function");
+    error_log("loading this function");
     $stmt = $pdo->prepare("SELECT subject, body FROM email_templates WHERE template_key = ?");
     $stmt->execute([$template_key]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -237,14 +236,14 @@ function load_email_template($pdo, string $template_key, array $placeholders = [
     // Todas as tags detectadas no subject ou body
     preg_match_all('/\{\{(.*?)\}\}/', $subject . $body, $matches);
     $tagsFound = array_unique($matches[1]);
-    // error_log("Tags found: " . implode(', ', $tagsFound));
+    error_log("Tags found: " . implode(', ', $tagsFound));
     // Procurar apenas as tags não preenchidas manualmente
     $missingTags = array_diff($tagsFound, array_keys($placeholders));
-   //  error_log("Missing tags: " . implode(', ', $missingTags));
+   error_log("Missing tags: " . implode(', ', $missingTags));
     if (!empty($missingTags)) {
         $stmt = $pdo->query("SELECT setting_key, setting_value FROM settings");
         $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-        // error_log("Settings loaded: " . implode(', ', array_keys($settings)));
+        error_log("Settings loaded: " . implode(', ', array_keys($settings)));
         foreach ($missingTags as $tag) {
             switch ($tag) {
                 case 'login_url':
@@ -257,7 +256,7 @@ function load_email_template($pdo, string $template_key, array $placeholders = [
                     break;
 
                 case 'support_email':
-                    $placeholders['support_email'] = $settings['support_email'] ?? 'support@usabio.ddev.site';
+                    $placeholders['support_email'] = $settings['support_email'] ?? 'sayhi@testflow.design';
                     break;
 
                 // podes adicionar mais aqui
@@ -273,7 +272,7 @@ function load_email_template($pdo, string $template_key, array $placeholders = [
         $body = str_replace($tag, $value, $body);
     }
     // ("EMAIL TEMPLATE SUBJECT: $subject");
-    // error_log("EMAIL TEMPLATE BODY: $body");
+    error_log("EMAIL TEMPLATE BODY: $body");
     
     return [
         'subject' => $subject,

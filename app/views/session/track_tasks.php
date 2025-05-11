@@ -101,6 +101,11 @@ require __DIR__ . '/../layouts/header.php';
                                 <i class="bi bi-check-circle-fill"></i>    
                                 <?php echo __('mark_as_complete'); ?>
                                 </button>
+                                <button type="button" class="btn btn-danger" id="btn-incomplete-<?php echo $task['id']; ?>" onclick="toggleInComplete(<?php echo $task['id']; ?>)">
+                                <i class="bi bi-check-circle-fill"></i>    
+                                <?php echo __('mark_as_incomplete'); ?>
+                                </button>
+                                <input type="hidden" name="task_error[<?php echo $task['id']; ?>]" id="error-<?php echo $task['id']; ?>" value="0">
                                 <input type="hidden" name="time_spent[<?php echo $task['id']; ?>]" id="input-<?php echo $task['id']; ?>" value="0">
                             </div>
 
@@ -163,14 +168,6 @@ require __DIR__ . '/../layouts/header.php';
                             <div class="mb-2">
                                 <textarea name="notes[<?php echo $task['id']; ?>]" class="form-control" placeholder="Moderator notes..." rows="2"></textarea>
                             </div>
-                            <div class="d-flex align-items-center gap-3 flex-wrap my-10">
-                                <input class="form-check-input btn-check" type="checkbox" value="Error occurred" id="error-<?php echo $task['id']; ?>" name="errors[<?php echo $task['id']; ?>]">
-                                <label class="form-check-label btn btn-danger btn-bordered fs-3" for="error-<?php echo $task['id']; ?>">
-                                    <?php echo __('task_failed'); ?>
-                                </label>
-                            </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -205,23 +202,48 @@ function startTimer(id) {
 function pauseTimer(id) {
     clearInterval(timers[id]);
     delete timers[id];
+    console.log('Paused timer for task ID:', id);
 }
 
 function toggleComplete(id) {
     const card = document.getElementById(`task-${id}`);
     const btn = document.getElementById(`btn-${id}`);
-    
+    taskId = id;
     if (!card.classList.contains('completed')) {
         pauseTimer(id);
         card.classList.add('completed', 'bg-light', 'opacity-50');
         btn.textContent = '🔄 Resume Task';
         btn.classList.remove('btn-outline-success');
         btn.classList.add('btn-outline-secondary');
+        document.getElementById('task-' + taskId).value = '1';
+        console.log('task-' + taskId);
     } else {
         card.classList.remove('completed', 'bg-light', 'opacity-50');
         btn.textContent = '✅ Mark as Complete';
         btn.classList.remove('btn-outline-secondary');
         btn.classList.add('btn-outline-success');
+        document.getElementById('task-' + taskId).value = '0';
+    }
+}
+
+function toggleInComplete(id) {
+    const card = document.getElementById(`task-${id}`);
+    const btn = document.getElementById(`btn-incomplete-${id}`);
+    
+    if (!card.classList.contains('incomplete')) {
+        pauseTimer(id);
+        card.classList.add('incomplete', 'bg-light', 'opacity-50');
+        btn.textContent = '🔄 Resume Task';
+        btn.classList.remove('btn-outline-danger');
+        btn.classList.add('btn-outline-secondary');
+        document.getElementById('error-' + taskId).value = '1';
+        console.log('error-' + taskId);
+    } else {
+        card.classList.remove('incomplete', 'bg-light', 'opacity-50');
+        btn.textContent = '❌ Mark as Incomplete';
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-outline-danger');
+        document.getElementById('error-' + taskId).value = '0';
     }
 }
 </script>

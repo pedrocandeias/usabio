@@ -4,9 +4,7 @@
 
 <div class="container py-4">
 
-<a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>" class="btn btn-secondary btn-xs mb-4">
-        ← Back to Test
-    </a>
+
 
 
 <h2><?= $field ? 'Edit' : 'Add' ?> Custom Field</h2>
@@ -44,9 +42,6 @@
     <a href="/index.php?controller=ParticipantCustomField&action=index&project_id=<?= $_GET['project_id'] ?? $field['project_id'] ?>" class="btn btn-secondary">Cancel</a>
 </form>
 
-<a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>" class="btn btn-secondary btn-xs mt-4">
-        ← Back to Test
-    </a>
 
 
 </div>
