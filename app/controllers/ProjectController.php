@@ -23,41 +23,58 @@ class ProjectController extends BaseController
     
     }
 
-    /**
-     * List all projects
-     */
-    public function index()
-    {
-        $userId = $_SESSION['user_id'] ?? null;
-        $isSuperadmin = $_SESSION['is_superadmin'] ?? false;
-    
-        if (!$userId) {
-            header("Location: /index.php?controller=Auth&action=login");
-            exit;
-        }
-    
-        if ($isSuperadmin) {
-            $stmt = $this->pdo->query("SELECT * FROM projects ORDER BY created_at DESC");
-            $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $stmt = $this->pdo->prepare("
-                SELECT DISTINCT p.*
-                FROM projects p
-                LEFT JOIN project_user pu ON pu.project_id = p.id
-                WHERE p.owner_id = :user_id OR pu.moderator_id = :user_id
-                ORDER BY p.created_at DESC
-            ");
-            $stmt->execute(['user_id' => $userId]);
-            $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-    
-        $breadcrumbs = [
-            ['label' => __('my_projects'), 'url' => '/index.php?controller=Project&action=index', 'active' => false],
-        ];
-    
-        include __DIR__ . '/../views/projects/index.php';
+   /**
+ * List all projects
+ */
+/**
+ * List all projects
+ */
+public function index()
+{
+    $userId = $_SESSION['user_id'] ?? null;
+    $isSuperadmin = $_SESSION['is_superadmin'] ?? false;
+
+    if (!$userId) {
+        header("Location: /index.php?controller=Auth&action=login");
+        exit;
     }
-    
+
+    $filter = $_GET['filter'] ?? null;
+
+    if ($isSuperadmin) {
+        // SUPERADMIN: always see everything
+        $stmt = $this->pdo->query("SELECT * FROM projects ORDER BY created_at DESC");
+        $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } elseif ($filter === 'my') {
+        // USER + filter=my → owned OR assigned as admin
+        $stmt = $this->pdo->prepare("
+            SELECT DISTINCT p.*
+            FROM projects p
+            LEFT JOIN project_user pu ON pu.project_id = p.id
+            WHERE p.owner_id = :user_id OR (pu.moderator_id = :user_id AND pu.is_admin = 1)
+            ORDER BY p.created_at DESC
+        ");
+        $stmt->execute(['user_id' => $userId]);
+        $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        // USER → owned OR assigned (any role)
+        $stmt = $this->pdo->prepare("
+            SELECT DISTINCT p.*
+            FROM projects p
+            LEFT JOIN project_user pu ON pu.project_id = p.id
+            WHERE p.owner_id = :user_id OR pu.moderator_id = :user_id
+            ORDER BY p.created_at DESC
+        ");
+        $stmt->execute(['user_id' => $userId]);
+        $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $breadcrumbs = [
+        ['label' => __('projects'), 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+    ];
+
+    include __DIR__ . '/../views/projects/index.php';
+}
 
     /**
      * Show create project form

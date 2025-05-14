@@ -4,7 +4,7 @@ $title = 'Admin Settings';
 $pageTitle = 'Admin Settings';
 $pageDescription = 'Manage settings.';
 $headerNavbuttons = [
-    __('back_to_projects_list') => [
+    __('back_to_projects') => [
         'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
@@ -35,7 +35,7 @@ require __DIR__ . '/../layouts/header.php';
 
         <?php
         if (!empty($_GET['email_success']) && $_GET['email_success'] === 'email_test_sent') { ?>
-       <div class="alert alert-success">email sent successfully</div>
+       <div class="alert alert-success">Email sent successfully</div>
        <?php }
         if (!empty($_GET['email_error']) && $_GET['email_error'] === 'email_test_failed') { ?>
         <div class="alert alert-danger">Failed to send test email</div>

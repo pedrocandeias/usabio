@@ -127,13 +127,14 @@ class UserController extends BaseController
     $isAdmin  = !empty($_POST['is_admin']) ? 1 : 0;
     $isSuperadmin = !empty($_POST['is_superadmin']) ? 1 : 0;
     $user_type = $_POST['user_type'] ?? null;
-    $password = $_POST['password'] ?? null;          // <-- NEW
+    $is_confirmed = '1';
+    $password = $_POST['password'] ?? null;
 
     // --- build the base query ---
     $sql  = "UPDATE moderators
-             SET email = ?, username = ?, fullname = ?, company = ?, is_admin = ?, is_superadmin = ?, user_type = ?, updated_at = NOW()";
+             SET email = ?, username = ?, fullname = ?, company = ?, is_admin = ?, is_superadmin = ?, user_type = ?, is_confirmed = ?, updated_at = NOW()";
 
-    $params = [$email, $email, $fullname, $company, $isAdmin, $isSuperadmin, $user_type];
+    $params = [$email, $email, $fullname, $company, $isAdmin, $isSuperadmin, $user_type, $is_confirmed];
 
     // --- add password if supplied ---
     if (!empty($password)) {

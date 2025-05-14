@@ -21,15 +21,24 @@ require __DIR__ . '/../layouts/header.php';
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Email Templates</h3>
+    
             </div>
             <div class="card-body">
                 <?php if (!empty($_GET['success'])): ?>
-                    <div class="alert alert-success">✅ Template updated successfully.</div>
+                    <div class="alert alert-success">Template updated successfully.</div>
                 <?php endif; ?>
                 <?php if (!empty($_GET['error'])): ?>
                     <div class="alert alert-danger">⚠️ <?php echo htmlspecialchars($_GET['error']); ?></div>
                 <?php endif; ?>
+                <?php if (!empty($_SESSION['toast_success'])): ?>
+                    <div class="alert alert-success"><?php echo $_SESSION['toast_success']; ?></div>
+                    <?php unset($_SESSION['toast_success']); ?>
+                <?php endif; ?>
 
+                <?php if (!empty($_SESSION['toast_error'])): ?>
+                    <div class="alert alert-danger">❌ <?php echo $_SESSION['toast_error']; ?></div>
+                    <?php unset($_SESSION['toast_error']); ?>
+                <?php endif; ?>
                 <table class="table table-bordered table-hover align-middle">
                     <thead>
                         <tr>
@@ -45,9 +54,12 @@ require __DIR__ . '/../layouts/header.php';
                                 <td><code><?php echo htmlspecialchars($template['template_key']); ?></code></td>
                                 <td><?php echo htmlspecialchars($template['subject']); ?></td>
                                 <td><?php echo date('Y-m-d H:i', strtotime($template['updated_at'])); ?></td>
-                                <td>
-                                    <a href="/index.php?controller=EmailTemplate&action=edit&id=<?php echo $template['id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <td class="d-flex justify-content-center">
+                                    <a href="/index.php?controller=EmailTemplate&action=edit&id=<?php echo $template['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
+                                    <a href="/index.php?controller=EmailTemplate&action=testSingle&template=<?php echo urlencode($template['template_key']); ?>" class="btn btn-sm btn-secondary ms-1">Test</a>
                                 </td>
+
+
                             </tr>
                         <?php endforeach; ?>
                         <?php if (empty($templates)): ?>

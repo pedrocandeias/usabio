@@ -65,6 +65,7 @@ class ProjectUserController extends BaseController
             foreach ($allModerators as $mod) {
                 if ($mod['id'] == $moderator_id) {
                     $mod['status'] = 'pending';
+                    $mod['invite_id'] = $invite['id'];
                     $visibleModerators[$moderator_id] = $mod;
                     break;
                 }
@@ -213,6 +214,31 @@ public function demote()
     $stmt->execute([$project_id, $moderator_id]);
 
     $_SESSION['toast_success'] = "Admin rights removed.";
+    header("Location: /index.php?controller=ProjectUser&action=index&project_id=" . $project_id);
+    exit;
+}
+
+
+public function cancelInvite()
+{
+    $project_id = $_GET['project_id'] ?? null;
+    $invite_id = $_GET['invite_id'] ?? null;
+
+    if (!$project_id || !$invite_id) {
+        echo "Missing data.";
+        exit;
+    }
+
+    if (!$this->userIsProjectAdmin($project_id)) {
+        echo "Access denied.";
+        exit;
+    }
+
+    // Delete the invite
+    $stmt = $this->pdo->prepare("DELETE FROM project_invites WHERE id = ? AND project_id = ?");
+    $stmt->execute([$invite_id, $project_id]);
+
+    $_SESSION['toast_success'] = "Invite cancelled successfully!";
     header("Location: /index.php?controller=ProjectUser&action=index&project_id=" . $project_id);
     exit;
 }

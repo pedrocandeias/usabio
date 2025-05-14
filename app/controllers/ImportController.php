@@ -264,216 +264,211 @@ class ImportController extends BaseController
     }
 
 
-    private function importFromJsonArray(array $data): int
-    {
+   private function importFromJsonArray(array $data): int
+{
+    $ownerId = $_SESSION['user_id'] ?? null;
 
-        $ownerId = $_SESSION['user_id'] ?? null;
+    if (!$ownerId) {
+        echo "You must be logged in to import a project.";
+        exit;
+    }
 
-        if (!$ownerId) {
-            echo "You must be logged in to import a project.";
-            exit;
-        }
-        // Step 1: Insert project
-        $project = $data['project'] ?? [];
-        $stmt = $this->pdo->prepare(
-            "
+    // Step 1: Insert project
+    $project = $data['project'] ?? [];
+    $stmt = $this->pdo->prepare(
+        "
         INSERT INTO projects (
             title, description, owner_id, product_under_test, business_case,
             test_objectives, participants, equipment, responsibilities,
             location_dates, test_procedure, project_image, created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
     "
-        );
-        $stmt->execute(
-            [
-            $project['title'] ?? 'Imported Project',
-            $project['description'] ?? '',
-            $ownerId,
-            $project['product_under_test'] ?? '',
-            $project['business_case'] ?? '',
-            $project['test_objectives'] ?? '',
-            $project['participants'] ?? '',
-            $project['equipment'] ?? '',
-            $project['responsibilities'] ?? '',
-            $project['location_dates'] ?? '',
-            $project['test_procedure'] ?? '',
-            $project['project_image'] ?? '',
-            ]
-        );
-        $project_id = $this->pdo->lastInsertId();
+    );
+    $stmt->execute([
+        $project['title'] ?? 'Imported Project',
+        $project['description'] ?? '',
+        $ownerId,
+        $project['product_under_test'] ?? '',
+        $project['business_case'] ?? '',
+        $project['test_objectives'] ?? '',
+        $project['participants'] ?? '',
+        $project['equipment'] ?? '',
+        $project['responsibilities'] ?? '',
+        $project['location_dates'] ?? '',
+        $project['test_procedure'] ?? '',
+        $project['project_image'] ?? '',
+    ]);
+    $project_id = $this->pdo->lastInsertId();
 
-        // Step 2a: Insert custom fields and build label → ID map
-        $fieldNameToId = [];
+    // ✅ NEW: Add creator as project admin (moderator)
+    $stmt = $this->pdo->prepare("
+        INSERT INTO project_user (project_id, moderator_id, is_admin)
+        VALUES (?, ?, 1)
+    ");
+    $stmt->execute([$project_id, $ownerId]);
 
-        foreach ($data['custom_fields'] ?? [] as $field) {
-            $stmt = $this->pdo->prepare(
-                "
+    // Step 2a: Insert custom fields and build label → ID map
+    $fieldNameToId = [];
+    foreach ($data['custom_fields'] ?? [] as $field) {
+        $stmt = $this->pdo->prepare(
+            "
             INSERT INTO participants_custom_fields (project_id, label, field_type, options, position)
             VALUES (?, ?, ?, ?, ?)
         "
-            );
-            $stmt->execute(
-                [
-                $project_id,
-                $field['label'],
-                $field['field_type'],
-                $field['options'] ?? '',
-                $field['position'] ?? 0
-                ]
-            );
+        );
+        $stmt->execute([
+            $project_id,
+            $field['label'],
+            $field['field_type'],
+            $field['options'] ?? '',
+            $field['position'] ?? 0
+        ]);
+        $insertedId = $this->pdo->lastInsertId();
+        $fieldNameToId[strtolower($field['label'])] = $insertedId;
+    }
 
-            $insertedId = $this->pdo->lastInsertId();
-            $fieldNameToId[strtolower($field['label'])] = $insertedId;
-        }
-
-        // Step 2b: Insert tests, tasks, questions
-        $firstTestId = null;
-
-        foreach ($data['tests'] ?? [] as $test) {
-            $stmt = $this->pdo->prepare(
-                "
+    // Step 2b: Insert tests, tasks, questions
+    $firstTestId = null;
+    foreach ($data['tests'] ?? [] as $test) {
+        $stmt = $this->pdo->prepare(
+            "
             INSERT INTO tests (project_id, title, description, layout_image, created_at)
             VALUES (?, ?, ?, ?, NOW())
         "
-            );
-            $stmt->execute(
-                [
-                $project_id,
-                $test['title'],
-                $test['description'],
-                $test['layout_image'] ?? null
-                ]
-            );
-            $testId = $this->pdo->lastInsertId();
-            $firstTestId = $firstTestId ?? $testId; // keep the first test ID for participant assignment
+        );
+        $stmt->execute([
+            $project_id,
+            $test['title'],
+            $test['description'],
+            $test['layout_image'] ?? null
+        ]);
+        $testId = $this->pdo->lastInsertId();
+        $firstTestId = $firstTestId ?? $testId;
 
-            // Task groups
-            foreach ($test['task_groups'] ?? [] as $tg) {
-                $stmt = $this->pdo->prepare("INSERT INTO task_groups (test_id, title, position) VALUES (?, ?, ?)");
-                $stmt->execute([$testId, $tg['title'], $tg['position'] ?? 0]);
-                $tgId = $this->pdo->lastInsertId();
+        // Task groups
+        foreach ($test['task_groups'] ?? [] as $tg) {
+            $stmt = $this->pdo->prepare("INSERT INTO task_groups (test_id, title, position) VALUES (?, ?, ?)");
+            $stmt->execute([$testId, $tg['title'], $tg['position'] ?? 0]);
+            $tgId = $this->pdo->lastInsertId();
 
-                foreach ($tg['tasks'] ?? [] as $task) {
-                    if (empty($task['task_text'])) continue; // skip invalid task
- // Convert string task to full array
- if (is_string($task)) {
-    $task = [
-        'task_text' => $task,
-        'preset_type' => null,
-        'script' => '',
-        'scenario' => '',
-        'metrics' => '',
-        'task_type' => 'text',
-        'task_options' => '',
-        'position' => 0
-    ];
-}
+            foreach ($tg['tasks'] ?? [] as $task) {
+                if (empty($task['task_text'])) continue;
 
-                    $stmt = $this->pdo->prepare("INSERT INTO tasks (
-                        task_group_id, task_text, preset_type, script, scenario, metrics, task_type, task_options, position
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                
-                    $stmt->execute([
-                        $tgId,
-                        $task['task_text'] ?? '[Untitled Task]',
-                        $task['preset_type'] ?? null,
-                        $task['script'] ?? '',
-                        $task['scenario'] ?? '',
-                        $task['metrics'] ?? '',
-                        $task['task_type'] ?? 'text',
-                        $task['task_options'] ?? '',
-                        $task['position'] ?? 0
-                    ]);
+                if (is_string($task)) {
+                    $task = [
+                        'task_text' => $task,
+                        'preset_type' => null,
+                        'script' => '',
+                        'scenario' => '',
+                        'metrics' => '',
+                        'task_type' => 'text',
+                        'task_options' => '',
+                        'position' => 0
+                    ];
                 }
+
+                $stmt = $this->pdo->prepare(
+                    "INSERT INTO tasks (
+                        task_group_id, task_text, preset_type, script, scenario,
+                        metrics, task_type, task_options, position
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                );
+                $stmt->execute([
+                    $tgId,
+                    $task['task_text'] ?? '[Untitled Task]',
+                    $task['preset_type'] ?? null,
+                    $task['script'] ?? '',
+                    $task['scenario'] ?? '',
+                    $task['metrics'] ?? '',
+                    $task['task_type'] ?? 'text',
+                    $task['task_options'] ?? '',
+                    $task['position'] ?? 0
+                ]);
             }
+        }
 
-            // Questionnaire groups
-            foreach ($test['questionnaire_groups'] ?? [] as $qg) {
-                $stmt = $this->pdo->prepare("INSERT INTO questionnaire_groups (test_id, title, position) VALUES (?, ?, ?)");
-                $stmt->execute([$testId, $qg['title'], $qg['position'] ?? 0]);
-                $qgId = $this->pdo->lastInsertId();
+        // Questionnaire groups
+        foreach ($test['questionnaire_groups'] ?? [] as $qg) {
+            $stmt = $this->pdo->prepare("INSERT INTO questionnaire_groups (test_id, title, position) VALUES (?, ?, ?)");
+            $stmt->execute([$testId, $qg['title'], $qg['position'] ?? 0]);
+            $qgId = $this->pdo->lastInsertId();
 
-                foreach ($qg['questions'] ?? [] as $q) {
-                    if (is_string($q)) {
-                        $q = [
-                            'text' => $q,
-                            'question_type' => 'text',
-                            'question_options' => '',
-                            'position' => 0,
-                            'preset_type' => null
-                        ];
-                    }
-                
-                    $stmt = $this->pdo->prepare(
-                        "
+            foreach ($qg['questions'] ?? [] as $q) {
+                if (is_string($q)) {
+                    $q = [
+                        'text' => $q,
+                        'question_type' => 'text',
+                        'question_options' => '',
+                        'position' => 0,
+                        'preset_type' => null
+                    ];
+                }
+
+                $stmt = $this->pdo->prepare(
+                    "
                     INSERT INTO questions (
                         questionnaire_group_id, text, question_type,
                         question_options, position, preset_type
                     ) VALUES (?, ?, ?, ?, ?, ?)
                 "
-                    );
-                    $stmt->execute(
-                        [
-                        $qgId,
-                        $q['text'],
-                        $q['question_type'],
-                        $q['question_options'],
-                        $q['position'] ?? 0,
-                        $q['preset_type'] ?? null
-                        ]
-                    );
-                }
+                );
+                $stmt->execute([
+                    $qgId,
+                    $q['text'],
+                    $q['question_type'],
+                    $q['question_options'],
+                    $q['position'] ?? 0,
+                    $q['preset_type'] ?? null
+                ]);
             }
         }
+    }
 
-        // Step 3: Insert participants and assign to test
-        foreach ($data['participants'] ?? [] as $p) {
-            $stmt = $this->pdo->prepare(
-                "
+    // Step 3: Insert participants and assign to test
+    foreach ($data['participants'] ?? [] as $p) {
+        $stmt = $this->pdo->prepare(
+            "
             INSERT INTO participants (
                 project_id, participant_name, participant_age,
                 participant_gender, participant_academic_level,
                 created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, NOW(), NOW())
         "
-            );
-            $stmt->execute(
-                [
-                $project_id,
-                $p['participant_name'],
-                $p['participant_age'],
-                $p['participant_gender'],
-                $p['participant_academic_level']
-                ]
-            );
-            $participantId = $this->pdo->lastInsertId();
+        );
+        $stmt->execute([
+            $project_id,
+            $p['participant_name'],
+            $p['participant_age'],
+            $p['participant_gender'],
+            $p['participant_academic_level']
+        ]);
+        $participantId = $this->pdo->lastInsertId();
 
-            // Assign to test
-            if (!empty($firstTestId)) {
-                $stmt = $this->pdo->prepare("INSERT INTO participant_test (participant_id, test_id) VALUES (?, ?)");
-                $stmt->execute([$participantId, $firstTestId]);
-            }
+        // Assign to test
+        if (!empty($firstTestId)) {
+            $stmt = $this->pdo->prepare("INSERT INTO participant_test (participant_id, test_id) VALUES (?, ?)");
+            $stmt->execute([$participantId, $firstTestId]);
+        }
 
-            // Insert custom data values
-            foreach ($p['custom_fields'] ?? [] as $fieldKey => $value) {
-                $fieldId = $fieldNameToId[strtolower($fieldKey)] ?? null;
+        // Insert custom data values
+        foreach ($p['custom_fields'] ?? [] as $fieldKey => $value) {
+            $fieldId = $fieldNameToId[strtolower($fieldKey)] ?? null;
 
-                if ($fieldId && trim($value) !== '') {
-                    $stmt = $this->pdo->prepare(
-                        "
+            if ($fieldId && trim($value) !== '') {
+                $stmt = $this->pdo->prepare(
+                    "
                     INSERT INTO participant_custom_data (
                         participant_id, field_id, value, created_at, updated_at
                     ) VALUES (?, ?, ?, NOW(), NOW())
                 "
-                    );
-                    $stmt->execute([$participantId, $fieldId, $value]);
-                }
+                );
+                $stmt->execute([$participantId, $fieldId, $value]);
             }
         }
-
-        return $project_id;
     }
 
+    return $project_id;
+}
 
     public function processFile()
     {

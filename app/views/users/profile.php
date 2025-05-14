@@ -4,11 +4,11 @@ $title = 'My Profile';
 $pageTitle = 'My Profile';
 $pageDescription = 'Manage your profile information';
 $headerNavbuttons = [
-    'Back to Projects' => [
-        'url' => 'index.php?controller=Project&action=index',
+    __('back_to_projects') => [
+        'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
-        'id' => 'kt_back_dashboard_button',
+        'id' => 'kt_back_home_primary_button',
     ],
 ];
 

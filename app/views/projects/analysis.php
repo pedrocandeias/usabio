@@ -4,8 +4,8 @@ $title = 'Project Analysis';
 $pageTitle = 'Project Analysis';
 $pageDescription = 'Manage your project and test sessions.';
 $headerNavbuttons = [
-    'Back to projects' => [
-        'url' => '/index.php?controller=Project&action=edit&id=' . $project_id,
+    __('back_to_projects') => [
+        'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
         'id' => 'kt_back_home_primary_button',

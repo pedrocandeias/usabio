@@ -5,10 +5,11 @@ $title = 'Moderators Management';
 $pageTitle = 'Moderators Management';
 $pageDescription = 'Manage the moderators for your project.';
 $headerNavbuttons = [
-    'Back to project list' => [
-        'url' => '/index.php?controller=Project&action=show&id=' . $project_id ,
+    __('back_to_projects') => [
+        'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
+        'id' => 'kt_back_home_primary_button',
     ],
 ];
 
@@ -47,11 +48,11 @@ require __DIR__ . '/../layouts/header.php';
                     <?php endif; ?>
 
                     <?php if ($moderator['status'] === 'assigned'): ?>
-                        <span class="badge bg-success ms-2">Assigned</span>
+                        <span class="badge bg-success ms-2"><?php echo __('assigned'); ?></span>
                     <?php elseif ($moderator['status'] === 'pending'): ?>
-                        <span class="badge bg-warning text-dark ms-2">Pending Invite</span>
+                        <span class="badge bg-warning text-dark ms-2"><?php echo __('pending_invite'); ?></span>
                     <?php elseif ($moderator['status'] === 'email_sent'): ?>
-                        <span class="badge bg-info text-white ms-2">Email Sent</span>
+                        <span class="badge bg-info text-white ms-2"><?php echo __('email_sent'); ?></span>
                     <?php endif; ?>
                     <?php if (!empty($moderator['is_admin'])): ?>
                         <span class="badge bg-success ms-2">Admin</span>
@@ -59,6 +60,19 @@ require __DIR__ . '/../layouts/header.php';
                 </span>
 
                 <div class="d-flex gap-2">
+
+<?php if ($moderator['status'] === 'pending'): ?>
+    <?php if ($this->userIsProjectAdmin($project_id)): ?>
+        <a href="/index.php?controller=ProjectUser&action=cancelInvite&project_id=<?php echo $project_id; ?>&invite_id=<?php echo $moderator['invite_id']; ?>"
+           class="btn btn-outline-danger btn-sm"
+           onclick="return confirm('Are you sure you want to cancel this invite?');">
+           Cancel Invite
+        </a>
+    <?php endif; ?>
+<?php endif; ?>
+     
+
+                
                 <?php if ($moderator['status'] === 'assigned'): ?>
     <?php if ($this->userIsProjectAdmin($project_id) && $moderator['id'] != $project['owner_id']): ?>
         <?php if (!empty($moderator['is_admin'])): ?>

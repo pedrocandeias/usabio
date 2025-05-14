@@ -227,4 +227,21 @@ public function userCanCreateProject(): bool
     return (int)$isAdmin === 1;
 }
 
+
+public function userHasPendingProjectInvites(): bool
+{
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) return false;
+
+    $stmt = $this->pdo->prepare("
+        SELECT COUNT(*) 
+        FROM project_invites 
+        WHERE moderator_id = ? AND status = 'pending'
+    ");
+    $stmt->execute([$userId]);
+
+    return $stmt->fetchColumn() > 0;
+}
+
+
 }

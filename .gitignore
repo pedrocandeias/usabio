@@ -140,10 +140,4 @@ dist
 /.ddev
 
 # Local dev files
-/indev/demos/
-/indev/demo1/
-/indev/demo2/
-/indev/tools/
-/indev/testflow/
-/uploads/
-/indev/_demo1/
+/indev/*

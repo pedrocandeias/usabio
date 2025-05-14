@@ -1,10 +1,11 @@
 <?php  
+require_once __DIR__ . '/../../helpers/menu.php';
 if ($_SESSION['is_superadmin'] == 1) {
-    $user_type = 'Super Admin';
+    $user_permissions = 'Super Admin';
 } elseif ($_SESSION['is_admin'] == 1) {
-    $user_type = 'Admin';
+    $user_permissions = 'Admin';
 } else {
-    $user_type = 'User';
+    $user_permissions = 'User';
 } ?>
 <?php
 if (!empty($_SESSION['fullname']) ) {
@@ -14,6 +15,8 @@ if (!empty($_SESSION['fullname']) ) {
 } else {
     $displayName = 'Guest';
 }
+$canCreateProject = $this->userCanCreateProject();
+$hasPendingInvites = $this->userHasPendingProjectInvites();
 ?>
 
 <?php require __DIR__ . '/../layouts/head.php';  ?>
@@ -73,28 +76,39 @@ if (!empty($_SESSION['fullname']) ) {
                             <!--begin::Navbar-->
                             <div class="d-flex align-items-stretch" id="kt_header_nav">
                                 <!--begin::Menu wrapper-->
-                                <div class="header-menu align-items-stretch" data-kt-drawer="true" data-kt-drawer-name="header-menu" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_header_menu_mobile_toggle" data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_body', lg: '#kt_header_nav'}">
+                                <div class="header-menu align-items-stretch">
                                     <!--begin::Menu-->
-                                    <div class="menu menu-rounded menu-column menu-lg-row menu-active-bg menu-title-gray-700 menu-state-primary menu-arrow-gray-500 fw-semibold my-5 my-lg-0 align-items-stretch px-2 px-lg-0" id="#kt_header_menu" data-kt-menu="true">
+                                    <div class="menu menu-rounded menu-column menu-lg-row fw-semibold my-5 my-lg-0 align-items-stretch px-2 px-lg-0" id="#kt_header_menu" data-kt-menu="true">
                                         
-                                        <div class="menu-item  here menu-here-bg me-0 me-lg-2">
-                                           
+                                        <div class="menu-item  menu <?php echo isMenuActive('Project', 'index') && !isMenuActive('Project', 'index', ['filter' => 'my']) ? 'here menu-here-bg' : ''; ?> me-0 me-lg-2">
                                             <a class="menu-link py-3" href="/?controller=Project&action=index">
-                                                <span class="menu-title"><?php echo __('projects'); ?></span>
-                                                <span class="menu-arrow d-lg-none"></span>
+                                                <?php echo __('all_projects'); ?>
                                             </a>
-                                           
+                                        </div>
+
+                                        
+                                        <div class="menu-item <?php echo isMenuActive('Project', 'index', ['filter' => 'my']) ? 'here menu-here-bg' : ''; ?> me-0 me-lg-2">
+                                            <a class="menu-link py-3" href="/?controller=Project&action=index&filter=my">
+                                                <?php echo __('my_projects'); ?>
+                                            </a>
                                         </div>
                                         
-                                        
-                                        <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-0 me-lg-2">
-                                           
-                                            <a class="menu-link py-3" href="/?controller=Project&action=index">
-                                                <span class="menu-title"><?php echo __('team'); ?></span>
-                                                <span class="menu-arrow d-lg-none"></span>
+                                        <?php if($canCreateProject) { ?>
+                                        <div class="menu-item me-0 me-lg-2">
+                                            <a href="#" class="menu-link btn btn-light btn-sm text-primary py-3" data-bs-toggle="modal" data-bs-target="#kt_modal_create_app" data-bs-theme="light">
+                                                <i class="ki-duotone ki-plus fs-2 text-primary"></i>
+                                                    <?php echo __('create_a_new_project'); ?>
                                             </a>
-                                           
                                         </div>
+                                        <?php } else { ?>
+                                        <div class="menu-item me-0 me-lg-2">
+                                            <a href="request.php" class="menu-link btn btn-light text-primary py-3">
+                                                <i class="ki-duotone
+                                                ki-plus fs-2 text-primary"></i>
+                                                    <?php echo __('create_a_new_project'); ?>
+                                            </a>
+                                        </div>
+                                        <?php } ?>
                                         
                                     </div>
                                     <!--end::Menu-->
@@ -125,7 +139,7 @@ if (!empty($_SESSION['fullname']) ) {
 
 
                             <!--begin::Heading-->
-                            <div class="d-flex flex-column flex-center bgi-no-repeat rounded-top px-9 py-10" style="background-image:url('assets/media/misc/menu-header-bg.jpg')">
+                            <div class="d-flex flex-column flex-center bg-primary rounded-top px-9 py-10"">
                                 <!--begin::Title-->
                                 <h3 class="text-white fw-semibold mb-3">Administration</h3>
                                 <!--end::Title-->
@@ -186,25 +200,25 @@ if (!empty($_SESSION['fullname']) ) {
                         <!--end::Menu wrapper-->
                     </div>
                     <!--end::Admin links-->    
-                            <?php endif; ?>
+                    <?php endif; ?>
                                 
-                    <!--begin::Chat-->
-
-                    <div class="d-flex align-items-center ms-1 ms-lg-3">
-                        <!--begin::Menu wrapper-->
-                        <div class="position-relative btn btn-icon btn-active-light-primary btn-custom w-30px h-30px w-md-40px h-md-40px" id="kt_drawer_chat_toggle">
-                            <i class="ki-duotone ki-message-text-2 fs-1">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                <span class="path3"></span>
-                            </i>
-                            <span class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink"></span>
+                   <?php if ($hasPendingInvites) : ?>
+                        <!--begin::activity-->
+                        <div class="d-flex align-items-center ms-1 ms-lg-3">
+                            <!--begin::Menu wrapper-->
+                            <a href="index.php?controller=Invite&action=index" class="position-relative btn btn-icon btn-active-light-primary btn-custom w-30px h-30px w-md-40px h-md-40px" data-toggle="tooltip" data-theme="light" data-placement="bottom" title="You have new project invites!">
+                                <i class="ki-duotone ki-message-text-2 fs-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                <span class="bullet bullet-dot bg-light h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink"></span>
+                            </a>
+                            <!--end::Menu wrapper-->
                         </div>
-                        <!--end::Menu wrapper-->
-                    </div>
-                    
-                    <!--end::Chat-->
-                            
+                        <!--end::activity-->
+                    <?php endif; ?>
+
                     <!--begin::Theme mode-->
                     <div class="d-flex align-items-center ms-1 ms-lg-3">
                         <!--begin::Menu toggle-->
@@ -313,8 +327,8 @@ if (!empty($_SESSION['fullname']) ) {
                                     <div class="d-flex flex-column">
                                         <div class="fw-bold d-flex align-items-center fs-5">  
                                             <span class="badge badge-light-success fw-bold fs-8 py-1 ">
-                                            <?php if (!empty($user_type) ) {
-                                                echo $user_type;
+                                            <?php if (!empty($user_permissions) ) {
+                                                echo $user_permissions;
                                             } ?>
                                             </span>
                                         </div>

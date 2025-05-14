@@ -9,27 +9,11 @@ if (!isset($participantscount) && isset($this) && property_exists($this, 'projec
 }
 if (!isset($assignedUsers) && isset($this) && property_exists($this, 'projecAssignedUsers')) { $assignedUsers = $this->projecAssignedUsers;
 }
-$canCreateProject = $this->userCanCreateProject();
+
 $menuActive = 'overview';
 $pageTitle = 'Projects';
 $pageDescription = 'Manage your projects and test sessions.';
 $title = __('my_projects');
-
-
-if($canCreateProject) {
-$headerNavbuttons = [
-    __('create_a_new_project') => [
-            'url' => '#',
-            'icon' => 'ki-duotone ki-plus fs-2',
-            'class' => 'btn bg-body btn-active-color-primary',
-            'id' => 'kt_toolbar_primary_button',
-            'data' => [
-                'bs-toggle' => 'modal',
-                'bs-target' => '#kt_modal_create_app',
-            ],
-        ],
-    ];
-}
 
 require __DIR__ . '/../layouts/header.php'; ?>
 
@@ -208,90 +192,5 @@ require __DIR__ . '/../layouts/header.php'; ?>
 
     <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>
-
-<script>
-// Calculate total projects and percentages
-"use strict";
-
-// Class definition
-var KTProjectList = function () {    
-    var initChart = function () {
-        // init chart
-        var element = document.getElementById("kt_project_list_status_chart");
-
-        if (!element) {
-            return;
-        }
-
-        var config = {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [40, 60,],
-                    backgroundColor: ['#00A3FF', '#50CD89']
-                }],
-                labels: ['In Progress', 'Completed',]
-            },
-            options: {
-                chart: {
-                    fontFamily: 'inherit'
-                },
-                borderWidth: 0,
-                cutout: '75%',
-                cutoutPercentage: 65,
-                responsive: true,
-                maintainAspectRatio: false,
-                title: {
-                    display: false
-                },
-                animation: {
-                    animateScale: true,
-                    animateRotate: true
-                },
-                stroke: {
-                    width: 0
-                },
-                tooltips: {
-                    enabled: true,
-                    intersect: false,
-                    mode: 'nearest',
-                    bodySpacing: 5,
-                    yPadding: 10,
-                    xPadding: 10,
-                    caretPadding: 0,
-                    displayColors: false,
-                    backgroundColor: '#20D489',
-                    titleFontColor: '#ffffff',
-                    cornerRadius: 4,
-                    footerSpacing: 0,
-                    titleSpacing: 0
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }                
-            }
-        };
-
-        var ctx = element.getContext('2d');
-        var myDoughnut = new Chart(ctx, config);
-    }
-
-    // Public methods
-    return {
-        init: function () {
-            initChart();
-        }
-    }
-}();
-
-// On document ready
-KTUtil.onDOMContentLoaded(function() {
-    KTProjectList.init();
-});
-</script>
-
-
 </body>
 </html>

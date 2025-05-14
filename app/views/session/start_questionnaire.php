@@ -5,9 +5,9 @@ $pageTitle = 'Project details - Questionnaire testing';
 $pageDescription = 'Test Sessions for Questionnaire.';
 $project_id = $evaluation['project_id'] ?? ($_GET['project_id'] ?? 0);
 $headerNavbuttons = [
-    'Back to project' => [
-        'url' => '/index.php?controller=Test&action=index&project_id='.$project_id,
-        'icon' => 'ki-duotone ki-black-left fs-2',
+    __('back_to_projects') => [
+        'url' => '/index.php?controller=Project&action=index',
+        'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
         'id' => 'kt_back_home_primary_button',
     ],

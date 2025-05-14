@@ -4,16 +4,21 @@ use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-
 class MailHelper
 {
+    private static function setUtf8Defaults($mail) {
+        $mail->CharSet = 'UTF-8';
+        $mail->Encoding = 'base64';
+        $mail->isHTML(true);
+        $mail->ContentType = 'text/html; charset=UTF-8';
+    }
+
     public static function sendInviteEmail($toEmail, $projectTitle, $registerUrl, $pdo)
     {
         $smtp = self::getSmtpConfig($pdo);
         $mail = new PHPMailer(true);
     
         try {
-            // SMTP config
             $mail->isSMTP();
             $mail->Host = $smtp['mailserver_host'] ?? 'localhost';
             $mail->Port = $smtp['mailserver_port'] ?? 1025;
@@ -21,33 +26,27 @@ class MailHelper
             $mail->Username = $smtp['mailserver_username'] ?? '';
             $mail->Password = $smtp['mailserver_password'] ?? '';
             $mail->SMTPSecure = $smtp['mailserver_encryption'] ?? '';
+
             $defaults = self::getEmailDefaults($pdo);
             $mail->setFrom($defaults['from_email'], $defaults['from_name']);
             $mail->addAddress($toEmail);
-            $mail->isHTML(true);
-    
-            // Carregar o template e substituir placeholders
-            $login_url = MailHelper::getLoginUrl($pdo);
 
+            self::setUtf8Defaults($mail);
+
+            $login_url = self::getLoginUrl($pdo);
             $template = load_email_template($pdo, 'invite_email', [
                 'project_title' => $projectTitle,
                 'link' => $registerUrl,
                 'login_url' => $login_url,
                 'email' => $toEmail,
             ]);
-    
-            if (!$template) {
-                error_log("Missing template: invite_email");
-                return false;
-            }
-    
-            $mail->Subject = $template['subject'];
+            if (!$template) return false;
+
+            $mail->Subject = mb_encode_mimeheader($template['subject'], 'UTF-8');
             $mail->Body = $template['body'];
             $mail->AltBody = strip_tags($template['body']);
-    
             $mail->send();
             return true;
-    
         } catch (Exception $e) {
             error_log("Invite email failed: " . $mail->ErrorInfo);
             return false;
@@ -55,54 +54,41 @@ class MailHelper
     }
 
     public static function sendRegistrationConfirmation($toEmail, $fullname, $pdo)
-{
-    $smtp = self::getSmtpConfig($pdo);
-    $mail = new PHPMailer(true);
+    {
+        $smtp = self::getSmtpConfig($pdo);
+        $mail = new PHPMailer(true);
 
-    try {
-        // Configurar SMTP
-        $mail->isSMTP();
-        $mail->Host = $smtp['mailserver_host'] ?? 'localhost';
-        $mail->Port = $smtp['mailserver_port'] ?? 1025;
-        $mail->SMTPAuth = !empty($smtp['mailserver_username']);
-        $mail->Username = $smtp['mailserver_username'] ?? '';
-        $mail->Password = $smtp['mailserver_password'] ?? '';
-        $mail->SMTPSecure = $smtp['mailserver_encryption'] ?? '';
+        try {
+            $mail->isSMTP();
+            $mail->Host = $smtp['mailserver_host'] ?? 'localhost';
+            $mail->Port = $smtp['mailserver_port'] ?? 1025;
+            $mail->SMTPAuth = !empty($smtp['mailserver_username']);
+            $mail->Username = $smtp['mailserver_username'] ?? '';
+            $mail->Password = $smtp['mailserver_password'] ?? '';
+            $mail->SMTPSecure = $smtp['mailserver_encryption'] ?? '';
 
-        $defaults = self::getEmailDefaults($pdo);
-        error_log("Email defaults: " . json_encode($defaults));
-        $mail->setFrom($defaults['from_email'], $defaults['from_name']);
-        $mail->addAddress($toEmail);
-        $mail->isHTML(true);
+            $defaults = self::getEmailDefaults($pdo);
+            $mail->setFrom($defaults['from_email'], $defaults['from_name']);
+            $mail->addAddress($toEmail);
 
-        // Carregar template
-        $template = load_email_template($pdo, 'registration_confirmation', [
-            'fullname' => $fullname,
-            'email' => $toEmail
-            // login_url e platform_name são automáticos
-        ]);
-        error_log("Loaded template: " . json_encode($template));
+            self::setUtf8Defaults($mail);
 
-        if (!$template) {
-            error_log("Missing template: registration_confirmation");
+            $template = load_email_template($pdo, 'registration_confirmation', [
+                'fullname' => $fullname,
+                'email' => $toEmail
+            ]);
+            if (!$template) return false;
+
+            $mail->Subject = mb_encode_mimeheader($template['subject'], 'UTF-8');
+            $mail->Body = $template['body'];
+            $mail->AltBody = strip_tags($template['body']);
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Registration confirmation failed: " . $mail->ErrorInfo);
             return false;
         }
-
-        $mail->Subject = $template['subject'];
-        $mail->Body = $template['body'];
-        $mail->AltBody = strip_tags($template['body']);
-        error_log("subject:" . $template['subject']);
-        error_log("body:" . $template['body']);
-        $mail->send();
-        return true;
-
-    } catch (Exception $e) {
-        error_log("Registration confirmation failed: " . $mail->ErrorInfo);
-        return false;
     }
-}
-
-
 
     public static function sendTestEmail($to, $pdo, &$error = null)
     {
@@ -122,16 +108,53 @@ class MailHelper
             $mail->setFrom($defaults['from_email'], $defaults['from_name']);
             $mail->addAddress($to);
 
-            $mail->isHTML(true);
-            $mail->Subject = 'Test Email from TestFlow';
+            self::setUtf8Defaults($mail);
+
+            $mail->Subject = mb_encode_mimeheader('Test Email from TestFlow', 'UTF-8');
             $mail->Body = '<p>This is a test email confirming your mailserver settings are working.</p>';
             $mail->AltBody = 'This is a test email from TestFlow.';
-
             $mail->send();
             return true;
         } catch (Exception $e) {
             $error = $mail->ErrorInfo;
             error_log("Test email failed: " . $mail->ErrorInfo);
+            return false;
+        }
+    }
+
+    public static function sendConfirmationEmail($toEmail, $fullname, $confirmationUrl, $pdo)
+    {
+        $smtp = self::getSmtpConfig($pdo);
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host = $smtp['mailserver_host'] ?? 'localhost';
+            $mail->Port = $smtp['mailserver_port'] ?? 1025;
+            $mail->SMTPAuth = !empty($smtp['mailserver_username']);
+            $mail->Username = $smtp['mailserver_username'] ?? '';
+            $mail->Password = $smtp['mailserver_password'] ?? '';
+            $mail->SMTPSecure = $smtp['mailserver_encryption'] ?? '';
+
+            $defaults = self::getEmailDefaults($pdo);
+            $mail->setFrom($defaults['from_email'], $defaults['from_name']);
+            $mail->addAddress($toEmail);
+
+            self::setUtf8Defaults($mail);
+
+            $template = load_email_template($pdo, 'email_confirmation_request', [
+                'fullname' => $fullname,
+                'confirmation_link' => $confirmationUrl
+            ]);
+            if (!$template) return false;
+
+            $mail->Subject = mb_encode_mimeheader($template['subject'], 'UTF-8');
+            $mail->Body = $template['body'];
+            $mail->AltBody = strip_tags($template['body']);
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Confirmation email failed: " . $mail->ErrorInfo);
             return false;
         }
     }
@@ -155,68 +178,20 @@ class MailHelper
             WHERE setting_key IN ('noreplymail', 'platform_name')
         ");
         $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-        error_log("Email defaults loaded: " . implode(', ', array_keys($settings)));
-    
         return [
             'from_email' => $settings['noreplymail'] ?? 'noreply@testflow.design',
             'from_name' => $settings['platform_name'] ?? 'TestFlow'
         ];
     }
-    
 
     public static function getLoginUrl($pdo)
     {
-    $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'platform_base_url'");
-    $stmt->execute();
-    $base_url = $stmt->fetchColumn() ?: 'https://usabio.ddev.site';
-
-    return rtrim($base_url, '/') . '/index.php?controller=Auth&action=login';
-    }
-
-    public static function sendConfirmationEmail($toEmail, $fullname, $confirmationUrl, $pdo)
-{
-    $smtp = self::getSmtpConfig($pdo);
-    $mail = new PHPMailer(true);
-
-    try {
-        $mail->isSMTP();
-        $mail->Host = $smtp['mailserver_host'] ?? 'localhost';
-        $mail->Port = $smtp['mailserver_port'] ?? 1025;
-        $mail->SMTPAuth = !empty($smtp['mailserver_username']);
-        $mail->Username = $smtp['mailserver_username'] ?? '';
-        $mail->Password = $smtp['mailserver_password'] ?? '';
-        $mail->SMTPSecure = $smtp['mailserver_encryption'] ?? '';
-
-        $defaults = self::getEmailDefaults($pdo);
-        $mail->setFrom($defaults['from_email'], $defaults['from_name']);
-        $mail->addAddress($toEmail);
-        $mail->isHTML(true);
-
-        $template = load_email_template($pdo, 'email_confirmation_request', [
-            'fullname' => $fullname,
-            'confirmation_link' => $confirmationUrl
-        ]);
-
-        if (!$template) {
-            error_log("Missing template: email_confirmation_request");
-            return false;
-        }
-
-        $mail->Subject = $template['subject'];
-        $mail->Body = $template['body'];
-        $mail->AltBody = strip_tags($template['body']);
-
-        $mail->send();
-        return true;
-
-    } catch (Exception $e) {
-        error_log("Confirmation email failed: " . $mail->ErrorInfo);
-        return false;
+        $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'platform_base_url'");
+        $stmt->execute();
+        $base_url = $stmt->fetchColumn() ?: 'https://usabio.ddev.site';
+        return rtrim($base_url, '/') . '/index.php?controller=Auth&action=login';
     }
 }
-
-
-} // mailhelper
 
 
 function load_email_template($pdo, string $template_key, array $placeholders = []): ?array

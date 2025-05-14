@@ -1,6 +1,7 @@
 <?php /**
        * head 
-       */       
+       */    
+
       ?>
 <!DOCTYPE html>
 <html lang="en">

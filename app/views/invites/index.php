@@ -4,11 +4,11 @@ $title = 'My Profile - Invitations';
 $pageTitle = 'My Profile - Invitations';
 $pageDescription = 'Manage your invitation to projects';
 $headerNavbuttons = [
-    'Back to Projects' => [
-        'url' => 'index.php?controller=Project&action=index',
+    __('back_to_projects') => [
+        'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',
-        'id' => 'kt_back_dashboard_button',
+        'id' => 'kt_back_home_primary_button',
     ],
 ];
 
@@ -28,12 +28,12 @@ require __DIR__ . '/../layouts/header.php';
         <div class="card-body py-0">
             <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold">
                 <li class="nav-item">
-                    <a class="nav-link text-active-primary py-5 me-6 active" href="index.php?controller=User&action=profile">
+                    <a class="nav-link text-active-primary py-5 me-6 " href="index.php?controller=User&action=profile">
                         <?php echo __('account_settings'); ?>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-active-primary py-5 me-6 " href="index.php?controller=Invite&action=index">
+                    <a class="nav-link text-active-primary py-5 me-6 active" href="index.php?controller=Invite&action=index">
                         <?php echo __('project_invitations'); ?>
                     </a>
                 </li>   
@@ -95,8 +95,7 @@ require __DIR__ . '/../layouts/header.php';
                     </tbody>
                 </table>
             <?php endif; ?>
-            <a href="index.php?controller=Project&action=index" class="btn btn-link mt-4">&larr; <?php echo __('back_to_moderator_management'); ?></a>
-
+        
         </div>
         </div>
     </div>

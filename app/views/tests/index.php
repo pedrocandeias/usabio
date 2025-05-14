@@ -4,7 +4,7 @@ $pageTitle = __('project_details_tests');
 $pageDescription = __('manage_project_test_sessions');
 $menuActive = 'tests';
 $headerNavbuttons = [
-    __('back_to_projects_list') => [
+    __('back_to_projects') => [
         'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',

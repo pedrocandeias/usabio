@@ -3,7 +3,7 @@ return [
     'current_projects' => 'Projectos Atuais',
     'project_details' => 'Detalhes do Projecto',
     'overview' => 'Visão Geral',
-    'back_to_projects_list' => 'Voltar à Lista de Projectos',
+    'back_to_projects' => 'Voltar aos Projectos',
     'project_name' => 'Nome do Projecto',
     'project_description' => 'Descrição do Projecto',
     'project_start_date' => 'Data de Início do Projecto',

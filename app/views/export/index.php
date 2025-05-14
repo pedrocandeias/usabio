@@ -6,7 +6,7 @@ $pageTitle = 'Export project data';
 $pageDescription = 'Export the projects and test sessions results.';
 $title = 'Export Data:' . htmlspecialchars($project['title']);
 $headerNavbuttons = [
-    __('back_to_projects_list') => [
+    __('back_to_projects') => [
         'url' => '/index.php?controller=Project&action=index',
         'icon' => 'ki-duotone ki-home fs-2',
         'class' => 'btn btn-custom btn-flex btn-color-white btn-active-light',

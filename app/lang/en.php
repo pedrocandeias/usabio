@@ -3,7 +3,7 @@ return [
     'current_projects' => 'Current Projects1',
     'project_details' => 'Project Details',
     'overview' => 'Overview',
-    'back_to_projects_list' => 'Back to Projects List',
+    'back_to_projects' => 'Back to Projects',
     'project_name' => 'Project Name',
     'project_description' => 'Project Description',
     'project_start_date' => 'Project Start Date',
@@ -302,5 +302,10 @@ return [
  'add_question' => 'Add Question',
  'no_questions_in_this_group_yet' => 'No questions in this group yet',
 
+ 'all_projects' => 'All Projects',
+ 'my_projects' => 'My Projects',
+ 'add_a_new_project' => 'Add a new project',
+ 'create_test' => 'Create Test',
+ 'email_sent'  => 'Email sent',
 ];
 ?>

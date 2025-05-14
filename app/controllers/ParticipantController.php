@@ -236,7 +236,7 @@ class ParticipantController extends BaseController
 
         $participant_id = $this->pdo->lastInsertId();
 
-        // ✅ Save assigned tests
+        //Save assigned tests
         if (!empty($_POST['test_ids'])) {
             $stmt = $this->pdo->prepare("INSERT INTO participant_test (participant_id, test_id) VALUES (?, ?)");
             foreach ($_POST['test_ids'] as $testId) {
@@ -244,7 +244,7 @@ class ParticipantController extends BaseController
             }
         }
 
-        // ✅ Save custom participant data
+        // Save custom participant data
         if (!empty($_POST['custom_field'])) {
             $stmt = $this->pdo->prepare(
                 "
