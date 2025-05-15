@@ -222,6 +222,7 @@ require __DIR__ . '/../layouts/header.php';
                                                                         <?php if ($task['id']) : ?>
                                                                             <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
                                                                         <?php endif; ?>
+
                                                                         <input type="hidden" name="task_group_id" value="<?php echo $group['id']; ?>">
 
                                                                         <div class="row mb-3">
@@ -271,6 +272,10 @@ require __DIR__ . '/../layouts/header.php';
                                                                                 <small class="form-text text-muted">Choosing one will auto-fill the options below.</small>
                                                                             </div>
                                                                         </div>
+
+<?php echo $task['task_options'];
+print_r($task);
+?>
 
                                                                         <div class="mb-3">
                                                                             <label class="form-label">Evaluation Options</label>
@@ -1128,7 +1133,7 @@ require __DIR__ . '/../layouts/header.php';
 
                 // Faz scroll suave até ao grupo
                 const target = document.querySelector(hash);
-                if (target) {$group['id']
+                if (target) {
                     setTimeout(() => {
                         target.scrollIntoView({ behavior: "smooth", block: "start" });
                     }, 300); // aguarda a transição da tab
@@ -1194,17 +1199,25 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 };
 
-document.getElementById('preset-options').addEventListener('change', function () {
-    const selectedLabel = this.options[this.selectedIndex].text;
-    const preset = presets[selectedLabel];
+document.querySelectorAll('select[id^="preset-options"]').forEach(select => {
+    select.addEventListener('change', function () {
+        const selectedLabel = this.options[this.selectedIndex].text;
+        const preset = presets[selectedLabel];
 
-    if (preset) {
-        document.getElementById('preset_type').value = selectedLabel;
-        document.getElementById('task_options').value = preset.options;
-        document.getElementById('task_type').value = preset.type;
-    }
+        if (preset) {
+            const modal = this.closest('.modal');
+            if (!modal) return;
+
+            const taskOptions = modal.querySelector('textarea[name="task_options"], textarea[name="question_options"]');
+            const taskType = modal.querySelector('select[name="task_type"], select[name="question_type"]');
+            const presetType = modal.querySelector('input[name="preset_type"]');
+
+            if (taskOptions) taskOptions.value = preset.options;
+            if (taskType) taskType.value = preset.type;
+            if (presetType) presetType.value = selectedLabel;
+        }
+    });
 });
-
 
 document.addEventListener("DOMContentLoaded", function () {
 

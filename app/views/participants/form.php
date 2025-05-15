@@ -87,7 +87,7 @@ require __DIR__ . '/../layouts/header.php';
             
         <?php } else { ?>
             <div class="alert alert-warning mt-3 mb-3" role="alert">
-                ⚠️ <?php echo __('no_custom_fields_for_participants_found_for_this_project'); ?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list"><?php echo __('create_custom_fields'); ?></a> <?php echo __('to_collect_additional_information_about_participants'); ?>.
+                ⚠️ <?php echo __('no_custom_fields_for_participants_found_for_this_project'); ?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list"><?php echo __('create_custom_fields1'); ?></a> <?php echo __('to_collect_additional_information_about_participants'); ?>.
             </div>
         <?php } ?>
        

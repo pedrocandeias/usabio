@@ -311,6 +311,8 @@ return [
  'create_custom_fields' => 'Create Custom Fields',
  'custom_fields' => 'Custom Fields',
  'questions_in_test' => 'Questions in Test',
- 
+
+ 'tests_that_this_participant_is_assigned_to' => 'Tests that this participant is assigned to',
+
 ];
 ?>

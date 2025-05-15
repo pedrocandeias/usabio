@@ -434,7 +434,7 @@ class SessionController extends BaseController
         $project_id = $evaluation['project_id'];
 
         // Done! Redirect to dashboard or summary
-        header("Location: /index.php?controller=Session&action=dashboard&project_id=" . $project_id . "&success=1");
+        header("Location: /index.php?controller=Test&action=index&project_id=" . $project_id . "&success=1");
         exit;
     }
 
