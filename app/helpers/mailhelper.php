@@ -188,7 +188,7 @@ class MailHelper
     {
         $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'platform_base_url'");
         $stmt->execute();
-        $base_url = $stmt->fetchColumn() ?: 'https://usabio.ddev.site';
+        $base_url = $stmt->fetchColumn() ?: 'https://testflow.design';
         return rtrim($base_url, '/') . '/index.php?controller=Auth&action=login';
     }
 }
@@ -222,7 +222,7 @@ function load_email_template($pdo, string $template_key, array $placeholders = [
         foreach ($missingTags as $tag) {
             switch ($tag) {
                 case 'login_url':
-                    $base = $settings['platform_base_url'] ?? 'https://usabio.ddev.site';
+                    $base = $settings['platform_base_url'] ?? 'https://testflow.design';
                     $placeholders['login_url'] = rtrim($base, '/') . '/index.php?controller=Auth&action=login';
                     break;
 

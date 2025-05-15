@@ -75,7 +75,7 @@ return [
     'manage_tasks_questions' => 'Manage Tasks & Questions',
     'start_task_session' => 'Start Task Session',
     'start_questionnaire_session' => 'Start Questionnaire Session',
-    'sessions_dones'   => 'Sessions Done',
+    'sessions_done'   => 'Sessions Done',
     'participants_in_project' => 'Participants in Project',
     'no_participants_found_for_this_project' => 'No participants found for this project.',
     'custom_fields_for_participants' => 'Custom fields for participants',
@@ -307,5 +307,10 @@ return [
  'add_a_new_project' => 'Add a new project',
  'create_test' => 'Create Test',
  'email_sent'  => 'Email sent',
+ 'to_collect_additional_information_about_participants' => 'to collect additional information about participants',
+ 'create_custom_fields' => 'Create Custom Fields',
+ 'custom_fields' => 'Custom Fields',
+ 'questions_in_test' => 'Questions in Test',
+ 
 ];
 ?>

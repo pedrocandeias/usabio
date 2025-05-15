@@ -1,5 +1,5 @@
 <?php 
-$title = 'Manage Tasks';
+$title = __('manage_tasks');
 require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">

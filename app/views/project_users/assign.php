@@ -65,10 +65,18 @@ require __DIR__ . '/../layouts/header.php';
     <?php if ($this->userIsProjectAdmin($project_id)): ?>
         <a href="/index.php?controller=ProjectUser&action=cancelInvite&project_id=<?php echo $project_id; ?>&invite_id=<?php echo $moderator['invite_id']; ?>"
            class="btn btn-outline-danger btn-sm"
-           onclick="return confirm('Are you sure you want to cancel this invite?');">
+           onclick="return confirm('Are you sure you want to cancel this invite?');" >
            Cancel Invite
         </a>
     <?php endif; ?>
+<?php endif; ?>
+
+<?php if ($moderator['status'] === 'email_sent'): ?>
+    <a href="/index.php?controller=ProjectUser&action=cancelEmailInvite&project_id=<?php echo $project_id; ?>&email=<?php echo urlencode($moderator['email']); ?>" 
+       class="btn btn-danger btn-sm"
+       onclick="return confirm('Cancel email invite to <?php echo htmlspecialchars($moderator['email']); ?>?');">
+       Cancel Invite
+    </a>
 <?php endif; ?>
      
 

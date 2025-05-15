@@ -104,7 +104,7 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                             </div>
                             <div class="col-md-3">
                                 <div class="d-flex flex-column mb-4">
-                                    <a href="/index.php?controller=Project&action=analysis&id=<?php echo $projectBase['id']; ?>" class="btn btn-lg btn-primary mb-3">
+                                    <a href="/index.php?controller=Analysis&action=project&id=<?php echo $projectBase['id']; ?>" class="btn btn-lg btn-primary mb-3">
                                         <i class="ki-duotone ki-chart-simple-2 fs-1">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
@@ -150,7 +150,7 @@ if (!isset($projectBase) && isset($this) && property_exists($this, 'projectBase'
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-active-primary py-5 me-6 <?php if ($menuActive == 'analysis') { echo 'active'; } ?>" href="/index.php?controller=Project&action=analysis&id=<?php echo $projectBase['id']; ?>">
+                <a class="nav-link text-active-primary py-5 me-6 <?php if ($menuActive == 'analysis') { echo 'active'; } ?>" href="/index.php?controller=Analysis&action=index&id=<?php echo $projectBase['id']; ?>">
                     <?php echo __('analysis'); ?>
                 </a>
             </li>

@@ -54,18 +54,15 @@ require __DIR__ . '/../layouts/header.php';
                                     <div class="d-flex flex-stack mb-3">
                                         <!--begin::Badge-->
                                         <?php if (!empty($test['status'])) : ?>
-                                                <div class="badge badge-light-danger"><?php echo __('incomplete'); ?></div>
-                                            <?php if ($test['status'] == 'complete') : ?>
+                                             <?php if ($test['status'] == 'complete') : ?>
                                                 <div class="badge badge-light-success"><?php echo __('completed'); ?></div>
                                             <?php else : ?>
                                                 <?php if ($test['session_count'] > 0) : ?>
                                                     <div class="badge badge-light-warning"><?php echo __('in_progress'); ?></div>
                                                 <?php elseif ($test['session_count'] == 0) : ?>
-                                                    <div class="badge badge-light-info"><?php echo __('not_yet_started'); ?></div>
+                                                    <div class="badge badge-light-danger"><?php echo __('not_yet_started'); ?></div>
                                                 <?php endif; ?>
                                             <?php endif; ?>
-                                        <?php else: ?>
-                                            <div class="badge badge-light-danger"><?php echo __('not_yet_started'); ?></div>
                                         <?php endif; ?>
                                       
                                         <!--end::Badge-->
@@ -176,16 +173,19 @@ require __DIR__ . '/../layouts/header.php';
                                             <!--end::Stat-->
                                             <div class="separator my-3"></div>
                                         <!--begin::Actions-->
-                                        <div class="d-flex mt-5">
-                                            <div class="separator"></div>
-                                            <a href="/index.php?controller=Session&action=startTaskSession&test_id=<?php echo $test['id']; ?>" class="btn btn-primary w-100"><?php echo __('start_task_session'); ?></a>
-                                        </div>
-                                         <!--begin::Actions-->
-                                         <div class="d-flex my-1">
+                                        <?php 
+                                        if ($test['task_count'] != 0): ?>
+                                            <div class="d-flex my-1">
+                                                <div class="separator"></div>
+                                                <a href="/index.php?controller=Session&action=startTaskSession&test_id=<?php echo $test['id']; ?>" class="btn btn-primary w-100"><?php echo __('start_task_session'); ?></a>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($test['question_count'] != 0): ?>
+                                        <div class="d-flex my-1">
                                             <div class="separator"></div>
                                             <a href="/index.php?controller=Session&action=startQuestionnaire&test_id=<?php echo $test['id']; ?>" class="btn btn-secondary w-100"><?php echo __('start_questionnaire_session'); ?></a>
                                         </div>
-                                        <!--end::Actions-->
+                                        <?php endif; ?>
                                         <!--end::Actions-->
                                 </div>
                                 <!--end::Card body-->

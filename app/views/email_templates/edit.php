@@ -38,7 +38,7 @@ require __DIR__ . '/../layouts/header.php';
                     <div class="mb-4">
                         <label class="form-label">Body (HTML allowed)</label>
                         <textarea name="body" class="form-control" rows="10" required><?php echo htmlspecialchars($template['body']); ?></textarea>
-                        <small class="text-muted">You can use placeholders like <code>{{project_title}}</code>, <code>{{login_url}}</code>, <code>{{fullname}}</code>, <code>{{link}}</code>.</small>
+                        <small class="text-muted">You can use placeholders like <code>{{project_title}}</code>, <code>{{login_url}}</code>, <code>{{fullname}}</code>, <code>{{username}}</code>, <code>{{platform_name}}</code>,<code>{{link}}</code>.</small>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Save Changes</button>

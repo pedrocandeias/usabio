@@ -53,7 +53,7 @@ try {
 SELECT * FROM (SELECT 'openai_api_key', '') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'openai_api_key') LIMIT 1;" => "openai_api_key settings",
 "INSERT INTO settings (setting_key, setting_value)
-SELECT * FROM (SELECT 'platform_base_url', 'https://usabio.ddev.site') AS tmp
+SELECT * FROM (SELECT 'platform_base_url', 'https://testflow.design') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'platform_base_url') LIMIT 1;" => "platform_base_url settings",
 "INSERT INTO settings (setting_key, setting_value)
 SELECT * FROM (SELECT 'max_projects_per_user', '3') AS tmp

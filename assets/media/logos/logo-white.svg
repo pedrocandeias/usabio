@@ -8,7 +8,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.4.1 (1:1.4.1+202503302257+93de688d07)"
-   sodipodi:docname="logo_white.svg"
+   sodipodi:docname="logo-white.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,14 +24,14 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.69308361"
-     inkscape:cx="334.01454"
+     inkscape:cx="335.45736"
      inkscape:cy="184.6819"
      inkscape:window-width="1920"
      inkscape:window-height="961"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="text6" />
+     inkscape:current-layer="layer1" />
   <defs
      id="defs1" />
   <g
@@ -49,7 +49,7 @@
        id="path2"
        sodipodi:nodetypes="ccc" />
     <path
-       style="fill:none;stroke:#999999;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
+       style="fill:none;stroke:#ffffff;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
        d="m 33.019973,195.50041 8.346874,-8.09856 z"
        id="path3"
        sodipodi:nodetypes="ccc" />
@@ -58,7 +58,7 @@
        style="fill:none;stroke:#ffffff;stroke-width:4.20164;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
        d="M 41.214207,187.40185 H 29.638093 A 10.419784,10.419784 0 0 1 19.218319,176.98206 V 156.25471 A 16.627512,16.627512 0 0 1 35.84582,139.6272 v 0 h 27.863725 a 15.631756,15.631756 0 0 1 15.631751,15.63176 v 0.2372" />
     <path
-       style="fill:none;stroke:#999999;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
+       style="fill:none;stroke:#ffffff;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:3.77953;stroke-opacity:1"
        d="m 79.382896,167.44422 -9.240754,-8.58613 z"
        id="path2-6"
        sodipodi:nodetypes="ccc" />

@@ -159,6 +159,14 @@ class ProjectUserController extends BaseController
         ");
         $stmt->execute([$project_id, $user_id]);
 
+        // Remove any old accepted project_invites
+        $stmt = $this->pdo->prepare("
+            DELETE FROM project_invites 
+            WHERE project_id = ? AND moderator_id = ? AND status = 'accepted'
+        ");
+        $stmt->execute([$project_id, $user_id]);
+
+
         $_SESSION['toast_success'] = "Moderator removed successfully!";
         header('Location: /?controller=ProjectUser&action=index&project_id=' . $project_id . '&success=moderator_removed');
         exit;
@@ -240,6 +248,33 @@ public function cancelInvite()
 
     $_SESSION['toast_success'] = "Invite cancelled successfully!";
     header("Location: /index.php?controller=ProjectUser&action=index&project_id=" . $project_id);
+    exit;
+}
+
+public function cancelEmailInvite()
+{
+    $project_id = $_GET['project_id'] ?? null;
+    $email = $_GET['email'] ?? null;
+
+    if (!$project_id || !$email) {
+        $_SESSION['toast_error'] = "Missing project ID or email.";
+        header('Location: /index.php?controller=ProjectUser&action=index&project_id=' . $project_id);
+        exit;
+    }
+
+    if (!$this->userIsProjectAdmin($project_id)) {
+        echo "Access denied.";
+        exit;
+    }
+
+    $stmt = $this->pdo->prepare("
+        DELETE FROM pending_invite_emails 
+        WHERE project_id = ? AND email = ? AND status = 'sent'
+    ");
+    $stmt->execute([$project_id, $email]);
+
+    $_SESSION['toast_success'] = "Email invite to $email canceled successfully.";
+    header('Location: /index.php?controller=ProjectUser&action=index&project_id=' . $project_id);
     exit;
 }
 

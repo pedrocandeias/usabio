@@ -30,7 +30,7 @@ require __DIR__ . '/../layouts/header.php';
                 <div class="card bg-transparent border-primary mb-xl-8 shadow-sm">
                      <div class="card-body d-flex flex-column">
                     <h3 class="card-title fs-3 fw-bold text-primary">
-                            <?php echo __('product_under_test'); ?>:
+                            <?php echo __('product_under_test'); ?>
                         </h3>    
                     <div class="card-text fs-6">
                             <?php echo htmlspecialchars($project['product_under_test']); ?>
@@ -40,7 +40,7 @@ require __DIR__ . '/../layouts/header.php';
                 <div class="card bg-transparent border-primary mb-xl-8 shadow-sm">
                     <div class="card-body d-flex flex-column">
                     <h3 class="card-title fs-3 fw-bold text-primary">
-                            <?php echo __('business_case'); ?>:
+                            <?php echo __('business_case'); ?>
                         </h3>
                         <div class="card-text fs-6">
                             <?php echo nl2br(htmlspecialchars($project['business_case'])); ?>

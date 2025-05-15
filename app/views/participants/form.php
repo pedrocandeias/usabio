@@ -87,7 +87,7 @@ require __DIR__ . '/../layouts/header.php';
             
         <?php } else { ?>
             <div class="alert alert-warning mt-3 mb-3" role="alert">
-                ⚠️ No custom fields for participants found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list">Create custom fields</a> to collect additional information about participants.
+                ⚠️ <?php echo __('no_custom_fields_for_participants_found_for_this_project'); ?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#custom-fields-list"><?php echo __('create_custom_fields'); ?></a> <?php echo __('to_collect_additional_information_about_participants'); ?>.
             </div>
         <?php } ?>
        
@@ -110,20 +110,18 @@ require __DIR__ . '/../layouts/header.php';
         </div>
         <?php else : ?>
             <div class="alert alert-warning mt-3 mb-3" role="alert">
-                ⚠️ No tests found for this project. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list">Create tests</a> to assign to participants.
+                ⚠️ <?php echo __('no_tests_found_for_this_project'); ?>. <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#test-list"><?php echo __('create_tests'); ?></a> <?php echo __('to_assign_to_participants'); ?>.
             </div>
         <?php endif; ?>
         </div>
         <div class="mt-2">
-            <button type="submit" class="btn btn-primary">Save Participant</button>
-            <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary"><?php echo __('save_participant'); ?></button>
+            <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary"><?php echo __('cancel'); ?></a>
         </div>
     </form>
 
-    <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary mt-4 mb-4">← Back to Projects</a>
- 
+    <a href="/index.php?controller=Project&action=show&id=<?php echo $project_id; ?>#participant-list" class="btn btn-secondary mt-4 mb-4">← <?php echo __('back_to_projects'); ?></a> 
 </div>
-
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
 <?php require __DIR__ . '/../layouts/footer_scripts.php'; ?>

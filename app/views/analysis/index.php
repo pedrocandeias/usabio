@@ -1,8 +1,10 @@
 <?php 
 $menuActive = 'analysis';
+$activeTab = 'overview';
 $title = 'Project Analysis';
 $pageTitle = 'Project Analysis';
 $pageDescription = 'Manage your project and test sessions.';
+$projectBase = $project;
 $headerNavbuttons = [
     __('back_to_projects') => [
         'url' => '/index.php?controller=Project&action=index',
@@ -18,6 +20,15 @@ require __DIR__ . '/../layouts/header.php';
 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
 <div class="content flex-row-fluid" id="kt_content">
 <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>   
+
+
+<div class="nav nav-tabs mb-4">
+    <a class="nav-link <?php echo $activeTab === 'overview' ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=index&id=<?php echo $project_id; ?>">Overview</a>
+    <a class="nav-link <?php echo $activeTab === 'tasks' ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=tasks&id=<?php echo $project_id; ?>">Tasks</a>
+    <a class="nav-link <?php echo $activeTab === 'questionnaires' ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=questionnaires&id=<?php echo $project_id; ?>">Questionnaires</a>
+    <a class="nav-link <?php echo $activeTab === 'sus' ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=sus&id=<?php echo $project_id; ?>">SUS</a>
+    <a class="nav-link <?php echo $activeTab === 'participants' ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=participants&id=<?php echo $project_id; ?>">Participants</a>
+</div>
 
 
     <div class="row align-items-center mb-4">
@@ -58,21 +69,7 @@ require __DIR__ . '/../layouts/header.php';
             </div>
         </div>
     </div>
-    <!-- Question Type Chart -->
-    <?php if (!empty($questionTypes)): ?>
-    <div class="row mb-5">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Question Types Distribution</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="questionTypeChart" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
+    
 
     <!-- Task Performance -->
     <?php if (!empty($taskStats)) : ?>
@@ -295,28 +292,6 @@ new Chart(document.getElementById('taskSuccessChart'), {
 });
 <?php endif; ?>
 
-<?php if (!empty($questionTypes)): ?>
-const questionTypeCtx = document.getElementById('questionTypeChart')?.getContext('2d');
-if (questionTypeCtx) {
-    new Chart(questionTypeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: <?php echo json_encode(array_column($questionTypes, 'question_type')); ?>,
-            datasets: [{
-                data: <?php echo json_encode(array_column($questionTypes, 'count')); ?>,
-                backgroundColor: ['#0d6efd', '#20c997', '#ffc107', '#dc3545'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
-    });
-}
-<?php endif; ?>
 
 <?php if (!empty($susBreakdown)): ?>
 const susCtx = document.getElementById('susScoreChart')?.getContext('2d');

@@ -225,10 +225,10 @@ require __DIR__ . '/../layouts/header.php';
                             <label class="form-label"><?php echo __('gender'); ?></label>
                             <select name="participant_gender" class="form-select">
                                 <option value=""><?php echo __('select'); ?></option>
-                                <option value="female" <?php echo ($participant['participant_gender'] ?? '') === 'female' ? 'selected' : ''; ?>>Female</option>
-                                <option value="male" <?php echo ($participant['participant_gender'] ?? '') === 'male' ? 'selected' : ''; ?>>Male</option>
-                                <option value="nonbinary" <?php echo ($participant['participant_gender'] ?? '') === 'nonbinary' ? 'selected' : ''; ?>>Non-Binary</option>
-                                <option value="prefer_not_say" <?php echo ($participant['participant_gender'] ?? '') === 'prefer_not_say' ? 'selected' : ''; ?>>Prefer not to say</option>
+                                <option value="female" <?php echo ($participant['participant_gender'] ?? '') === 'female' ? 'selected' : ''; ?>><?php echo __('female0'); ?></option>
+                                <option value="male" <?php echo ($participant['participant_gender'] ?? '') === 'male' ? 'selected' : ''; ?>><?php echo __('male'); ?></option>
+                                <option value="nonbinary" <?php echo ($participant['participant_gender'] ?? '') === 'nonbinary' ? 'selected' : ''; ?>><?php echo __('non_binary'); ?></option>
+                                <option value="prefer_not_say" <?php echo ($participant['participant_gender'] ?? '') === 'prefer_not_say' ? 'selected' : ''; ?>><?php echo __('prefer_not_to_say'); ?></option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -508,9 +508,7 @@ require __DIR__ . '/../layouts/header.php';
 <div class="card mt-5">
     <div class="card-header">
         <h3 class="card-title"><?php echo __('custom_fields_for_participants'); ?></h3>
-        <div class="card-toolbar">
-            <a href="/index.php?controller=CustomField&action=create&project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary"  data-bs-toggle="modal" data-bs-target="#kt_modal_add_custom_field<?php echo $project_id; ?>">+ <?php echo __('add_new_custom_field'); ?></a>
-        </div>
+        
     </div>
     <div class="card-body">
           <!-- Custom Participant Fields -->
