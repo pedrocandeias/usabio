@@ -111,39 +111,185 @@ public function index()
 
     // -------------------------------
     // Task-level Analysis
-    public function tasks()
-    {
-        $project_id = $_GET['id'] ?? 0;
-        $this->checkProjectAccess($project_id);
-        $project = $this->getProject($project_id);
+   public function tasks()
+{
+    $project_id = $_GET['id'] ?? 0;
+    $this->checkProjectAccess($project_id);
+    $project = $this->getProject($project_id);
 
-        $activeTab = 'tasks';
-        $breadcrumbs = [
-            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
-            ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id='.$project_id, 'active' => false],
-            ['label' => 'Task Analysis', 'url' => '', 'active' => true],
-        ];
+    // Get all test IDs in this project
+    $stmt = $this->pdo->prepare("SELECT id FROM tests WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $testIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
+    $testIdList = $testIds ? implode(',', $testIds) : '0';
 
-        include __DIR__ . '/../views/analysis/tasks.php';
+    // Get all participants for this project
+    $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM participants WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $totalParticipants = $stmt->fetchColumn() ?? 0;
+
+    // Main query: group by task text
+    $stmt = $this->pdo->prepare("
+        SELECT 
+            r.question AS task_text,
+            COUNT(*) AS total_responses,
+            SUM(CASE WHEN r.evaluation_errors IS NULL OR r.evaluation_errors = '' THEN 1 ELSE 0 END) AS success_count,
+            SUM(CASE WHEN r.evaluation_errors IS NOT NULL AND r.evaluation_errors != '' THEN 1 ELSE 0 END) AS fail_count,
+            AVG(r.time_spent) AS avg_time
+        FROM responses r
+        JOIN evaluations e ON e.id = r.evaluation_id
+        WHERE r.type = 'task' AND e.test_id IN ($testIdList)
+        GROUP BY r.question
+    ");
+    $stmt->execute();
+    $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Calculate median and stddev manually
+    foreach ($tasks as &$task) {
+        $stmt = $this->pdo->prepare("
+            SELECT r.time_spent
+            FROM responses r
+            JOIN evaluations e ON e.id = r.evaluation_id
+            WHERE r.type = 'task' 
+              AND e.test_id IN ($testIdList) 
+              AND r.question = ?
+              AND r.time_spent > 0
+            ORDER BY r.time_spent
+        ");
+        $stmt->execute([$task['task_text']]);
+        $times = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'time_spent');
+
+        $count = count($times);
+        $task['median_time'] = $count ? ($count % 2 ? 
+            $times[intval($count / 2)] : 
+            ($times[$count / 2 - 1] + $times[$count / 2]) / 2) : 0;
+
+        $mean = $task['avg_time'] ?? 0;
+        $variance = 0;
+        foreach ($times as $t) {
+            $variance += pow($t - $mean, 2);
+        }
+        $task['stddev_time'] = $count ? round(sqrt($variance / $count), 2) : 0;
+
+        // Success / fail / skipped rates
+        $responses = $task['total_responses'] ?? 0;
+        $task['success_rate'] = $responses ? round(($task['success_count'] / $responses) * 100, 1) : 0;
+        $task['fail_rate'] = $responses ? round(($task['fail_count'] / $responses) * 100, 1) : 0;
+        $task['skipped_rate'] = $totalParticipants ? round((($totalParticipants - $responses) / $totalParticipants) * 100, 1) : 0;
     }
+    unset($task);
+
+    // Sort by fail rate DESC
+    usort($tasks, fn($a, $b) => $b['fail_rate'] <=> $a['fail_rate']);
+    $taskStats = $tasks;
+    // Breadcrumbs
+    $breadcrumbs = [
+        ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+        ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id=' . $project_id, 'active' => false],
+        ['label' => 'Task Analysis', 'url' => '', 'active' => true],
+    ];
+
+    // View
+    include __DIR__ . '/../views/analysis/tasks.php';
+}
 
     // -------------------------------
     // Questionnaire-level Analysis
     public function questionnaires()
-    {
-        $project_id = $_GET['id'] ?? 0;
-        $this->checkProjectAccess($project_id);
-        $project = $this->getProject($project_id);
+{
+    $project_id = $_GET['id'] ?? 0;
+    $this->checkProjectAccess($project_id);
+    $project = $this->getProject($project_id);
 
-        $activeTab = 'questionnaires';
-        $breadcrumbs = [
-            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
-            ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id='.$project_id, 'active' => false],
-            ['label' => 'Questionnaire Analysis', 'url' => '', 'active' => true],
+    // Get all test IDs
+    $stmt = $this->pdo->prepare("SELECT id FROM tests WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $testIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
+    $testIdList = $testIds ? implode(',', $testIds) : '0';
+
+    // Get all questionnaire questions for this project
+    $stmt = $this->pdo->prepare("
+        SELECT q.id, q.text, q.question_type, q.question_options
+        FROM questions q
+        JOIN questionnaire_groups qg ON qg.id = q.questionnaire_group_id
+        JOIN tests t ON t.id = qg.test_id
+        WHERE t.project_id = ?
+          AND q.question_type IN ('radio', 'checkbox', 'dropdown')
+    ");
+    $stmt->execute([$project_id]);
+    $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $questionStats = [];
+
+    foreach ($questions as $q) {
+        $questionId = $q['id'];
+        $text = $q['text'];
+        $type = $q['question_type'];
+        $options = [];
+
+        // Parse options
+        foreach (explode(';', $q['question_options']) as $pair) {
+            if (strpos($pair, ':') !== false) {
+                [$label, $value] = explode(':', $pair, 2);
+                $options[trim($value)] = trim($label);
+            }
+        }
+
+        // Get answers for this question
+        $stmt = $this->pdo->prepare("
+            SELECT r.answer
+            FROM responses r
+            JOIN evaluations e ON e.id = r.evaluation_id
+            WHERE r.type = 'question'
+              AND e.test_id IN ($testIdList)
+              AND r.question = ?
+        ");
+        $stmt->execute([$text]);
+        $answers = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'answer');
+
+        $counts = [];
+        foreach ($answers as $ans) {
+            if (is_string($ans) && strpos($ans, ',') !== false && $type === 'checkbox') {
+                // multi-select answers (checkbox)
+                foreach (explode(',', $ans) as $subAns) {
+                    $subAns = trim($subAns);
+                    $counts[$subAns] = ($counts[$subAns] ?? 0) + 1;
+                }
+            } else {
+                $ans = trim($ans);
+                $counts[$ans] = ($counts[$ans] ?? 0) + 1;
+            }
+        }
+
+        // Calculate variance (to detect inconsistency)
+        $total = array_sum($counts) ?: 1;
+        $mean = $total / count($counts ?: [1]);
+        $variance = 0;
+        foreach ($counts as $val) {
+            $variance += pow($val - $mean, 2);
+        }
+        $variance = count($counts) ? round($variance / count($counts), 2) : 0;
+
+        $questionStats[] = [
+            'text' => $text,
+            'type' => $type,
+            'options' => $options,
+            'counts' => $counts,
+            'variance' => $variance,
+            'inconsistent' => $variance >= 5   // You can tune this threshold
         ];
-
-        include __DIR__ . '/../views/analysis/questionnaires.php';
     }
+
+    $activeTab = 'questionnaires';
+    $breadcrumbs = [
+        ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+        ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id=' . $project_id, 'active' => false],
+        ['label' => 'Questionnaire Analysis', 'url' => '', 'active' => true],
+    ];
+
+    include __DIR__ . '/../views/analysis/questionnaires.php';
+}
+
 
     // -------------------------------
     // SUS scores Analysis
