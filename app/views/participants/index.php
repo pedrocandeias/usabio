@@ -99,9 +99,9 @@ require __DIR__ . '/../layouts/header.php';
 														<!--end::User-->    
                             
                            </td>
-                            <td class="text-center"><?php echo htmlspecialchars($participant['participant_age']); ?></td>
-                            <td class="text-center"><?php echo htmlspecialchars($participant['participant_gender']); ?></td>
-                            <td class="text-center"><?php echo htmlspecialchars($participant['participant_academic_level']); ?></td>
+                            <td class="text-center"><?php echo htmlspecialchars($participant['participant_age'] ?? 'Anonymous'); ?></td>
+                            <td class="text-center"><?php echo htmlspecialchars($participant['participant_gender'] ?? 'Anonymous'); ?></td>
+                            <td class="text-center"><?php echo htmlspecialchars($participant['participant_academic_level'] ?? 'Anonymous'); ?></td>
                             <td class="text-center"><?php
                           
                        

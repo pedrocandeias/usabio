@@ -16,17 +16,33 @@ $headerNavbuttons = [
 require __DIR__ . '/../layouts/header.php'; 
 ?>
 
-<!--begin::Container-->
-<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
-<div class="content flex-row-fluid" id="kt_content">
-<?php require_once __DIR__ . '/../layouts/project-header.php'; ?>   
-
-
-
 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
     <div class="content flex-row-fluid" id="kt_content">
         <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>
-
+  <!--begin::Analytics navigation-->
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav mx-auto flex-shrink-0 flex-center flex-wrap border-transparent fs-6 fw-bold">
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase active" href="/index.php?controller=Analysis&action=index&id=<?php echo $project['id']; ?>">📊 Overview</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=tasks&id=<?php echo $project['id']; ?>">📋 Task Success</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=questionnaires&id=<?php echo $project['id']; ?>">📑 Questionnaires</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=sus&id=<?php echo $project['id']; ?>">🧠 SUS</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=participants&id=<?php echo $project['id']; ?>">👥 Participants</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--end::Analytics navigation-->
+      
         <!-- Project Analysis -->
         <h3 class="fw-bold my-4">Overview of: <?php echo htmlspecialchars($project['title']); ?></h3>
 
@@ -106,16 +122,7 @@ require __DIR__ . '/../layouts/header.php';
         <p><strong>Task Success Rate:</strong> <?php echo $taskSuccessRate; ?>%</p>
 
 
-        <!-- Links to Analysis Sections -->
-        <div class="mt-6">
-            <h4>Detailed Analysis</h4>
-            <ul class="nav flex-column fs-4">
-                <li><a href="/index.php?controller=Analysis&action=tasks&id=<?php echo $project['id']; ?>">📋 Task Success Analysis</a></li>
-                <li><a href="/index.php?controller=Analysis&action=questionnaires&id=<?php echo $project['id']; ?>">📊 Questionnaire Responses</a></li>
-                <li><a href="/index.php?controller=Analysis&action=sus&id=<?php echo $project['id']; ?>">🧠 SUS Scores</a></li>
-                <li><a href="/index.php?controller=Analysis&action=participants&id=<?php echo $project['id']; ?>">👥 Participants</a></li>
-            </ul>
-        </div>
+        
 
     </div>
 </div>

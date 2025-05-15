@@ -1,6 +1,7 @@
 <?php 
 $projectBase = $project;
 $menuActive = 'analysis';
+$activeTab = 'questionnaires';
 $title = 'Questionnaire Analysis';
 $pageTitle = 'Questionnaire Analysis';
 $pageDescription = 'Review participant answers to questionnaire items.';
@@ -18,9 +19,42 @@ require __DIR__ . '/../layouts/header.php';
     <div class="content flex-row-fluid" id="kt_content">
         <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>
 
-        <h3 class="fw-bold my-4">Questionnaire Analysis for <?php echo htmlspecialchars($project['title']); ?></h3>
 
-        <?php if (!empty($questionStats)): ?>
+
+        <!--begin::Analytics navigation-->
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav mx-auto flex-shrink-0 flex-center flex-wrap border-transparent fs-6 fw-bold">
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase <?php echo ($activeTab === 'overview') ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=index&id=<?php echo $project['id']; ?>">📊 Overview</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase <?php echo ($activeTab === 'tasks') ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=tasks&id=<?php echo $project['id']; ?>">📋 Task Success</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase <?php echo ($activeTab === 'questionnaires') ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=questionnaires&id=<?php echo $project['id']; ?>">📑 Questionnaires</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase <?php echo ($activeTab === 'sus') ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=sus&id=<?php echo $project['id']; ?>">🧠 SUS</a>
+                    </li>
+                    <li class="nav-item my-3">
+                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase <?php echo ($activeTab === 'participants') ? 'active' : ''; ?>" href="/index.php?controller=Analysis&action=participants&id=<?php echo $project['id']; ?>">👥 Participants</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--end::Analytics navigation-->
+
+     <div class="card my-5">
+            <div class="card-header">
+                <h3 class="card-title">Questionnaire Analysis</h3>
+            </div>
+        </div>
+
+
+        <?php 
+        
+        if (!empty($questionStats)): ?>
             <?php foreach ($questionStats as $q): ?>
                 <div class="card mb-4">
                     <div class="card-header">
@@ -30,7 +64,8 @@ require __DIR__ . '/../layouts/header.php';
                         <?php endif; ?>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($q['counts'])): ?>
+                        <?php 
+                        if (!empty($q['counts'])): ?>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>

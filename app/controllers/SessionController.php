@@ -409,13 +409,14 @@ class SessionController extends BaseController
             $hasError = isset($errors[$taskId]) && $errors[$taskId] === '1' ? 1 : null;
             $stmt = $this->pdo->prepare(
                 "
-            INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors, type)
-            VALUES (?, ?, ?, ?, ?, 'task')
+            INSERT INTO responses (evaluation_id, task_id, question, answer, time_spent, evaluation_errors, type)
+            VALUES (?, ?, ?, ?, ?, ?, 'task')
         "
             );
             $stmt->execute(
                 [
                 $evaluationId,
+                $taskId,
                 $task['task_text'],
                 trim($notes[$taskId] ?? ''),
                 (int)$seconds,
@@ -783,11 +784,12 @@ $breadcrumbs = [
         }
 
         $stmt = $this->pdo->prepare(
-            "INSERT INTO responses (evaluation_id, question, answer, time_spent, evaluation_errors, type)
-             VALUES (?, ?, ?, ?, NULL, ?)"
+            "INSERT INTO responses (evaluation_id, question_id, question, answer, time_spent, evaluation_errors, type)
+             VALUES (?, ?, ?, ?, ?, NULL, ?)"
         );
         $stmt->execute([
             $evaluationId,
+            $questionId,  
             $questionText,
             $answer,
             0,

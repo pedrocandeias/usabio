@@ -22,11 +22,21 @@ require __DIR__ . '/../layouts/header.php';
     <div class="content flex-row-fluid" id="kt_content">
         <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>
        
-        <div class="d-flex flex-wrap flex-stack">
-            <!--begin::Heading-->
-            <h3 class="fw-bold mx-4"><?php echo __('tasks_questions_for'); ?> <?php echo $test['title'];?></h3>
-            <!--end::Heading-->
-        </div>
+        <!--begin::Toolbar-->
+            <div class="d-flex flex-wrap flex-stack pt-10 pb-8">
+                <!--begin::Heading-->
+                            <h3 class="fw-bold mx-4"><?php echo __('tasks_questions_for'); ?> <?php echo $test['title'];?></h3>
+                <!--end::Heading-->
+                <!--begin::Controls-->
+                <div class="d-flex flex-wrap my-1">
+                <a href="/index.php?controller=Test&action=index&project_id=<?php echo $project_id; ?>" class="btn btn-light bg-white me-3">
+                    <i class="ki-duotone ki-black-left fs-2 me-2"></i>
+                    <?php echo __('back_to_tests'); ?>
+                </a>
+                </div>
+                <!--end::Controls-->
+            </div>
+            <!--end::Toolbar-->
        
         <div class=" flex-wrap flex-stack pt-10 pb-8 px-2">
             <div class="card ">

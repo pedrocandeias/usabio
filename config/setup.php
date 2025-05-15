@@ -234,6 +234,8 @@ WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'test_email') LIMIT
             answer TEXT NOT NULL,
             time_spent INT NOT NULL,
             evaluation_errors TEXT NULL,
+            question_id INT DEFAULT NULL,
+            task_id INT DEFAULT NULL,
             type ENUM('task', 'questionnaire') NOT NULL,
             FOREIGN KEY (evaluation_id) REFERENCES evaluations(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "responses",

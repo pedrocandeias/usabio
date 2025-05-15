@@ -195,7 +195,7 @@ public function index()
 
     // -------------------------------
     // Questionnaire-level Analysis
-    public function questionnaires()
+public function questionnaires()
 {
     $project_id = $_GET['id'] ?? 0;
     $this->checkProjectAccess($project_id);
@@ -205,7 +205,12 @@ public function index()
     $stmt = $this->pdo->prepare("SELECT id FROM tests WHERE project_id = ?");
     $stmt->execute([$project_id]);
     $testIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
-    $testIdList = $testIds ? implode(',', $testIds) : '0';
+
+    if (empty($testIds)) {
+        $testIds = [0]; // prevent empty IN clause
+    }
+
+    $placeholders = implode(',', array_fill(0, count($testIds), '?'));
 
     // Get all questionnaire questions for this project
     $stmt = $this->pdo->prepare("
@@ -235,40 +240,48 @@ public function index()
             }
         }
 
-        // Get answers for this question
-        $stmt = $this->pdo->prepare("
+        // ✅ Safe parameterized IN for test IDs + question_id
+        $sql = "
             SELECT r.answer
             FROM responses r
             JOIN evaluations e ON e.id = r.evaluation_id
-            WHERE r.type = 'question'
-              AND e.test_id IN ($testIdList)
-              AND r.question = ?
-        ");
-        $stmt->execute([$text]);
+            WHERE r.type IN ('question', 'questionnaire')
+              AND e.test_id IN ($placeholders)
+              AND r.question_id = ?
+        ";
+        $params = array_merge($testIds, [$questionId]);
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         $answers = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'answer');
 
         $counts = [];
         foreach ($answers as $ans) {
             if (is_string($ans) && strpos($ans, ',') !== false && $type === 'checkbox') {
-                // multi-select answers (checkbox)
                 foreach (explode(',', $ans) as $subAns) {
                     $subAns = trim($subAns);
-                    $counts[$subAns] = ($counts[$subAns] ?? 0) + 1;
+                    if ($subAns !== '') {
+                        $counts[$subAns] = ($counts[$subAns] ?? 0) + 1;
+                    }
                 }
             } else {
                 $ans = trim($ans);
-                $counts[$ans] = ($counts[$ans] ?? 0) + 1;
+                if ($ans !== '') {
+                    $counts[$ans] = ($counts[$ans] ?? 0) + 1;
+                }
             }
         }
 
-        // Calculate variance (to detect inconsistency)
-        $total = array_sum($counts) ?: 1;
-        $mean = $total / count($counts ?: [1]);
+        // Calculate variance
+        $responseCount = array_sum($counts);
+        $uniqueOptions = count($counts);
+        $mean = $uniqueOptions > 0 ? ($responseCount / $uniqueOptions) : 0;
         $variance = 0;
-        foreach ($counts as $val) {
-            $variance += pow($val - $mean, 2);
+        if ($uniqueOptions > 0) {
+            foreach ($counts as $val) {
+                $variance += pow($val - $mean, 2);
+            }
+            $variance = round($variance / $uniqueOptions, 2);
         }
-        $variance = count($counts) ? round($variance / count($counts), 2) : 0;
 
         $questionStats[] = [
             'text' => $text,
@@ -276,7 +289,7 @@ public function index()
             'options' => $options,
             'counts' => $counts,
             'variance' => $variance,
-            'inconsistent' => $variance >= 5   // You can tune this threshold
+            'inconsistent' => $variance >= 5
         ];
     }
 
@@ -291,39 +304,335 @@ public function index()
 }
 
 
-    // -------------------------------
-    // SUS scores Analysis
-    public function sus()
-    {
-        $project_id = $_GET['id'] ?? 0;
-        $this->checkProjectAccess($project_id);
-        $project = $this->getProject($project_id);
 
-        $activeTab = 'sus';
-        $breadcrumbs = [
-            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
-            ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id='.$project_id, 'active' => false],
-            ['label' => 'SUS Analysis', 'url' => '', 'active' => true],
-        ];
 
-        include __DIR__ . '/../views/analysis/sus.php';
+public function sus()
+{
+    $debug = true;   // ✅ Set to false to disable debug output
+
+    $project_id = $_GET['id'] ?? 0;
+    $this->checkProjectAccess($project_id);
+    $project = $this->getProject($project_id);
+
+    // Get test IDs
+    $stmt = $this->pdo->prepare("SELECT id FROM tests WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $testIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
+    $testIdList = $testIds ? implode(',', $testIds) : '0';
+
+    if ($debug) {
+        echo "<pre>DEBUG: project_id = $project_id\n";
+        echo "Test IDs: " . implode(',', $testIds) . "\n";
     }
+
+    // Find questionnaire groups with exactly 10 SUS questions
+    $stmt = $this->pdo->prepare("
+        SELECT qg.id AS group_id
+        FROM questionnaire_groups qg
+        JOIN tests t ON t.id = qg.test_id
+        WHERE t.project_id = ?
+    ");
+    $stmt->execute([$project_id]);
+    $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $susScores = [];
+    $susBreakdown = [];
+    $susChartLabels = [];
+    $susChartScores = [];
+
+    if ($debug) {
+        echo "Found questionnaire groups: ";
+        echo implode(',', array_column($groups, 'group_id')) . "\n";
+    }
+
+    foreach ($groups as $group) {
+        $groupId = $group['group_id'];
+
+        $stmt = $this->pdo->prepare("
+            SELECT id, text 
+            FROM questions
+            WHERE questionnaire_group_id = ? AND preset_type = 'SUS'
+            ORDER BY position ASC
+        ");
+        $stmt->execute([$groupId]);
+        $susQuestions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($susQuestions) !== 10) {
+            continue;
+        }
+
+        if ($debug) {
+            echo "Group $groupId has 10 SUS questions. Proceeding...\n";
+        }
+
+        // Get all responses
+        $stmt = $this->pdo->prepare("
+            SELECT e.id AS evaluation_id, e.participant_name, r.question, r.answer
+            FROM evaluations e
+            JOIN responses r ON r.evaluation_id = e.id
+            WHERE e.test_id IN ($testIdList)
+        ");
+        $stmt->execute();
+        $allResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Group by evaluation
+        $byEval = [];
+        foreach ($allResponses as $resp) {
+            $byEval[$resp['evaluation_id']]['participant'] = $resp['participant_name'] ?: 'Anonymous';
+            $byEval[$resp['evaluation_id']]['answers'][$resp['question']] = (int) $resp['answer'];
+        }
+
+        foreach ($byEval as $evalId => $entry) {
+            $participant = $entry['participant'];
+            $answers = $entry['answers'];
+
+            $score = 0;
+            $valid = true;
+            $individualAnswers = [];
+
+            foreach ($susQuestions as $i => $q) {
+                $qText = $q['text'];
+                $answer = $answers[$qText] ?? null;
+
+                if ($answer === null || $answer < 1 || $answer > 5) {
+                    $valid = false;
+                    break;
+                }
+
+                $individualAnswers[] = $answer;
+                $score += ($i % 2 === 0) ? ($answer - 1) : (5 - $answer);
+            }
+
+            if ($valid) {
+                $sus = $score * 2.5;
+                $susScores[] = ['participant' => $participant, 'score' => $sus];
+                $susBreakdown[] = [
+                    'participant' => $participant,
+                    'answers' => $individualAnswers,
+                    'score' => $sus,
+                    'label' => $sus >= 85 ? 'Excellent' : ($sus >= 70 ? 'Good' : ($sus >= 50 ? 'OK' : 'Poor'))
+                ];
+                $susChartLabels[] = $participant;
+                $susChartScores[] = $sus;
+            }
+        }
+    }
+
+    $susSummary = null;
+    if (!empty($susBreakdown)) {
+        $scores = array_column($susBreakdown, 'score');
+        $avg = round(array_sum($scores) / count($scores), 1);
+        $min = min($scores);
+        $max = max($scores);
+        $variation = ($max - $min) >= 30 ? 'high' : (($max - $min) >= 15 ? 'moderate' : 'low');
+        $label = $avg >= 85 ? 'Excellent' : ($avg >= 70 ? 'Good' : ($avg >= 50 ? 'OK' : 'Poor'));
+        $lowScores = count(array_filter($scores, fn($s) => $s < 50));
+        $susSummary = [
+            'average' => $avg,
+            'label' => $label,
+            'low' => $lowScores,
+            'variation' => $variation
+        ];
+    }
+
+    if ($debug) {
+        echo "Total valid SUS evaluations: " . count($susBreakdown) . "\n";
+        echo "</pre>";
+    }
+
+    $activeTab = 'sus';
+    $breadcrumbs = [
+        ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+        ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id=' . $project_id, 'active' => false],
+        ['label' => 'SUS Analysis', 'url' => '', 'active' => true],
+    ];
+
+    include __DIR__ . '/../views/analysis/sus.php';
+}
+
 
     // -------------------------------
     // Participant Analysis
-    public function participants()
-    {
-        $project_id = $_GET['id'] ?? 0;
-        $this->checkProjectAccess($project_id);
-        $project = $this->getProject($project_id);
+public function participants()
+{
+    $project_id = $_GET['id'] ?? 0;
+    $this->checkProjectAccess($project_id);
+    $project = $this->getProject($project_id);
 
-        $activeTab = 'participants';
-        $breadcrumbs = [
-            ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
-            ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id='.$project_id, 'active' => false],
-            ['label' => 'Participants', 'url' => '', 'active' => true],
+    // Get all test IDs
+    $stmt = $this->pdo->prepare("SELECT id FROM tests WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $testIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
+    $testIdList = $testIds ? implode(',', $testIds) : '0';
+
+    // Load participants
+    $stmt = $this->pdo->prepare("SELECT * FROM participants WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get custom fields
+    $stmt = $this->pdo->prepare("SELECT id, label FROM participants_custom_fields WHERE project_id = ? ORDER BY position ASC");
+    $stmt->execute([$project_id]);
+    $customFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Map custom field values
+    $participantIds = array_column($participants, 'id');
+    $customData = [];
+    if (!empty($participantIds)) {
+        $placeholders = implode(',', array_fill(0, count($participantIds), '?'));
+        $stmt = $this->pdo->prepare("SELECT participant_id, field_id, value FROM participant_custom_data WHERE participant_id IN ($placeholders)");
+        $stmt->execute($participantIds);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $customData[$row['participant_id']][$row['field_id']] = $row['value'];
+        }
+    }
+
+    // Get all SUS question texts (preset_type = 'SUS')
+    $stmt = $this->pdo->prepare("
+        SELECT text
+        FROM questions
+        WHERE questionnaire_group_id IN (
+            SELECT id FROM questionnaire_groups WHERE test_id IN ($testIdList)
+        ) AND preset_type = 'SUS'
+    ");
+    $stmt->execute();
+    $susQuestions = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'text');
+
+    $results = [];
+    foreach ($participants as $p) {
+        $participantId = $p['id'];
+
+        // Get evaluations for this participant (tasks + questionnaire)
+        $stmt = $this->pdo->prepare("
+            SELECT id, did_tasks, did_questionnaire
+            FROM evaluations
+            WHERE test_id IN ($testIdList) AND participant_name = ?
+        ");
+        $stmt->execute([$p['participant_name']]);
+        $evaluations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Calculate task success
+        $totalTasks = 0;
+        $successTasks = 0;
+        foreach ($evaluations as $eval) {
+            $stmt = $this->pdo->prepare("
+                SELECT evaluation_errors
+                FROM responses
+                WHERE evaluation_id = ? AND type = 'task'
+            ");
+            $stmt->execute([$eval['id']]);
+            $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $totalTasks += count($tasks);
+            foreach ($tasks as $task) {
+                if (empty($task['evaluation_errors'])) {
+                    $successTasks++;
+                }
+            }
+        }
+        $taskSuccessRate = $totalTasks > 0 ? round(($successTasks / $totalTasks) * 100, 1) : 0;
+
+        // SUS score
+        $susScore = null;
+        if (!empty($susQuestions)) {
+            $stmt = $this->pdo->prepare("
+                SELECT r.answer, r.question
+                FROM responses r
+                JOIN evaluations e ON e.id = r.evaluation_id
+                WHERE e.test_id IN ($testIdList) 
+                AND e.participant_name = ?
+                AND r.type IN ('question', 'questionnaire')
+                AND r.question IN (" . implode(',', array_fill(0, count($susQuestions), '?')) . ")
+                AND r.answer BETWEEN 1 AND 5
+            ");
+            $params = array_merge([$p['participant_name']], $susQuestions);
+            $stmt->execute($params);
+            $responses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $answers = array_column($responses, 'answer');
+            if (count($answers) === 10) {
+                $score = 0;
+                foreach ($answers as $i => $answer) {
+                    $score += ($i % 2 === 0) ? ($answer - 1) : (5 - $answer);
+                }
+                $susScore = round($score * 2.5, 1);
+            }
+        }
+
+        // Add participant
+        $participantData = [
+            'participant_name' => $p['participant_name'] ?? 'Anonymous',
+            'participant_age' => $p['participant_age'],
+            'participant_gender' => $p['participant_gender'],
+            'participant_academic_level' => $p['participant_academic_level'],
+            'tasks_completed' => $totalTasks,
+            'task_success' => $taskSuccessRate,
+            'questionnaire_completed' => !empty(array_filter(array_column($evaluations, 'did_questionnaire'))),
+            'sus_score' => $susScore,
+            'custom_fields' => []
         ];
 
-        include __DIR__ . '/../views/analysis/participants.php';
+        foreach ($customFields as $field) {
+            $participantData['custom_fields'][$field['label']] = $customData[$participantId][$field['id']] ?? null;
+        }
+
+        $results[] = $participantData;
     }
+
+    $participants = $results;
+
+    // Correlation calculation
+    $correlationData = [
+        'gender' => [],
+        'academic_level' => [],
+        'age_group' => []
+    ];
+
+    foreach ($participants as $p) {
+        // gender
+        $g = $p['participant_gender'] ?? 'Unknown';
+        $correlationData['gender'][$g][] = $p;
+        // academic level
+        $al = $p['participant_academic_level'] ?? 'Unknown';
+        $correlationData['academic_level'][$al][] = $p;
+        // age group
+        $age = intval($p['participant_age']);
+        $group = ($age < 18) ? '<18' : (($age <= 24) ? '18-24' : (($age <= 34) ? '25-34' : (($age <= 44) ? '35-44' : (($age <= 54) ? '45-54' : (($age <= 64) ? '55-64' : '65+')))));
+        $correlationData['age_group'][$group][] = $p;
+    }
+
+    // Custom field correlation
+    foreach ($participants as $p) {
+        foreach ($p['custom_fields'] as $fieldLabel => $value) {
+            if (!empty($value)) {
+                $correlationData['custom_field_' . $fieldLabel][$value][] = $p;
+            }
+        }
+    }
+
+    // Calculate averages
+    foreach ($correlationData as $groupType => &$groups) {
+        foreach ($groups as $value => $groupParticipants) {
+            $count = count($groupParticipants);
+            $taskSuccessSum = array_sum(array_column($groupParticipants, 'task_success'));
+            $susValues = array_column($groupParticipants, 'sus_score');
+            $susValid = array_filter($susValues, fn($v) => $v !== null);
+            $groups[$value] = [
+                'count' => $count,
+                'avg_task_success' => $count ? round($taskSuccessSum / $count, 1) : 0,
+                'avg_sus' => $susValid ? round(array_sum($susValid) / count($susValid), 1) : null
+            ];
+        }
+    }
+    unset($groups);
+
+    $activeTab = 'participants';
+    $breadcrumbs = [
+        ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
+        ['label' => $project['title'], 'url' => '/index.php?controller=Project&action=show&id=' . $project_id, 'active' => false],
+        ['label' => 'Participants Analysis', 'url' => '', 'active' => true],
+    ];
+
+    include __DIR__ . '/../views/analysis/participants.php';
+}
+
 }

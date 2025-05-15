@@ -313,6 +313,8 @@ return [
  'questions_in_test' => 'Questions in Test',
 
  'tests_that_this_participant_is_assigned_to' => 'Tests that this participant is assigned to',
+ 'view_participant' => 'View Participant',
+ 'back_to_tests' => 'Back to Tests',
 
 ];
 ?>
