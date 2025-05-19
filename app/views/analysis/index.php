@@ -44,41 +44,192 @@ require __DIR__ . '/../layouts/header.php';
         <!--end::Analytics navigation-->
       
         <!-- Project Analysis -->
-        <h3 class="fw-bold my-4">Overview of: <?php echo htmlspecialchars($project['title']); ?></h3>
+        <h3 class="fw-bold my-10">Overview of: <?php echo htmlspecialchars($project['title']); ?></h3>
+
 
         <div class="row g-6 mb-6">
+
+           
             <!-- Total Evaluations -->
-            <div class="col-md-4">
-                <div class="card bg-light-primary">
-                    <div class="card-body text-center">
+            <div class="col-md-3">
+                <div class="card bg-primary">
+                    <div class="card-body text-white">
                         <div class="fs-2x fw-bold"><?php echo $totalEvaluations; ?></div>
-                        <div class="fs-4 text-muted">Evaluations</div>
+                        <div class="fs-3">Evaluations</div>
                     </div>
                 </div>
             </div>
 
             <!-- Total Responses -->
-            <div class="col-md-4">
-                <div class="card bg-light-info">
-                    <div class="card-body text-center">
+            <div class="col-md-3">
+                <div class="card bg-secondary">
+                    <div class="card-body text-white">
                         <div class="fs-2x fw-bold"><?php echo $totalResponses; ?></div>
-                        <div class="fs-4 text-muted">Responses</div>
+                        <div class="fs-3">Responses</div>
                     </div>
                 </div>
             </div>
 
             <!-- Average Time -->
-            <div class="col-md-4">
-                <div class="card bg-light-success">
-                    <div class="card-body text-center">
+            <div class="col-md-3">
+                <div class="card bg-info">
+                    <div class="card-body text-white">
                         <div class="fs-2x fw-bold"><?php echo $avgTime; ?>s</div>
-                        <div class="fs-4 text-muted">Avg. Task Time</div>
+                        <div class="fs-3">Avg. Task Time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Success Rate -->
+            <div class="col-md-3">
+                <div class="card bg-success">
+                    <div class="card-body text-white">
+                        <div class="fs-2x fw-bold"><?php echo $taskSuccessRate; ?>%</div>
+                        <div class="fs-3">Task Success Rate:</div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="row g-6 mb-6">
 
-        <!-- SUS Summary -->
+         <h3 class="fw-bold my-10"><?php echo __('participant_demografics'); ?></h3>
+
+
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <!--begin::Item-->
+                        <div class="d-flex align-items-center mb-6">
+                            <!--begin::Symbol-->
+                            <div class="symbol symbol-45px w-40px me-5">
+                                <span class="symbol-label bg-lighten">
+                                    <i class="ki-duotone ki-compass fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                            </div>
+                            <!--end::Symbol-->
+                            <!--begin::Description-->
+                            <div class="d-flex align-items-center flex-wrap w-100">
+                                <!--begin::Title-->
+                                <div class="mb-1 pe-3 flex-grow-1">
+                                    <a href="#" class="fs-5 text-gray-800 text-hover-primary fw-bold">Total Participants</a>
+                                </div>
+                                <!--end::Title-->
+                                <!--begin::Label-->
+                                <div class="d-flex align-items-center">
+                                    <div class="fw-bold fs-5 text-gray-800 pe-1"><?php echo $totalParticipants; ?></div>
+                                </div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Description-->
+                        </div>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <div class="d-flex align-items-center mb-6">
+                            <!--begin::Symbol-->
+                            <div class="symbol symbol-45px w-40px me-5">
+                                <span class="symbol-label bg-lighten">
+                                    <i class="ki-duotone ki-element-11 fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                </span>
+                            </div>
+                            <!--end::Symbol-->
+                            <!--begin::Description-->
+                            <div class="d-flex align-items-center flex-wrap w-100">
+                                <!--begin::Title-->
+                                <div class="mb-1 pe-3 flex-grow-1">
+                                    <a href="#" class="fs-5 text-gray-800 text-hover-primary fw-bold">Average Age</a>
+                                </div>
+                                <!--end::Title-->
+                                <!--begin::Label-->
+                                <div class="d-flex align-items-center">
+                                    <div class="fw-bold fs-5 text-gray-800 pe-1"><?php echo $averageAge; ?></div>
+                                </div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Description-->
+                        </div>
+                        <!--end::Item-->
+    
+                        <p><strong>Gender Distribution:</strong></p>
+                        <ul>
+                            <?php foreach ($genderDistribution as $g): ?>
+                                <li><?php echo ucfirst($g['participant_gender'] ?? 'Unspecified'); ?>: <?php echo $g['count']; ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <p><strong>Education Levels:</strong></p>
+                        <ul>
+                            <?php foreach ($educationDistribution as $e): ?>
+                                <li><?php echo $e['participant_academic_level'] ?? 'Unspecified'; ?>: <?php echo $e['count']; ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+            	<!--begin::Card-->
+									<div class="card h-100">
+										<!--begin::Card body-->
+										<div class="card-body p-9">
+											<!--begin::Heading-->
+											<div class="fs-2hx fw-bold">237</div>
+											<div class="fs-4 fw-semibold text-gray-500 mb-7">Current Projects</div>
+											<!--end::Heading-->
+											<!--begin::Wrapper-->
+											<div class="d-flex flex-wrap">
+												<!--begin::Chart-->
+												<div class="d-flex flex-center h-100px w-100px me-9 mb-5">
+													<canvas id="kt_project_list_chart"></canvas>
+												</div>
+												<!--end::Chart-->
+												<!--begin::Labels-->
+												<div class="d-flex flex-column justify-content-center flex-row-fluid pe-11 mb-5">
+													<!--begin::Label-->
+													<div class="d-flex fs-6 fw-semibold align-items-center mb-3">
+														<div class="bullet bg-primary me-3"></div>
+														<div class="text-gray-500">Active</div>
+														<div class="ms-auto fw-bold text-gray-700">30</div>
+													</div>
+													<!--end::Label-->
+													<!--begin::Label-->
+													<div class="d-flex fs-6 fw-semibold align-items-center mb-3">
+														<div class="bullet bg-success me-3"></div>
+														<div class="text-gray-500">Completed</div>
+														<div class="ms-auto fw-bold text-gray-700">45</div>
+													</div>
+													<!--end::Label-->
+													<!--begin::Label-->
+													<div class="d-flex fs-6 fw-semibold align-items-center">
+														<div class="bullet bg-gray-300 me-3"></div>
+														<div class="text-gray-500">Yet to start</div>
+														<div class="ms-auto fw-bold text-gray-700">25</div>
+													</div>
+													<!--end::Label-->
+												</div>
+												<!--end::Labels-->
+											</div>
+											<!--end::Wrapper-->
+										</div>
+										<!--end::Card body-->
+									</div>
+									<!--end::Card-->
+            </div>
+
+            
+              
+        </div>
+
+
+
+<!-- SUS Summary -->
         <?php if (!empty($susSummary)) : ?>
             <div class="card mb-6">
                 <div class="card-header">
@@ -94,34 +245,6 @@ require __DIR__ . '/../layouts/header.php';
         <?php else : ?>
             <div class="alert alert-warning">No SUS results available yet.</div>
         <?php endif; ?>
-
-        <div class="col-md-6">
-            <div class="card border shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h4 class="mb-0">Participants Demographics</h4>
-                </div>
-                <div class="card-body">
-                    <p><strong>Total Participants:</strong> <?php echo $totalParticipants; ?></p>
-                    <p><strong>Average Age:</strong> <?php echo $averageAge; ?></p>
-                    <p><strong>Gender Distribution:</strong></p>
-                    <ul>
-                        <?php foreach ($genderDistribution as $g): ?>
-                            <li><?php echo ucfirst($g['participant_gender'] ?? 'Unspecified'); ?>: <?php echo $g['count']; ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <p><strong>Education Levels:</strong></p>
-                    <ul>
-                        <?php foreach ($educationDistribution as $e): ?>
-                            <li><?php echo $e['participant_academic_level'] ?? 'Unspecified'; ?>: <?php echo $e['count']; ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <p><strong>Task Success Rate:</strong> <?php echo $taskSuccessRate; ?>%</p>
-
-
         
 
     </div>
