@@ -204,14 +204,15 @@ $hasPendingInvites = $this->userHasPendingProjectInvites();
                                 
                    <?php if ($hasPendingInvites) : ?>
                         <!--begin::activity-->
-                        <div class="d-flex align-items-center ms-1 ms-lg-3">
+                        <div class="d-flex align-items-center ms-1 ms-lg-3"  data-bs-toggle="tooltip" data-theme="light" data-bs-placement="bottom" title="You have new project invites!">
                             <!--begin::Menu wrapper-->
-                            <a href="index.php?controller=Invite&action=index" class="position-relative btn btn-icon btn-active-light-primary btn-custom w-30px h-30px w-md-40px h-md-40px" data-toggle="tooltip" data-theme="light" data-placement="bottom" title="You have new project invites!">
+                            <a href="index.php?controller=Invite&action=index" class="position-relative btn btn-icon btn-active-light-primary btn-custom w-30px h-30px w-md-40px h-md-40px pulse pulse-primary">
                                 <i class="ki-duotone ki-message-text-2 fs-1">
                                     <span class="path1"></span>
                                     <span class="path2"></span>
                                     <span class="path3"></span>
                                 </i>
+                                <span class="pulse-ring border-5"></span>
                                 <span class="bullet bullet-dot bg-light h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink"></span>
                             </a>
                             <!--end::Menu wrapper-->

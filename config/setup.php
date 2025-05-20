@@ -308,7 +308,14 @@ WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'test_email') LIMIT
             FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
         ) ENGINE=InnoDB;" => "test_sessions",
 
-     
+        // === TABLE: usability_responses ===
+        "CREATE TABLE IF NOT EXISTS usability_results (
+            project_id INT PRIMARY KEY,
+            ai_summary TEXT,
+            last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_by VARCHAR(255) DEFAULT NULL
+        ) ENGINE=InnoDB;" => "usability_results",
+
 
     // === TABLE: Project Invites ===
     "CREATE TABLE IF NOT EXISTS project_invites (

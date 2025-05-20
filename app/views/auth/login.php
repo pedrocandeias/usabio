@@ -36,17 +36,17 @@ $error = $_GET['error'] ?? null;
                 <?php endif; ?>
                 <?php if ($success === 'confirm_required'): ?>
                     <div class="alert alert-success fs-4">
-                        ✅ Your account has been created. Please check your email to activate it.
+                        ✅ Your account has been created. <strong>Please check your email to activate it</strong>.
                     </div>
                 <?php endif; ?>
                 
                 <?php if ($error === 'confirm_required'): ?>
                     <div class="alert alert-warning fs-4">
-                        ⚠️ Please confirm your email address before logging in.
+                        ⚠️ <strong>Please confirm your email address before logging in.</strong>
                     </div>
                 <?php endif; ?>
-                <?php if ($error === 'Invalid credentialsl'): ?>
-                    <div class="alert alert-warning fs-4">
+                <?php if ($error === 'Invalid credentials'): ?>
+                    <div class="alert alert-danger fs-4">
                         ⚠️ Invalid credentials, please try again.        
                     </div>
                 <?php endif; ?>

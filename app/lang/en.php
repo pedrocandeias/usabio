@@ -315,6 +315,12 @@ return [
  'tests_that_this_participant_is_assigned_to' => 'Tests that this participant is assigned to',
  'view_participant' => 'View Participant',
  'back_to_tests' => 'Back to Tests',
-
+'no_task_responses_found_for_this_project' => 'No task responses found for this project.',
+'value' => 'Value',
+'system_usability_scale' => 'System Usability Scale',
+'gender_distribution' => 'Gender distribution',
+'level' => 'Level',
+'participant_demografics' => 'Participant demografics',
+'education_level' => 'Education level',
 ];
 ?>
