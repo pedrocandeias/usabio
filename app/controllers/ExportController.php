@@ -828,7 +828,7 @@ class ExportController extends BaseController
 
 public function exportProjectPdf()
 {
-         $project_id = $_GET['project_id'] ?? 0;
+    $project_id = $_GET['project_id'] ?? 0;
 
     // Access control
     if (!($_SESSION['is_admin'] ?? false) && !($_SESSION['is_superadmin'] ?? false)) {
@@ -840,11 +840,11 @@ public function exportProjectPdf()
         }
     }
 
-    // === Gather analysis data (you can refactor this to a helper or just reuse your AnalysisController logic) ===
+    // --- Project info
     require_once __DIR__ . '/../controllers/AnalysisController.php';
     $analysis = new AnalysisController($this->pdo);
 
-    // Project info
+    // Ensure these are public!
     $project = $analysis->getProject($project_id);
 
     // AI summary (latest if available)
@@ -852,34 +852,27 @@ public function exportProjectPdf()
     $stmt->execute([$project_id]);
     $aiSummary = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    // --- Task analytics ---
-    ob_start();
-    $analysis->tasks(); // This will set up $taskStats, $chartData etc.
-    ob_end_clean();
-    $taskStats = isset($GLOBALS['taskStats']) ? $GLOBALS['taskStats'] : [];
+    // --- Task stats
+    $analysis = new AnalysisController($this->pdo);
+    $taskStats = $analysis->getTaskStats($project_id);
 
-    // --- Problematic tasks ---
-    $problematicTasks = isset($GLOBALS['problematicTasks']) ? $GLOBALS['problematicTasks'] : [];
+    // --- Problematic tasks
+    $analysis = new AnalysisController($this->pdo);
+    $problematicTasks = $analysis->getProblematicTasks($project_id);
 
-    // --- Questionnaire analytics ---
-    ob_start();
-    $analysis->questionnaires();
-    ob_end_clean();
-    $questionStats = isset($GLOBALS['questionStats']) ? $GLOBALS['questionStats'] : [];
+    // --- Questionnaire stats
+    $questionStats = $analysis->getQuestionStats($project_id);
 
-    // --- SUS breakdown ---
-    ob_start();
-    $analysis->sus();
-    ob_end_clean();
-    $susBreakdown = isset($GLOBALS['susBreakdown']) ? $GLOBALS['susBreakdown'] : [];
+    // --- SUS breakdown
+    $susBreakdown = $analysis->getSUSBreakdown($project_id);
 
-    // --- Participant analytics ---
-    ob_start();
-    $analysis->participants();
-    ob_end_clean();
-    $participants = isset($GLOBALS['participants']) ? $GLOBALS['participants'] : [];
-    $customFields = isset($GLOBALS['customFields']) ? $GLOBALS['customFields'] : [];
-    $correlationData = isset($GLOBALS['correlationData']) ? $GLOBALS['correlationData'] : [];
+    // --- Participants, custom fields, demographic correlation
+   
+    $participants = $analysis->getParticipantAnalysis($project_id);
+
+    $participantResults = $analysis->getParticipantAnalysis($project_id);
+    $customFields = $participantResults['customFields'];
+    $correlationData = $participantResults['correlationData'];
 
     // ===== Render HTML view for PDF =====
     ob_start();
@@ -891,8 +884,99 @@ public function exportProjectPdf()
     $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4']);
     $mpdf->WriteHTML($html);
     $filename = 'usabio_project_' . $project_id . '_report_' . date('Ymd_His') . '.pdf';
-    $mpdf->Output($filename, 'D'); // 'D' = Download, 'I' = inline
+    $mpdf->Output($filename, 'D');
     exit;
+}
+
+public function getSUSBreakdown($project_id)
+{
+    // Get test IDs
+    $stmt = $this->pdo->prepare("SELECT id FROM tests WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    $testIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
+    $testIdList = $testIds ? implode(',', $testIds) : '0';
+
+    // Find questionnaire groups with exactly 10 SUS questions
+    $stmt = $this->pdo->prepare("
+        SELECT qg.id AS group_id
+        FROM questionnaire_groups qg
+        JOIN tests t ON t.id = qg.test_id
+        WHERE t.project_id = ?
+    ");
+    $stmt->execute([$project_id]);
+    $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $susBreakdown = [];
+
+    foreach ($groups as $group) {
+        $groupId = $group['group_id'];
+
+        // Get 10 SUS questions for this group
+        $stmt = $this->pdo->prepare("
+            SELECT id, text 
+            FROM questions
+            WHERE questionnaire_group_id = ? AND preset_type = 'SUS'
+            ORDER BY position ASC
+        ");
+        $stmt->execute([$groupId]);
+        $susQuestions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($susQuestions) !== 10) continue;
+
+        // Get all responses to these questions
+        $stmt = $this->pdo->prepare("
+            SELECT e.id AS evaluation_id, e.participant_name, r.question, r.answer
+            FROM evaluations e
+            JOIN responses r ON r.evaluation_id = e.id
+            WHERE e.test_id IN ($testIdList)
+        ");
+        $stmt->execute();
+        $allResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Group by evaluation
+        $byEval = [];
+        foreach ($allResponses as $resp) {
+            $byEval[$resp['evaluation_id']]['participant'] = $resp['participant_name'] ?: 'Anonymous';
+            $byEval[$resp['evaluation_id']]['answers'][$resp['question']] = (int) $resp['answer'];
+        }
+
+        foreach ($byEval as $evalId => $entry) {
+            $participant = $entry['participant'];
+            $answers = $entry['answers'];
+
+            $score = 0;
+            $valid = true;
+            $individualAnswers = [];
+
+            foreach ($susQuestions as $i => $q) {
+                $qText = $q['text'];
+                $answer = $answers[$qText] ?? null;
+
+                if ($answer === null || $answer < 1 || $answer > 5) {
+                    $valid = false;
+                    break;
+                }
+
+                $individualAnswers[] = $answer;
+                $score += ($i % 2 === 0) ? ($answer - 1) : (5 - $answer);
+            }
+
+            if ($valid) {
+                $susScore = $score * 2.5;
+                $label = $susScore >= 85 ? 'Excellent' : ($susScore >= 70 ? 'Good' : ($susScore >= 50 ? 'OK' : 'Poor'));
+
+                $susBreakdown[] = [
+                    'participant' => $participant,
+                    'answers' => $individualAnswers,
+                    'score' => $susScore,
+                    'label' => $label
+                ];
+            }
+        }
     }
+
+    return $susBreakdown;
+}
+
 
 }
