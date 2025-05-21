@@ -19,29 +19,8 @@ require __DIR__ . '/../layouts/header.php';
 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
     <div class="content flex-row-fluid" id="kt_content">
         <?php require_once __DIR__ . '/../layouts/project-header.php'; ?>
-        <!--begin::Analytics navigation-->
-        <div class="card">
-            <div class="card-body">
-                <ul class="nav mx-auto flex-shrink-0 flex-center flex-wrap border-transparent fs-6 fw-bold">
-                    <li class="nav-item my-3">
-                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase active" href="/index.php?controller=Analysis&action=index&id=<?php echo $project['id']; ?>">📊 Overview</a>
-                    </li>
-                    <li class="nav-item my-3">
-                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=tasks&id=<?php echo $project['id']; ?>">📋 Task Success</a>
-                    </li>
-                    <li class="nav-item my-3">
-                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=questionnaires&id=<?php echo $project['id']; ?>">📑 Questionnaires</a>
-                    </li>
-                    <li class="nav-item my-3">
-                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=sus&id=<?php echo $project['id']; ?>">🧠 SUS</a>
-                    </li>
-                    <li class="nav-item my-3">
-                        <a class="btn btn-active-light-primary fw-bolder nav-link btn-color-gray-700 px-3 px-lg-8 mx-1 text-uppercase" href="/index.php?controller=Analysis&action=participants&id=<?php echo $project['id']; ?>">👥 Participants</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <!--end::Analytics navigation-->
+     <?php require_once __DIR__  . '/../layouts/analysis-nav.php'; ?>
+       
 
         <!-- Project Analysis -->
         <h3 class="fw-bold my-10">Overview of: <?php echo htmlspecialchars($project['title']); ?></h3>
@@ -353,7 +332,7 @@ require __DIR__ . '/../layouts/header.php';
                 <div class="col-md-4">
                     <div class="card mb-5 mb-xl-8">
                         <!--begin::Header-->
-                        <div class="card-header border-0 pt-5">
+                        <div class="card-header pt-5">
                             <h3 class="card-title align-items-start flex-column">
                                 <span class="card-label fw-bold fs-3 mb-1"><?php echo __('system_usability_scale'); ?></span>
                             </h3>
@@ -503,6 +482,31 @@ require __DIR__ . '/../layouts/header.php';
                 
             <?php else : ?>
                 <div class="alert alert-warning">No SUS results available yet.</div>
+            <?php endif; ?>
+
+            <?php if (!empty($problematicTasks)): ?>
+                <div class="col-md-4">
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <h4 class="card-title">Potential Usability Issues</h4>
+                        </div>
+                        <div class="card-body">    
+                            <?php if (!empty($problematicTasks)): ?>
+                                <div class="alert alert-danger mb-5">
+                                    <strong>⚠️ Attention:</strong> The following tasks show potential usability issues:
+                                    <ul class="mb-0">
+                                        <?php foreach ($problematicTasks as $p): ?>
+                                            <li>
+                                                <strong><?php echo htmlspecialchars($p['task_text']); ?>:</strong>
+                                                <?php echo implode('; ', $p['reasons']); ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             <?php endif; ?>
         </div>
 

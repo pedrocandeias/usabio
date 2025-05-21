@@ -179,6 +179,91 @@ public function index()
     $stmt->execute([$project_id]);
     $aiSummary = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
+// Task-level stats
+$taskStats = [];
+$stmt = $this->pdo->prepare("
+    SELECT 
+        r.question AS task_text,
+        COUNT(*) AS total_responses,
+        SUM(CASE WHEN r.evaluation_errors IS NULL OR r.evaluation_errors = '' THEN 1 ELSE 0 END) AS success_count,
+        SUM(CASE WHEN r.evaluation_errors IS NOT NULL AND r.evaluation_errors != '' THEN 1 ELSE 0 END) AS fail_count,
+        AVG(r.time_spent) AS avg_time
+    FROM responses r
+    JOIN evaluations e ON e.id = r.evaluation_id
+    WHERE r.type = 'task' AND e.test_id IN ($testIdList)
+    GROUP BY r.question
+");
+$stmt->execute();
+$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calcula median, stddev e rates
+foreach ($tasks as &$task) {
+    $stmt = $this->pdo->prepare("
+        SELECT r.time_spent
+        FROM responses r
+        JOIN evaluations e ON e.id = r.evaluation_id
+        WHERE r.type = 'task' 
+            AND e.test_id IN ($testIdList) 
+            AND r.question = ?
+            AND r.time_spent > 0
+        ORDER BY r.time_spent
+    ");
+    $stmt->execute([$task['task_text']]);
+    $times = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'time_spent');
+
+    $count = count($times);
+    $task['median_time'] = $count ? ($count % 2 ?
+        $times[intval($count / 2)] : ($times[$count / 2 - 1] + $times[$count / 2]) / 2) : 0;
+
+    $mean = $task['avg_time'] ?? 0;
+    $variance = 0;
+    foreach ($times as $t) {
+        $variance += pow($t - $mean, 2);
+    }
+    $task['stddev_time'] = $count ? round(sqrt($variance / $count), 2) : 0;
+
+    $responses = $task['total_responses'] ?? 0;
+    $task['success_rate'] = $responses ? round(($task['success_count'] / $responses) * 100, 1) : 0;
+    $task['fail_rate'] = $responses ? round(($task['fail_count'] / $responses) * 100, 1) : 0;
+}
+unset($task);
+$taskStats = $tasks;
+
+$problematicTasks = [];
+$failRateThreshold = 30;   // percentagem de falha considerada alta
+$stddevThreshold   = 20;   // desvio padrão elevado (ajusta conforme desejado)
+$lowSuccessThresh  = 60;   // percentagem de sucesso considerada baixa
+
+foreach ($taskStats as $task) {
+    $isProblem = false;
+    $reasons = [];
+
+    if ($task['fail_rate'] > $failRateThreshold) {
+        $isProblem = true;
+        $reasons[] = "High fail rate ({$task['fail_rate']}%)";
+    }
+    if ($task['success_rate'] < $lowSuccessThresh) {
+        $isProblem = true;
+        $reasons[] = "Low success rate ({$task['success_rate']}%)";
+    }
+    if ($task['stddev_time'] > $stddevThreshold) {
+        $isProblem = true;
+        $reasons[] = "High time variability (Std Dev {$task['stddev_time']})";
+    }
+    if ($isProblem) {
+        $problematicTasks[] = [
+            'task_text' => $task['task_text'],
+            'fail_rate' => $task['fail_rate'],
+            'success_rate' => $task['success_rate'],
+            'stddev_time' => $task['stddev_time'],
+            'reasons' => $reasons
+        ];
+    }
+}
+
+
+
     // Breadcrumbs
     $breadcrumbs = [
         ['label' => 'Projects', 'url' => '/index.php?controller=Project&action=index', 'active' => false],
@@ -303,12 +388,12 @@ public function index()
 
         // Get all questionnaire questions for this project
         $stmt = $this->pdo->prepare("
-        SELECT q.id, q.text, q.question_type, q.question_options
+        SELECT q.id, q.text, q.question_type, q.question_options, q.preset_type
         FROM questions q
         JOIN questionnaire_groups qg ON qg.id = q.questionnaire_group_id
         JOIN tests t ON t.id = qg.test_id
         WHERE t.project_id = ?
-          AND q.question_type IN ('radio', 'checkbox', 'dropdown')
+        AND q.question_type IN ('radio', 'checkbox', 'dropdown')
     ");
         $stmt->execute([$project_id]);
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -376,9 +461,25 @@ foreach ($questions as $q) {
         'counts' => $counts,
         'variance' => $variance,
         'inconsistent' => $variance >= 5,
-        'is_sus' => ($q['question_type'] === 'radio' && str_contains($q['question_options'], 'preset_type:SUS'))
+        'is_sus' => ($q['preset_type'] ?? '') === 'SUS'
     ];
 }
+
+// Prepara dados para os gráficos (confirmar que tens isto)
+$chartData = [];
+
+foreach ($questionStats as $q) {
+    $chartData[] = [
+        'question' => $q['text'],
+        'labels' => array_values($q['options']),
+        'counts' => array_values(array_map(
+            fn($value) => $q['counts'][$value] ?? 0,
+            array_keys($q['options'])
+        )),
+        'is_sus' => $q['is_sus']
+    ];
+}
+
 
         $activeTab = 'questionnaires';
         $breadcrumbs = [
@@ -708,6 +809,17 @@ foreach ($questions as $q) {
             }
         }
         unset($groups);
+
+       $correlationChartData = [];
+foreach ($correlationData as $groupType => $groups) {
+    $correlationChartData[$groupType] = [
+        'labels' => array_keys($groups),
+        'task_success' => array_column($groups, 'avg_task_success'),
+        'sus_score' => array_map(function($g) { return $g['avg_sus'] ?? null; }, $groups),
+        'count' => array_column($groups, 'count'),
+    ];
+}
+
 
         $activeTab = 'participants';
         $breadcrumbs = [

@@ -322,5 +322,15 @@ return [
 'level' => 'Level',
 'participant_demografics' => 'Participant demografics',
 'education_level' => 'Education level',
+
+'variance' => 'Variance',
+'high_inconsistency' => 'High inconsistency',
+'no_sus_questionnaire_data_found' => 'No SUS questionnaire data found',
+'no_answers_recorded_for_this_question' => 'No answers recorded for this question',
+'sus_questions' => 'SUS Questions',
+'option' => 'Option',
+'responses' => 'Responses',
+'questionnaire_analysis' => 'Questionnaire Analysis',
+'other_questions' => 'Other Questions',
 ];
 ?>
